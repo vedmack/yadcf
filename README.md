@@ -1,4 +1,4 @@
-yadcf - Yet Another DataTables Column Filter
+Yet Another DataTables Column Filter - (yadcf)
 =====
 
 Usage:
