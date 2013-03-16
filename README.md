@@ -5,7 +5,11 @@ Usage:
 =====
 
 ```javascript
-
+  $('#example').dataTable().yadcf([
+      {column_number : 0},
+      {column_number : 1,data:["Yes","No"]},
+      {column_number : 2,column_data_type: "html", html_data_type: "text"}
+    ]);
 ```
 
 
