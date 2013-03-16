@@ -30,7 +30,6 @@
 * filter_reset_button_text	false			String		x											The text that will appear inside the reset button next to the select drop down
 *
 *
-*
 */
 var yadcf = (function ($) {
 
