@@ -180,9 +180,9 @@ var yadcf = (function ($) {
 
 			}
 
-			//load value from body data
-			if ($("body").data(filter_selector_string + "_val") !== undefined) {
-				$(filter_selector_string).find(".yadcf-filter").val($("body").data(filter_selector_string + "_val"));
+			//load value from document data
+			if ($(document).data(filter_selector_string + "_val") !== undefined) {
+				$(filter_selector_string).find(".yadcf-filter").val($(document).data(filter_selector_string + "_val"));
 			}
 		}
 	}
@@ -194,7 +194,7 @@ var yadcf = (function ($) {
 			return;
 		}
 
-		$("body").data(filter_selector_string + "_val", arg.value);
+		$(document).data(filter_selector_string + "_val", arg.value);
 
 		if (arg.value !== "-1") {
 			oTable.fnFilter($(arg).find('option:selected').text(), column_number);
