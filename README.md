@@ -12,6 +12,10 @@ Usage:
     ]);
 ```
 
+Example:
+=====
+
+http://jsbin.com/eyeviq/1
 
 License
 =====
