@@ -14,7 +14,7 @@ Usage:
   });
 ```
 
-All available parameters
+All available parameters (detailed explanation inside jquery.dataTables.yadcf.js)
 
 * column_number
 * data
