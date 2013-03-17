@@ -5,11 +5,13 @@ Usage:
 =====
 
 ```javascript
-  $('#example').dataTable().yadcf([
+  $(document).ready(function(){
+    $('#example').dataTable().yadcf([
       {column_number : 0},
-      {column_number : 1, data:["Yes","No"]},
-      {column_number : 2, column_data_type: "html", html_data_type: "text"}
-    ]);
+      {column_number : 1, data:["Yes","No"], filter_default_label: "Select Yes/No"},
+      {column_number : 2, text_data_delimiter: ",", filter_default_label: "Select value"},
+      {column_number : 3, column_data_type: "html", html_data_type: "text", filter_default_label: "Select tag"}]);
+  });
 ```
 
 All available parameters
@@ -17,6 +19,7 @@ All available parameters
 * column_number
 * data
 * column_data_type
+* text_data_delimiter
 * html_data_type
 * filter_container_id
 * filter_default_label
@@ -26,7 +29,7 @@ All available parameters
 Example:
 =====
 
-http://jsbin.com/eyeviq/1
+http://jsbin.com/eyeviq/2/
 
 License
 =====
