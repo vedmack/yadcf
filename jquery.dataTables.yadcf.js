@@ -55,7 +55,8 @@
 				Possible values:	text / value / id			
 				Description:		When using "html" for column_data_type argument you can 
 							choose how exactly to parse your html element/s in column , 
-							for example use "text" for the following <span class="someClass">Some text</span>
+							for example use "text" for the following 
+							<span class="someClass">Some text</span>
 
 * filter_container_id
 				Required:			false
