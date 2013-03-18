@@ -36,3 +36,16 @@ License
 
 Copyright 2013
 Dual licensed under two licenses: GPL v2 license or a BSD (3-point) license (just like DataTables itself)
+
+
+
+
+
+
+
+
+
+
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/vedmack/yadcf/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
