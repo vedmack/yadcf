@@ -30,7 +30,9 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 Example:
 =====
 
-http://jsbin.com/aperen/1/
+
+[Yadcf in action](http://jsbin.com/aperen/1/)
+
 
 License
 =====
