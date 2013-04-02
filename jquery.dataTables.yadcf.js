@@ -233,10 +233,9 @@ var yadcf = (function ($) {
 
 	function doFilter(filter_selector_string, arg, column_number) {
 		if (arg === "clear") {
-			$(filter_selector_string).find(".yadcf-filter").val("-1");
+			$(filter_selector_string).find(".yadcf-filter").val("-1").focus();
 			$(document).data(filter_selector_string + "_val", "-1");
 			oTable.fnFilter("", column_number);
-			$(filter_selector_string).find(".yadcf-filter-reset-button").focus();
 			return;
 		}
 
