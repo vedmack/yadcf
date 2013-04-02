@@ -205,7 +205,7 @@ var yadcf = (function ($) {
 					$(filter_selector_string).find(".yadcf-filter").prev().css("display", "inline-block");
 
 					$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +
-							"onclick=\"yadcf.doFilter('" + filter_selector_string + "', 'clear', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
+							"onclick=\"event.cancelBubble = true;event.stopPropagation();yadcf.doFilter('" + filter_selector_string + "', 'clear', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
 
 				} else {
 
@@ -218,7 +218,7 @@ var yadcf = (function ($) {
 							options + "</select>").appendTo("#" + filter_container_id);
 
 					$("#" + filter_container_id).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +
-							"onclick=\"yadcf.doFilter('" + "#" + filter_container_id + "', 'clear', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
+							"onclick=\"event.cancelBubble = true;event.stopPropagation();yadcf.doFilter('" + "#" + filter_container_id + "', 'clear', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
 
 				}
 
