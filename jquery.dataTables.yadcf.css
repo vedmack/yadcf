@@ -1,5 +1,5 @@
 .yadcf-filter-reset-button {
-  display: inline-block;
+	display: inline-block;
 }
 
 .yadcf-filter {
@@ -7,4 +7,8 @@
 	padding-left: 4px;
 	padding-bottom: 3px;
 	padding-top: 3px;
+}
+
+.yadcf-filter-inuse {
+	background-color: #8BBEF0;
 }
