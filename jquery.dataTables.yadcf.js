@@ -249,6 +249,7 @@ var yadcf = (function ($) {
 			oTable.fnFilter($(arg).find('option:selected').text(), column_number);
 		} else {
 			oTable.fnFilter("", column_number);
+			$(filter_selector_string).find(".yadcf-filter").removeClass("yadcf-filter-inuse");
 		}
 	}
 
