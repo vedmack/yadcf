@@ -235,13 +235,13 @@ var yadcf = (function ($) {
 	function doFilter(filter_selector_string, arg, column_number) {
 		if (arg === "clear") {
 			$(filter_selector_string).find(".yadcf-filter").val("-1").focus();
-			$(filter_selector_string).find(".yadcf-filter").removeClass("yadcf-filter-inuse");
+			$(filter_selector_string).find(".yadcf-filter").removeClass("inuse");
 			$(document).data(filter_selector_string + "_val", "-1");
 			oTable.fnFilter("", column_number);
 			return;
 		}
 
-		$(filter_selector_string).find(".yadcf-filter").addClass("yadcf-filter-inuse");
+		$(filter_selector_string).find(".yadcf-filter").addClass("inuse");
 
 		$(document).data(filter_selector_string + "_val", arg.value);
 
@@ -249,7 +249,7 @@ var yadcf = (function ($) {
 			oTable.fnFilter($(arg).find('option:selected').text(), column_number);
 		} else {
 			oTable.fnFilter("", column_number);
-			$(filter_selector_string).find(".yadcf-filter").removeClass("yadcf-filter-inuse");
+			$(filter_selector_string).find(".yadcf-filter").removeClass("inuse");
 		}
 	}
 
