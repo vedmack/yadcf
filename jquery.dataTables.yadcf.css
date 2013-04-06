@@ -9,6 +9,10 @@
 	padding-top: 3px;
 }
 
-.yadcf-filter-inuse {
+.yadcf-filter.inuse {
 	background-color: #8BBEF0;
+}
+
+.yadcf-filter > option{
+    background: white;
 }
