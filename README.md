@@ -1,6 +1,21 @@
 Yet Another DataTables Column Filter - (yadcf)
 =====
 
+Features:
+=====
+
+  - Parsing various types of columns: 
+   - plain text 
+   - plain text with delimiter
+   - one or more HTML elements with the ability to extract text / value / id from each HTML element
+  - Css support:
+   - each filter element got css style class , so its style can be easily overridden
+  - Reset button for filter:
+   - next to each filter a reset button will appear (this button allows the user to reset the filter)
+  - Filter in use visual notification:
+   - when certain filter is being used it will be highlighted (the color of highlight can easily be changed with css)
+
+
 Usage:
 =====
 
