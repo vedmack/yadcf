@@ -14,7 +14,7 @@ Features:
    - next to each filter a reset button will appear (this button allows the user to reset the filter)
   - Filter in use visual notification:
    - when certain filter is being used it will be highlighted (the color of highlight can easily be changed with css)
-  - Miscellaneous 
+  - Miscellaneous: 
    - predefined data for filter (array of strings)
    - ability to place the filter in external html element (for example some div element)
    - change filter default label (Select value, etc)
