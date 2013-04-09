@@ -8,17 +8,17 @@ Features:
    - plain text 
    - plain text with delimiter
    - one or more HTML elements with the ability to extract text / value / id from each HTML element
-  - Css support:
-   - each filter element got css style class , so its style can be easily overridden
+  - CSS support:
+   - each filter element has got a css style class , so its style can be easily overridden
   - Reset button for filter:
    - next to each filter a reset button will appear (this button allows the user to reset the filter)
   - Filter in use visual notification:
-   - when certain filter is being used it will be highlighted (the color of highlight can easily be changed with css)
+   - when a certain filter is being used it will be highlighted (the color of highlight can easily be changed with css)
   - Miscellaneous: 
-   - predefined data for filter (array of strings)
-   - ability to place the filter in external html element (for example some div element)
-   - change filter default label (Select value, etc)
-   - change filter reset button text (x, clear etc)
+   - predefined data source for filter (array of strings)
+   - ability to place the filter in an external html element (for example: inside a div element)
+   - change the filter's default label (Select value, etc)
+   - change the filter's reset button text (x, clear etc)
 
 
 Usage:
