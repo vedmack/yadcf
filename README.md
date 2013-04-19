@@ -1,6 +1,13 @@
 Yet Another DataTables Column Filter - (yadcf)
 =====
 
+Description:
+=====
+
+This jQuery plug-in allows the user to easily add filter components to table columns, the plug-in works on top of the DataTables jQuery plug-in.
+If you are using this plugin it would be nice if you drop me an email to vedmack@gmail.com with some feedback
+
+
 Features:
 =====
 
