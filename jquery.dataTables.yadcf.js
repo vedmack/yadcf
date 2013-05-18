@@ -191,8 +191,8 @@ var yadcf = (function ($) {
 				filter_selector_string = oTable.selector + " thead th:eq(" + column_number + ")";
 				$filter_selector = $(filter_selector_string).find(".yadcf-filter");
 			} else {
-				filter_selector_string = filter_container_id;
-				$filter_selector = $("#" + filter_selector_string).find(".yadcf-filter");
+				filter_selector_string = "#" + filter_container_id;
+				$filter_selector = $(filter_selector_string).find(".yadcf-filter");
 			}
 
 			if ($filter_selector.length === 1) {
