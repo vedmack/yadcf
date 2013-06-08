@@ -11,6 +11,9 @@ If you are using this plugin it would be nice if you drop me an email to vedmack
 Features:
 =====
 
+  - Various filter options: 
+   - select input
+   - autocomplete input - make use of the jQuery UI Autocomplete widget (with some enhancements)
   - Parsing various types of columns: 
    - plain text 
    - plain text with delimiter
@@ -37,7 +40,7 @@ $(document).ready(function(){
     {column_number : 0},
     {column_number : 1, filter_container_id: "external_filter_container"},
     {column_number : 2, data:["Yes","No"], filter_default_label: "Select Yes/No"},
-    {column_number : 3, text_data_delimiter: ",", filter_default_label: "Select value"},
+    {column_number : 3, text_data_delimiter: ",", enable_auto_complete: true},
     {column_number : 4, column_data_type: "html", html_data_type: "text", filter_default_label: "Select tag"}]);
 });
 ```
@@ -52,13 +55,14 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 * filter_container_id
 * filter_default_label
 * filter_reset_button_text
+* enable_auto_complete
 
 
 Example:
 =====
 
 
-[yadcf in action](http://jsbin.com/esezof/1/)
+[yadcf in action](http://jsbin.com/imagut/1/edit)
 
 
 License
