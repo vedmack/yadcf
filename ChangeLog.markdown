@@ -1,4 +1,4 @@
-# Yet Another DataTables Column Filter (Yadcf) - ChangeLog
+# Yet Another DataTables Column Filter (Yadcf) ChangeLog
 
 ## 0.2
 
