@@ -62,7 +62,7 @@ Example:
 =====
 
 
-[yadcf in action](http://jsbin.com/imagut/1/)
+[yadcf in action](http://jsbin.com/omotef/1/)
 
 
 License
