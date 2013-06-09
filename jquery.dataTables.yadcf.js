@@ -110,6 +110,7 @@ var yadcf = (function ($) {
 		if (arg === "clear") {
 			$("#yadcf-filter-" + column_number).val("").focus();
 			$("#yadcf-filter-" + column_number).removeClass("inuse");
+			$(document).removeData("#yadcf-filter-" + column_number + "_val");
 			oTable.fnFilter("", column_number);
 			return;
 		}
@@ -344,9 +345,10 @@ var yadcf = (function ($) {
 
 	function autocompleteKeyUP(event) {
 		if (event.target.value === "" && event.keyCode === 8 && $(event.target).hasClass("inuse")) {
-			var id = parseInt($(event.target).attr("id").replace("yadcf-filter-", ""), 10);
-			$("#yadcf-filter-" + id).removeClass("inuse");
-			oTable.fnFilter("", id);
+			var column_number = parseInt($(event.target).attr("id").replace("yadcf-filter-", ""), 10);
+			$("#yadcf-filter-" + column_number).removeClass("inuse");
+			$(document).removeData("#yadcf-filter-" + column_number + "_val");
+			oTable.fnFilter("", column_number);
 		}
 	}
 
