@@ -80,3 +80,5 @@ Dual licensed under two licenses: GPL v2 license or a BSD (3-point) license (jus
 
 
 [![githalytics.com alpha](https://cruel-carlota.pagodabox.com/98b24f2a1ca5deaaaa08b94dd52594ec "githalytics.com")](http://githalytics.com/vedmack/yadcf)
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/vedmack/yadcf/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
