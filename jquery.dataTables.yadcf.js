@@ -5,7 +5,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.2
+* Version:     0.3.0
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
 * Contact:     vedmack@gmail.com	
@@ -81,53 +81,70 @@ var yadcf = (function ($) {
 
 	'use strict';
 
-	var oTable,
-		options;
+	var oTables = {},
+		oTablesIndex = {},
+		options = {};
 
-	function doFilter(arg, column_number) {
-		if (arg === "clear") {
-			$("#yadcf-filter-" + column_number).val("-1").focus();
-			$("#yadcf-filter-" + column_number).removeClass("inuse");
-			$(document).data("#yadcf-filter-" + column_number + "_val", "-1");
-			oTable.fnFilter("", column_number);
-			return;
-		}
-
-		$("#yadcf-filter-" + column_number).addClass("inuse");
-
-		$(document).data("#yadcf-filter-" + column_number + "_val", arg.value);
-
-		if (arg.value !== "-1") {
-			oTable.fnFilter($(arg).find('option:selected').text(), column_number);
-		} else {
-			oTable.fnFilter("", column_number);
-			$("#yadcf-filter-" + column_number).removeClass("inuse");
-		}
+	function resetIApiIndex() {
+		$.fn.dataTableExt.iApiIndex = 0;
 	}
 
-	function doFilterAutocomplete(arg, column_number) {
+	function doFilter(arg, table_selector_jq_friendly, column_number) {
+		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
+		var oTable = oTables[table_selector_jq_friendly];
 
 		if (arg === "clear") {
-			$("#yadcf-filter-" + column_number).val("").focus();
-			$("#yadcf-filter-" + column_number).removeClass("inuse");
-			$(document).removeData("#yadcf-filter-" + column_number + "_val");
+			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("-1").focus();
+			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
+			$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", "-1");
 			oTable.fnFilter("", column_number);
+			resetIApiIndex();
 			return;
 		}
 
-		$("#yadcf-filter-" + column_number).addClass("inuse");
+		$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
 
-		$(document).data("#yadcf-filter-" + column_number + "_val", arg.value);
-		oTable.fnFilter(arg.value, column_number);
+		$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", arg.value);
+
+		if (arg.value !== "-1") {
+			oTable.fnFilter($(arg).find('option:selected').text(), column_number, false, false, true, true);
+		} else {
+			oTable.fnFilter("", column_number);
+			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
+		}
+		resetIApiIndex();
+	}
+
+	function doFilterAutocomplete(arg, table_selector_jq_friendly, column_number) {
+		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
+		var oTable = oTables[table_selector_jq_friendly];
+
+		if (arg === "clear") {
+			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
+			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
+			$(document).removeData("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val");
+			oTable.fnFilter("", column_number);
+			resetIApiIndex();
+			return;
+		}
+
+		$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
+
+		$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", arg.value);
+		oTable.fnFilter(arg.value, column_number, false, false, true, true);
+		resetIApiIndex();
 	}
 
 	function autocompleteSelect(event, ui) {
-		var col_num = parseInt(event.target.id.replace("yadcf-filter-", ""), 10),
-			filter_selector_string = $(event.target).attr("filter_selector_string");
-		doFilterAutocomplete(ui.item, col_num);
+
+		var table_column = event.target.id.replace("yadcf-filter-", ""),
+			dashIndex = table_column.lastIndexOf("-"),
+			table_selector_jq_friendly = table_column.substring(0, dashIndex),
+			col_num = parseInt(table_column.substring(dashIndex + 1), 10);
+		doFilterAutocomplete(ui.item, table_selector_jq_friendly, col_num);
 	}
 
-	function appendSelectFilter(args) {
+	function appendSelectFilter(oTable, args, table_selector) {
 
 		var i = 0,
 			$filter_selector,
@@ -153,7 +170,8 @@ var yadcf = (function ($) {
 			ii,
 			default_options = {
 				enable_auto_complete : false
-			};
+			},
+			table_selector_jq_friendly;
 
 
 		for (i; i < args.length; i++) {
@@ -268,36 +286,38 @@ var yadcf = (function ($) {
 			}
 
 			if (filter_container_id === undefined) {
-				filter_selector_string = oTable.selector + " thead th:eq(" + column_number + ")";
+				filter_selector_string = table_selector + " thead th:eq(" + column_number + ")";
 				$filter_selector = $(filter_selector_string).find(".yadcf-filter");
 			} else {
 				filter_selector_string = "#" + filter_container_id;
 				$filter_selector = $(filter_selector_string).find(".yadcf-filter");
 			}
 
+			table_selector_jq_friendly = table_selector.replace(":", "-").replace("(", "").replace(")", "").replace(".", "-").replace("#", "-");
+
 			if ($filter_selector.length === 1) {
 				if (enable_auto_complete === false) {
 					$filter_selector.empty();
 					$filter_selector.append(options);
 				} else {
-					$(document).data("yadcf-filter-" + column_number, options);
+					$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, options);
 				}
 			} else {
 
 				if (filter_container_id === undefined) {
 
 					if (enable_auto_complete === false) {
-						$(filter_selector_string).append("<select id=\"yadcf-filter-" + column_number + "\" class=\"yadcf-filter\" " +
-							"onchange=\"yadcf.doFilter(this, " + column_number + ")\" onclick='event.cancelBubble = true;event.stopPropagation();'>" + options + "</select>");
+						$(filter_selector_string).append("<select id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" " +
+							"onchange=\"yadcf.doFilter(this, '" + table_selector_jq_friendly + "', " + column_number + ")\" onclick='event.cancelBubble = true;event.stopPropagation();'>" + options + "</select>");
 						$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +
-							"onclick=\"event.cancelBubble = true;event.stopPropagation();yadcf.doFilter('clear', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
+							"onclick=\"event.cancelBubble = true;event.stopPropagation();yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
 					} else {
-						$(filter_selector_string).append("<input id=\"yadcf-filter-" + column_number + "\" class=\"yadcf-filter\" onclick='event.cancelBubble = true;event.stopPropagation();"
-							+ "' placeholder='" + filter_default_label + "'" + "' onkeyup='yadcf.autocompleteKeyUP(event);'>" + "</input>");
-						$(document).data("yadcf-filter-" + column_number, options);
+						$(filter_selector_string).append("<input id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" onclick='event.cancelBubble = true;event.stopPropagation();"
+							+ "' placeholder='" + filter_default_label + "'" + " onkeyup=\"yadcf.autocompleteKeyUP('" + table_selector_jq_friendly + "',event);\"></input>");
+						$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, options);
 
 						$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +
-							"onclick=\"event.cancelBubble = true;event.stopPropagation();yadcf.doFilterAutocomplete('clear', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
+							"onclick=\"event.cancelBubble = true;event.stopPropagation();yadcf.doFilterAutocomplete('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
 					}
 
 					$(filter_selector_string).find(".yadcf-filter").prev().css("display", "inline-block");
@@ -309,32 +329,32 @@ var yadcf = (function ($) {
 					}
 
 					if (enable_auto_complete === false) {
-						$("<select id=\"yadcf-filter-" + column_number + "\" class=\"yadcf-filter\" " +
-							"onchange=\"yadcf.doFilter(this, " + column_number + ")\" onclick='event.cancelBubble = true;event.stopPropagation();'>" +
+						$("<select id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" " +
+							"onchange=\"yadcf.doFilter(this, '" + table_selector_jq_friendly + "', " + column_number + ")\" onclick='event.cancelBubble = true;event.stopPropagation();'>" +
 							options + "</select>").appendTo("#" + filter_container_id);
 
 						$("#" + filter_container_id).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +
-							"onclick=\"event.cancelBubble = true;event.stopPropagation();yadcf.doFilter('clear', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
+							"onclick=\"event.cancelBubble = true;event.stopPropagation();yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
 
 					} else {
-						$(filter_selector_string).append("<input id=\"yadcf-filter-" + column_number + "\" class=\"yadcf-filter\" onclick='event.cancelBubble = true;event.stopPropagation();"
+						$(filter_selector_string).append("<input id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" onclick='event.cancelBubble = true;event.stopPropagation();"
 							+ "' placeholder='" + filter_default_label + "'>" + "</input>").appendTo("#" + filter_container_id);
-						$(document).data("yadcf-filter-" + column_number, options);
+						$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, options);
 
 						$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +
-							"onclick=\"event.cancelBubble = true;event.stopPropagation();yadcf.doFilterAutocomplete('clear', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
+							"onclick=\"event.cancelBubble = true;event.stopPropagation();yadcf.doFilterAutocomplete('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
 					}
 
 				}
 
 			}
 
-			if ($(document).data("#yadcf-filter-" + column_number + "_val") !== undefined && $(document).data("#yadcf-filter-" + column_number + "_val") !== "-1") {
-				$(filter_selector_string).find(".yadcf-filter").val($(document).data("#yadcf-filter-" + column_number + "_val"));
+			if ($(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val") !== undefined && $(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val") !== "-1") {
+				$(filter_selector_string).find(".yadcf-filter").val($(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val"));
 			}
 			if (enable_auto_complete === true) {
-				$("#yadcf-filter-" + column_number).autocomplete({
-				    source: $(document).data("yadcf-filter-" + column_number),
+				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).autocomplete({
+				    source: $(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number),
 					select: autocompleteSelect
 				});
 			}
@@ -343,39 +363,66 @@ var yadcf = (function ($) {
 
 
 
-	function autocompleteKeyUP(event) {
+	function autocompleteKeyUP(table_selector_jq_friendly, event) {
 		if (event.target.value === "" && event.keyCode === 8 && $(event.target).hasClass("inuse")) {
-			var column_number = parseInt($(event.target).attr("id").replace("yadcf-filter-", ""), 10);
-			$("#yadcf-filter-" + column_number).removeClass("inuse");
-			$(document).removeData("#yadcf-filter-" + column_number + "_val");
+			$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
+			var oTable = oTables[table_selector_jq_friendly],
+				column_number = parseInt($(event.target).attr("id").replace("yadcf-filter-" + table_selector_jq_friendly + "-", ""), 10);
+
+			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
+			$(document).removeData("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val");
 			oTable.fnFilter("", column_number);
+			resetIApiIndex();
 		}
 	}
 
-	function getOptions() {
-		return options;
+	function getOptions(selector) {
+		return options[selector];
 	}
 
-    $.fn.yadcf = function (options_arg) {
-        oTable = this;
-        options = options_arg;
+	function initAndBindTable(table_arg, table_selector, index) {
 
-        if (oTable.fnSettings().sAjaxSource === null) {
-			appendSelectFilter(yadcf.getOptions());
+		var table_selector_jq_friendly = table_selector.replace(":", "-").replace("(", "").replace(")", "").replace(".", "-").replace("#", "-"),
+			table_selector_tmp;
+        oTables[table_selector_jq_friendly] = table_arg;
+		oTablesIndex[table_selector_jq_friendly] = index;
+
+        if (table_arg.fnSettings().sAjaxSource === null) {
+			table_selector_tmp = table_selector;
+			if (table_selector.indexOf(":eq") !== -1) {
+				table_selector_tmp = table_selector.substring(0, table_selector.lastIndexOf(":eq"));
+			}
+			appendSelectFilter(table_arg, yadcf.getOptions(table_selector_tmp), table_selector);
         } else {
 	        if (parseFloat($().jquery) >= 1.7) {
-				$(document).on("draw", oTable, function (event) {
-					appendSelectFilter(yadcf.getOptions());
+				$(document).on("draw", table_arg, function (event, ui) {
+					appendSelectFilter(table_arg, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
 	            });
 	        } else {
-				$(document).delegate(oTable, "draw", function () {
-					appendSelectFilter(yadcf.getOptions());
+				$(document).delegate(table_arg, "draw", function (event, ui) {
+					appendSelectFilter(table_arg, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
 				});
 	        }
         }
+	}
 
-        return oTable;
+    $.fn.yadcf = function (options_arg) {
 
+		if ($(this.selector).length === 1) {
+			options[this.selector] = options_arg;
+			initAndBindTable(this, this.selector, 0);
+		} else {
+			var i = 0,
+				selector;
+			for (i; i < $(this.selector).length; i++) {
+				$.fn.dataTableExt.iApiIndex = i;
+				selector = this.selector + ":eq(" + i + ")";
+				options[this.selector] = options_arg;
+				initAndBindTable(this, selector, i);
+			}
+			$.fn.dataTableExt.iApiIndex = 0;
+		}
+        return this;
     };
 
 

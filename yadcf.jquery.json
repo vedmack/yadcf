@@ -1,0 +1,31 @@
+{
+  "name": "yadcf",
+  "title": "Yet Another DataTables Column Filter (Yadcf)",
+  "description": "This jQuery plug-in allows the user to easily add filter components to table columns, the plug-in works on top of the DataTables jQuery plug-in.",
+  "keywords": [
+    "jquery",
+    "datatables",
+	"filter",
+	"column",
+    "plugin"
+  ],
+  "version": "0.3.0",
+  "author": {
+    "name": "Daniel Reznick",
+    "url": "https://github.com/vedmack"
+  },
+  "licenses": [
+    {
+      "type": "GPL v2",
+      "url": "https://github.com/vedmack/yadcf/blob/master/LICENSE-GPL"
+    },
+	{
+      "type": "BSD (3-point)",
+      "url": "https://github.com/vedmack/yadcf/blob/master/LICENSE-BSD"
+    }
+  ],
+  "bugs": "https://github.com/vedmack/yadcf/issues",
+  "homepage": "https://github.com/vedmack/yadcf",
+  "docs": "https://github.com/vedmack/yadcf/blob/master/README.md",
+  "download": "https://github.com/vedmack/yadcf/archive/master.zip"
+}

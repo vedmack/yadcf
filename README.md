@@ -18,6 +18,7 @@ Features:
    - plain text 
    - plain text with delimiter
    - one or more HTML elements with the ability to extract text / value / id from each HTML element
+  - Multiple tables support
   - CSS support:
    - each filter element has got a css style class , so its style can be easily overridden
   - Reset button for filter:
@@ -29,6 +30,16 @@ Features:
    - ability to place the filter in an external html element (for example: inside a div element)
    - change the filter's default label (Select value, etc)
    - change the filter's reset button text (x, clear etc)
+
+
+Examples:
+=====
+
+[DOM source example](http://yadcf-showcase.appspot.com/DOM_source.html)
+
+[AJAX source example](http://yadcf-showcase.appspot.com/ajax_source.html)
+
+[Multiple tables example](http://yadcf-showcase.appspot.com/multiple_tables.html)
 
 
 Usage:
@@ -56,13 +67,6 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 * filter_default_label
 * filter_reset_button_text
 * enable_auto_complete
-
-
-Example:
-=====
-
-
-[yadcf in action](http://jsbin.com/orixab/1/)
 
 
 License
