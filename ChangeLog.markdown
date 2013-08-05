@@ -1,7 +1,7 @@
 # Yet Another DataTables Column Filter (Yadcf) ChangeLog
 
 
-## 0.3.1
+## 0.3.0
 
 * Added support for multiple tables
 
