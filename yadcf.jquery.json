@@ -27,5 +27,8 @@
   "bugs": "https://github.com/vedmack/yadcf/issues",
   "homepage": "http://yadcf-showcase.appspot.com/",
   "docs": "https://github.com/vedmack/yadcf/blob/master/README.md",
-  "download": "https://github.com/vedmack/yadcf/archive/master.zip"
+  "download": "https://github.com/vedmack/yadcf/archive/master.zip",
+  "dependencies": {
+    "jquery": ">=1.4"
+  }
 }
