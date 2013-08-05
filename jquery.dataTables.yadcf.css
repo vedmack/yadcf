@@ -20,3 +20,7 @@
 .ui-autocomplete .ui-menu-item { 
 	font-size:13px;
 }
+
+.yadcf-filter-wrapper {
+	display: inline-block;
+}

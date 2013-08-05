@@ -5,7 +5,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.3.0
+* Version:     0.3.1
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
 * Contact:     vedmack@gmail.com	
@@ -307,11 +307,29 @@ var yadcf = (function ($) {
 				if (filter_container_id === undefined) {
 
 					if (enable_auto_complete === false) {
+
+						if ($(filter_selector_string + " div.DataTables_sort_wrapper").length > 0) {
+							$(filter_selector_string + " div.DataTables_sort_wrapper").css("display", "inline-block");
+						}
+
+						//add a wrapper to hold both filter and reset button
+						$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter-wrapper\"></div>");
+						filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
+
 						$(filter_selector_string).append("<select id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" " +
 							"onchange=\"yadcf.doFilter(this, '" + table_selector_jq_friendly + "', " + column_number + ")\" onclick='event.cancelBubble = true;event.stopPropagation();'>" + options + "</select>");
 						$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +
 							"onclick=\"event.cancelBubble = true;event.stopPropagation();yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
 					} else {
+
+						if ($(filter_selector_string + " div.DataTables_sort_wrapper").length > 0) {
+							$(filter_selector_string + " div.DataTables_sort_wrapper").css("display", "inline-block");
+						}
+
+						//add a wrapper to hold both filter and reset button
+						$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter-wrapper\"></div>");
+						filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
+
 						$(filter_selector_string).append("<input id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" onclick='event.cancelBubble = true;event.stopPropagation();"
 							+ "' placeholder='" + filter_default_label + "'" + " onkeyup=\"yadcf.autocompleteKeyUP('" + table_selector_jq_friendly + "',event);\"></input>");
 						$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, options);
@@ -320,25 +338,28 @@ var yadcf = (function ($) {
 							"onclick=\"event.cancelBubble = true;event.stopPropagation();yadcf.doFilterAutocomplete('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
 					}
 
-					$(filter_selector_string).find(".yadcf-filter").prev().css("display", "inline-block");
-
 				} else {
 
 					if ($("#" + filter_container_id).length === 0) {
 						alert("Filter container could not be found.");
+						return;
 					}
 
+					$("#" + filter_container_id).append("<div id=\"yadcf-filter-wrapper-" + filter_container_id + "\" class=\"yadcf-filter-wrapper\"></div>");
+					filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
+
 					if (enable_auto_complete === false) {
+
 						$("<select id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" " +
 							"onchange=\"yadcf.doFilter(this, '" + table_selector_jq_friendly + "', " + column_number + ")\" onclick='event.cancelBubble = true;event.stopPropagation();'>" +
-							options + "</select>").appendTo("#" + filter_container_id);
+							options + "</select>").appendTo("#" + filter_container_id + " div.yadcf-filter-wrapper");
 
 						$("#" + filter_container_id).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +
 							"onclick=\"event.cancelBubble = true;event.stopPropagation();yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
 
 					} else {
 						$(filter_selector_string).append("<input id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" onclick='event.cancelBubble = true;event.stopPropagation();"
-							+ "' placeholder='" + filter_default_label + "'>" + "</input>").appendTo("#" + filter_container_id);
+							+ "' placeholder='" + filter_default_label + "'>" + "</input>").appendTo("#" + filter_container_id + " div.yadcf-filter-wrapper");
 						$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, options);
 
 						$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +
