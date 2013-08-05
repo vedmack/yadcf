@@ -3,7 +3,7 @@
 
 ## 0.3.0
 
-* Added support for multiple tables (major rewrite)
+* Added support for multiple tables
 
 
 
