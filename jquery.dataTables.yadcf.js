@@ -5,7 +5,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.3.1
+* Version:     0.3.3
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
 * Contact:     vedmack@gmail.com	
@@ -74,6 +74,20 @@
 				Type:				boolean
 				Default value:		false
 				Description:		Turns the filter into an autocomplete input - make use of the jQuery UI Autocomplete widget (with some enhancements)
+
+* sort_as
+				Required:			false
+				Type:				String
+				Default value:		alpha
+				Possible values:	alpha / num
+				Description:		Defines how the values in the filter will be sorted, alphabetically or numerically
+
+* sort_order
+				Required:			false
+				Type:				String
+				Default value:		asc
+				Possible values:	asc / desc 		
+				Description:		Defines the order in which the values in the filter will be sorted, ascending or descending
 *
 *
 */
@@ -144,6 +158,14 @@ var yadcf = (function ($) {
 		doFilterAutocomplete(ui.item, table_selector_jq_friendly, col_num);
 	}
 
+	function sortNumAsc(a, b) {
+		return a - b;
+	}
+
+	function sortNumDesc(a, b) {
+		return b - a;
+	}
+
 	function appendSelectFilter(oTable, args, table_selector) {
 
 		var i = 0,
@@ -159,8 +181,11 @@ var yadcf = (function ($) {
 			filter_default_label,
 			filter_reset_button_text,
 			enable_auto_complete,
+			sort_as,
+			sort_order,
 
 			options,
+			options_tmp,
 			j,
 			k,
 			data_length,
@@ -169,7 +194,9 @@ var yadcf = (function ($) {
 			col_filter_array = {},
 			ii,
 			default_options = {
-				enable_auto_complete : false
+				enable_auto_complete : false,
+				sort_as : "alpha",
+				sort_order : "asc"
 			},
 			table_selector_jq_friendly;
 
@@ -187,6 +214,8 @@ var yadcf = (function ($) {
 			filter_default_label = args[i].filter_default_label;
 			filter_reset_button_text = args[i].filter_reset_button_text;
 			enable_auto_complete = args[i].enable_auto_complete;
+			sort_as = args[i].sort_as;
+			sort_order = args[i].sort_order;
 
 			if (column_number === undefined) {
 				alert("You must specify column number");
@@ -213,11 +242,7 @@ var yadcf = (function ($) {
 				filter_reset_button_text = "x";
 			}
 
-			if (enable_auto_complete === false) {
-				options = "<option value=\"" + "-1" + "\">" + filter_default_label + "</option>";
-			} else {
-				options = [];
-			}
+			options = [];
 
 			if (data === undefined) {
 				data = oTable._('tr');
@@ -240,11 +265,7 @@ var yadcf = (function ($) {
 							}
 							if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
 								col_filter_array[col_inner_data] = col_inner_data;
-								if (enable_auto_complete === false) {
-									options += '<option value="' + col_inner_data + '">' + col_inner_data + '</option>';
-								} else {
-									options.push(col_inner_data);
-								}
+								options.push(col_inner_data);
 							}
 						}
 					} else if (column_data_type === "text") {
@@ -254,22 +275,14 @@ var yadcf = (function ($) {
 								col_inner_data = col_inner_elements[k];
 								if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
 									col_filter_array[col_inner_data] = col_inner_data;
-									if (enable_auto_complete === false) {
-										options += '<option value="' + col_inner_data + '">' + col_inner_data + '</option>';
-									} else {
-										options.push(col_inner_data);
-									}
+									options.push(col_inner_data);
 								}
 							}
 						} else {
 							col_inner_data = data[j][column_number];
 							if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
 								col_filter_array[col_inner_data] = col_inner_data;
-								if (enable_auto_complete === false) {
-									options += '<option value="' + col_inner_data + '">' + col_inner_data + '</option>';
-								} else {
-									options.push(col_inner_data);
-								}
+								options.push(col_inner_data);
 							}
 						}
 					}
@@ -277,11 +290,7 @@ var yadcf = (function ($) {
 
 			} else {
 				for (ii = 0; ii < data.length; ii++) {
-					if (enable_auto_complete === false) {
-						options += '<option value="' + data[ii] + '">' + data[ii] + '</option>';
-					} else {
-						options.push(data[ii]);
-					}
+					options.push(data[ii]);
 				}
 			}
 
@@ -294,6 +303,30 @@ var yadcf = (function ($) {
 			}
 
 			table_selector_jq_friendly = table_selector.replace(":", "-").replace("(", "").replace(")", "").replace(".", "-").replace("#", "-");
+
+			//apply sort to options
+			if (sort_as === "alpha") {
+				if (sort_order === "asc") {
+					options.sort();
+				} else if (sort_order === "desc") {
+					options.sort();
+					options.reverse();
+				}
+			} else if (sort_as === "num") {
+				if (sort_order === "asc") {
+					options.sort(sortNumAsc);
+				} else if (sort_order === "desc") {
+					options.sort(sortNumDesc);
+				}
+			}
+
+			if (enable_auto_complete === false) {
+				options_tmp = "<option value=\"" + "-1" + "\">" + filter_default_label + "</option>";
+				for (ii = 0; ii < options.length; ii++) {
+					options_tmp += "<option value=\"" + options[ii] + "\">" + options[ii] + "</option>";
+				}
+				options = options_tmp;
+			}
 
 			if ($filter_selector.length === 1) {
 				if (enable_auto_complete === false) {

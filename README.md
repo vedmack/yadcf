@@ -30,6 +30,8 @@ Features:
    - ability to place the filter in an external html element (for example: inside a div element)
    - change the filter's default label (Select value, etc)
    - change the filter's reset button text (x, clear etc)
+   - define how the values in the filter will be sorted
+   - define the order in which the values in the filter will be sorted
 
 
 Examples:
@@ -49,7 +51,7 @@ Usage:
 $(document).ready(function(){
   $('#example').dataTable().yadcf([
     {column_number : 0},
-    {column_number : 1, filter_container_id: "external_filter_container"},
+    {column_number : 1, filter_container_id: "external_filter_container", sort_as: "num"},
     {column_number : 2, data:["Yes","No"], filter_default_label: "Select Yes/No"},
     {column_number : 3, text_data_delimiter: ",", enable_auto_complete: true},
     {column_number : 4, column_data_type: "html", html_data_type: "text", filter_default_label: "Select tag"}]);
@@ -67,6 +69,8 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 * filter_default_label
 * filter_reset_button_text
 * enable_auto_complete
+* sort_as
+* sort_order
 
 
 License
