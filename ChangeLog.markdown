@@ -1,6 +1,12 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
 
+## 0.3.8
+
+* Added new filter type: range between two numbers with slider widget, filter_type: "range_number_slider" (https://github.com/vedmack/yadcf/issues/6)
+* Fixed IE8 issues (https://github.com/vedmack/yadcf/issues/7)
+
+
 
 ## 0.3.5
 

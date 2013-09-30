@@ -15,6 +15,7 @@ Features:
    - select input
    - autocomplete input - make use of the jQuery UI Autocomplete widget (with some enhancements)
    - range of numbers
+   - range of numbers with slider widget - make use of the jQuery UI Slider widget (with some enhancements)
   - Parsing various types of columns: 
    - plain text 
    - plain text with delimiter
@@ -33,6 +34,7 @@ Features:
    - change the filter's reset button text (x, clear etc)
    - define how the values in the filter will be sorted
    - define the order in which the values in the filter will be sorted
+   - support all major browser (including IE8)
 
 
 Examples:
@@ -52,7 +54,7 @@ Usage:
 $(document).ready(function(){
   $('#example').dataTable().yadcf([
     {column_number : 0},
-    {column_number : 1, filter_type: "range_number", filter_container_id: "external_filter_container"},
+    {column_number : 1, filter_type: "range_number_slider", filter_container_id: "external_filter_container"},
     {column_number : 2, data: ["Yes", "No"], filter_default_label: "Select Yes/No"},
     {column_number : 3, filter_type: "auto_complete", text_data_delimiter: ","},
     {column_number : 4, column_data_type: "html", html_data_type: "text", filter_default_label: "Select tag"}]);
