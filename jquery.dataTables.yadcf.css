@@ -32,6 +32,7 @@
 
 .yadcf-filter-wrapper {
 	display: inline-block;
+	white-space: nowrap;
 	margin-left: 2px;
 }
 
