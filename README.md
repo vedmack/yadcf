@@ -11,32 +11,32 @@ If you are using this plugin it would be nice if you drop me an email to vedmack
 Features:
 =====
 
-  - Various filter options: 
-   - select input
-   - autocomplete input - make use of the jQuery UI Autocomplete widget (with some enhancements)
-   - range of numbers
-   - range of numbers with slider widget - make use of the jQuery UI Slider widget (with some enhancements)
-   - range of dates - make use of the jQuery UI Datepicker widget (with some enhancements)
-  - Parsing various types of columns: 
-   - plain text 
-   - plain text with delimiter
-   - one or more HTML elements with the ability to extract text / value / id from each HTML element
-  - Multiple tables support
-  - CSS support:
-   - each filter element has got a css style class , so its style can be easily overridden
-  - Reset button for filter:
-   - next to each filter a reset button will appear (this button allows the user to reset the filter)
-  - Filter in use visual notification:
-   - when a certain filter is being used it will be highlighted (the color of highlight can easily be changed with css)
-  - Miscellaneous: 
-   - predefined data source for filter (array of strings)
-   - ability to place the filter in an external html element (for example: inside a div element)
-   - change the filter's default label (Select value, etc)
-   - change the filter's reset button text (x, clear etc)
-   - define how the values in the filter will be sorted
-   - define the order in which the values in the filter will be sorted
-   - support all major browser (including IE8)
-   - define in which date format the date will be parsed and displayed in datepicker widget
+- Various filter options: 
+ - select input
+ - autocomplete input - make use of the jQuery UI Autocomplete widget (with some enhancements)
+ - range of numbers
+ - range of numbers with slider widget - make use of the jQuery UI Slider widget (with some enhancements)
+ - range of dates - make use of the jQuery UI Datepicker widget (with some enhancements)
+- Parsing various types of columns: 
+ - plain text 
+ - plain text with delimiter
+ - one or more HTML elements with the ability to extract text / value / id from each HTML element
+- Multiple tables support
+- CSS support:
+ - each filter element has got a css style class , so its style can be easily overridden
+ - Reset button for filter:
+ - next to each filter a reset button will appear (this button allows the user to reset the filter)
+- Filter in use visual notification:
+ - when a certain filter is being used it will be highlighted (the color of highlight can easily be changed with css)
+- Miscellaneous: 
+ - predefined data source for filter (array of strings)
+ - ability to place the filter in an external html element (for example: inside a div element)
+ - change the filter's default label (Select value, etc)
+ - change the filter's reset button text (x, clear etc)
+ - define how the values in the filter will be sorted
+ - define the order in which the values in the filter will be sorted
+ - support all major browser (including IE8)
+ - define in which date format the date will be parsed and displayed in datepicker widget
 
 
 Examples:
