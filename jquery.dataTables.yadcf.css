@@ -30,6 +30,9 @@
 	font-size:13px;
 }
 
+#ui-datepicker-div { 
+	font-size:13px;
+}
 .yadcf-filter-wrapper {
 	display: inline-block;
 	white-space: nowrap;
@@ -41,6 +44,15 @@
 }
 
 .yadcf-filter-range-number-seperator {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+.yadcf-filter-range-date {
+	width: 80px;
+}
+
+.yadcf-filter-range-date-seperator {
 	margin-left: 10px;
 	margin-right: 10px;
 }

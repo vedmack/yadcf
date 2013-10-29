@@ -16,6 +16,7 @@ Features:
    - autocomplete input - make use of the jQuery UI Autocomplete widget (with some enhancements)
    - range of numbers
    - range of numbers with slider widget - make use of the jQuery UI Slider widget (with some enhancements)
+   - range of dates - make use of the jQuery UI Datepicker widget (with some enhancements)
   - Parsing various types of columns: 
    - plain text 
    - plain text with delimiter
@@ -35,6 +36,7 @@ Features:
    - define how the values in the filter will be sorted
    - define the order in which the values in the filter will be sorted
    - support all major browser (including IE8)
+   - define in which date format the date will be parsed and displayed in datepicker widget
 
 
 Examples:
@@ -75,7 +77,7 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 * enable_auto_complete
 * sort_as
 * sort_order
-
+* date_format
 
 License
 =====

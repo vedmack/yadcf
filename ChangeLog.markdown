@@ -1,9 +1,14 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.4.0
+
+* Added new filter type: range between two dates with jQuery UI Datepicker widget, filter_type: "range_number_slider" (https://github.com/vedmack/yadcf/issues/6)
+* Added new attribute to yadcf constructor: date_format, it defines the format in which the date values are being parsed into Date object and also in which format the datepicker will display the selected dates, default value: "mm/dd/yyyy"
+
 
 ## 0.3.8
 
-* Added new filter type: range between two numbers with slider widget, filter_type: "range_number_slider" (https://github.com/vedmack/yadcf/issues/6)
+* Added new filter type: range between two numbers with jQuery UI Slider widget, filter_type: "range_number_slider" (https://github.com/vedmack/yadcf/issues/6)
 * Fixed IE8 issues (https://github.com/vedmack/yadcf/issues/7)
 
 
