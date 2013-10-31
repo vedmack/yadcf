@@ -756,7 +756,7 @@ var yadcf = (function ($) {
 
 					} else if (args[i].filter_type === "auto_complete") {
 						$(filter_selector_string).append("<input id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" onclick='yadcf.stopPropagation(event);"
-							+ "' placeholder='" + filter_default_label + "'>" + "</input>").appendTo("#" + filter_container_id + " div.yadcf-filter-wrapper");
+							+ "' placeholder='" + filter_default_label + "'>" + "</input>");
 						$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, options);
 
 						$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +
