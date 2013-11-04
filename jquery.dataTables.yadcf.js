@@ -6,7 +6,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.4.0
+* Version:     0.4.2
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
 * Contact:     vedmack@gmail.com	
@@ -103,6 +103,11 @@
 				Default value:		mm/dd/yyyy
 				Possible values:	mm/dd/yyyy / dd/mm/yyyy (eventually I replace yyyy into yy for jquery datepicker)
 				Description:		Defines the format in which the date values are being parsed into Date object
+
+* ignore_char
+				Required:			false
+				Type:				String
+				Description:		Tells the range_number and range_number_slide to ignore specific char while filtering (that char can used as number separator)
 *
 *
 */
@@ -181,27 +186,33 @@ var yadcf = (function ($) {
 		return b - a;
 	}
 
-	function findMinInArray(array) {
+	function findMinInArray(array, ignore_char) {
 		var narray = [], i;
 		for (i = 0; i < array.length; i++) {
 			if (array[i] !== null) {
+				if (ignore_char !== undefined) {
+					array[i] = array[i].replace(ignore_char, "");
+				}
 				narray.push(array[i]);
 			}
 		}
 		return Math.min.apply(Math, narray);
 	}
 
-	function findMaxInArray(array) {
+	function findMaxInArray(array, ignore_char) {
 		var narray = [], i;
 		for (i = 0; i < array.length; i++) {
 			if (array[i] !== null) {
+				if (ignore_char !== undefined) {
+					array[i] = array[i].replace(ignore_char, "");
+				}
 				narray.push(array[i]);
 			}
 		}
 		return Math.max.apply(Math, narray);
 	}
 
-	function addRangeNumberFilterCapability(table_selector_jq_friendly, fromId, toId, col_num) {
+	function addRangeNumberFilterCapability(table_selector_jq_friendly, fromId, toId, col_num, ignore_char) {
 
 		$.fn.dataTableExt.afnFiltering.push(
 			function (oSettings, aData, iDataIndex) {
@@ -210,11 +221,19 @@ var yadcf = (function ($) {
 					val = aData[col_num] === "-" ? 0 : aData[col_num],
 					retVal = false,
 					table_selector_jq_friendly_local = table_selector_jq_friendly,
-					current_table_selector_jq_friendly = oSettings.oInstance.selector.replace(":", "-").replace("(", "").replace(")", "").replace(".", "-").replace("#", "-");
+					current_table_selector_jq_friendly = oSettings.oInstance.selector.replace(":", "-").replace("(", "").replace(")", "").replace(".", "-").replace("#", "-"),
+					ignore_char_local = ignore_char;
 
 				if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
 					return true;
 				}
+
+				if (ignore_char_local !== undefined) {
+					min = min.replace(ignore_char_local, "");
+					max = max.replace(ignore_char_local, "");
+					val = val.replace(ignore_char_local, "");
+				}
+
 				min = (min !== "") ? (+min) : min;
 				max = (max !== "") ? (+max) : max;
 				val = (val !== "") ? (+val) : val;
@@ -273,7 +292,7 @@ var yadcf = (function ($) {
 		);
 	}
 
-	function addRangeNumberSliderFilterCapability(table_selector_jq_friendly, fromId, toId, col_num) {
+	function addRangeNumberSliderFilterCapability(table_selector_jq_friendly, fromId, toId, col_num, ignore_char) {
 
 		$.fn.dataTableExt.afnFiltering.push(
 			function (oSettings, aData, iDataIndex) {
@@ -282,10 +301,17 @@ var yadcf = (function ($) {
 					val = aData[col_num] === "-" ? 0 : aData[col_num],
 					retVal = false,
 					table_selector_jq_friendly_local = table_selector_jq_friendly,
-					current_table_selector_jq_friendly = oSettings.oInstance.selector.replace(":", "-").replace("(", "").replace(")", "").replace(".", "-").replace("#", "-");
+					current_table_selector_jq_friendly = oSettings.oInstance.selector.replace(":", "-").replace("(", "").replace(")", "").replace(".", "-").replace("#", "-"),
+					ignore_char_local = ignore_char;
 
 				if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
 					return true;
+				}
+
+				if (ignore_char_local !== undefined) {
+					min = min.replace(ignore_char_local, "");
+					max = max.replace(ignore_char_local, "");
+					val = val.replace(ignore_char_local, "");
 				}
 
 				min = (min !== "") ? (+min) : min;
@@ -305,7 +331,7 @@ var yadcf = (function ($) {
 		);
 	}
 
-	function addRangeNumberFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, filter_default_label) {
+	function addRangeNumberFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, filter_default_label, ignore_char) {
 		var fromId = "yadcf-filter-" + table_selector_jq_friendly + "-from-" + column_number,
 			toId = "yadcf-filter-" + table_selector_jq_friendly + "-to-" + column_number,
 			filter_selector_string_tmp,
@@ -317,7 +343,7 @@ var yadcf = (function ($) {
 			return;
 		}
 
-		addRangeNumberFilterCapability(table_selector_jq_friendly, fromId, toId, column_number);
+		addRangeNumberFilterCapability(table_selector_jq_friendly, fromId, toId, column_number, ignore_char);
 
 		//add a wrapper to hold both filter and reset button
 		$(filter_selector_string).append("<div onclick=\"yadcf.stopPropagation(event);\" id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper\"></div>");
@@ -448,7 +474,7 @@ var yadcf = (function ($) {
 		resetIApiIndex();
 	}
 
-	function addRangeNumberSliderFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, min_val, max_val) {
+	function addRangeNumberSliderFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, min_val, max_val, ignore_char) {
 		var sliderId = "yadcf-filter-" + table_selector_jq_friendly + "-slider-" + column_number,
 			min_tip_id = "yadcf-filter-" + table_selector_jq_friendly + "-min_tip-" + column_number,
 			max_tip_id = "yadcf-filter-" + table_selector_jq_friendly + "-max_tip-" + column_number,
@@ -461,7 +487,7 @@ var yadcf = (function ($) {
 			return;
 		}
 
-		addRangeNumberSliderFilterCapability(table_selector_jq_friendly, min_tip_id, max_tip_id, column_number);
+		addRangeNumberSliderFilterCapability(table_selector_jq_friendly, min_tip_id, max_tip_id, column_number, ignore_char);
 
 		//add a wrapper to hold both filter and reset button
 		$(filter_selector_string).append("<div onclick=\"yadcf.stopPropagation(event);\" id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper\"></div>");
@@ -517,6 +543,7 @@ var yadcf = (function ($) {
 			sort_as,
 			sort_order,
 			date_format,
+			ignore_char,
 
 			options,
 			options_tmp,
@@ -532,7 +559,8 @@ var yadcf = (function ($) {
 				enable_auto_complete : false,
 				sort_as : "alpha",
 				sort_order : "asc",
-				date_format : "mm/dd/yyyy"
+				date_format : "mm/dd/yyyy",
+				ignore_char : undefined
 			},
 			table_selector_jq_friendly,
 			min_val,
@@ -557,6 +585,10 @@ var yadcf = (function ($) {
 			date_format = args[i].date_format;
 			//for jquery datepicker
 			date_format = date_format.replace("yyyy", "yy");
+
+			if (args[i].ignore_char !== undefined) {
+				ignore_char = new RegExp(args[i].ignore_char, "g");
+			}
 
 			if (column_number === undefined) {
 				alert("You must specify column number");
@@ -642,8 +674,8 @@ var yadcf = (function ($) {
 			}
 
 			if (args[i].filter_type === "range_number_slider") {
-				min_val = findMinInArray(options);
-				max_val = findMaxInArray(options);
+				min_val = findMinInArray(options, ignore_char);
+				max_val = findMaxInArray(options, ignore_char);
 			}
 
 
@@ -723,11 +755,11 @@ var yadcf = (function ($) {
 
 					} else if (args[i].filter_type === "range_number") {
 
-						addRangeNumberFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, filter_default_label);
+						addRangeNumberFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, filter_default_label, ignore_char);
 
 					} else if (args[i].filter_type === "range_number_slider") {
 
-						addRangeNumberSliderFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, min_val, max_val);
+						addRangeNumberSliderFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, min_val, max_val, ignore_char);
 
 					} else if (args[i].filter_type === "range_date") {
 
@@ -764,11 +796,11 @@ var yadcf = (function ($) {
 
 					} else if (args[i].filter_type === "range_number") {
 
-						addRangeNumberFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, filter_default_label);
+						addRangeNumberFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, filter_default_label, ignore_char);
 
 					} else if (args[i].filter_type === "range_number_slider") {
 
-						addRangeNumberSliderFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, min_val, max_val);
+						addRangeNumberSliderFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, min_val, max_val, ignore_char);
 
 					} else if (args[i].filter_type === "range_date") {
 
