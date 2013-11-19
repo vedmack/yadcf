@@ -6,7 +6,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.4.2
+* Version:     0.4.3
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
 * Contact:     vedmack@gmail.com	
@@ -125,7 +125,8 @@ var yadcf = (function ($) {
 
 	function doFilter(arg, table_selector_jq_friendly, column_number) {
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
-		var oTable = oTables[table_selector_jq_friendly];
+		var oTable = oTables[table_selector_jq_friendly],
+			selected_value;
 
 		if (arg === "clear") {
 			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("-1").focus();
@@ -140,8 +141,10 @@ var yadcf = (function ($) {
 
 		$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", arg.value);
 
+		selected_value = $.trim($(arg).find('option:selected').text());
+
 		if (arg.value !== "-1") {
-			oTable.fnFilter($(arg).find('option:selected').text(), column_number, false, false, true, true);
+			oTable.fnFilter(selected_value, column_number, false, false, true, true);
 		} else {
 			oTable.fnFilter("", column_number);
 			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
