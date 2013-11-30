@@ -324,10 +324,39 @@ var yadcf = (function ($) {
 					retVal = false,
 					table_selector_jq_friendly_local = table_selector_jq_friendly,
 					current_table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(oSettings.oInstance.selector),
-					ignore_char_local = ignore_char;
+					ignore_char_local = ignore_char,
+					column_data_type,
+					html_data_type,
+					i;
 
 				if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
 					return true;
+				}
+
+				for (i = 0; i < yadcf.getOptions(oSettings.oInstance.selector).length; i++) {
+					if (yadcf.getOptions(oSettings.oInstance.selector)[i].column_number === col_num) {
+
+						column_data_type = yadcf.getOptions(oSettings.oInstance.selector)[i].column_data_type;
+						html_data_type = yadcf.getOptions(oSettings.oInstance.selector)[i].html_data_type;
+
+						if (column_data_type === "html") {
+							if (html_data_type === undefined) {
+								html_data_type = "text";
+							}
+							switch (html_data_type) {
+							case "text":
+								val = $(val).text();
+								break;
+							case "value":
+								val = $(val).val();
+								break;
+							case "id":
+								val = val.id;
+								break;
+							}
+						}
+						break;
+					}
 				}
 
 				if (ignore_char_local !== undefined) {
