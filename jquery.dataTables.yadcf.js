@@ -1061,23 +1061,38 @@ var yadcf = (function ($) {
 	}
 
 	//--------------------------------------------------------
+	function exInternalFilterColumnAJAXQueue(table_arg, column_number, filter_value) {
+		return function () {
+			var table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_arg.selector);
+			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val(filter_value);
+			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).change();
+		};
+	}
+
 	function exFilterColumn(table_arg, column_number, filter_value) {
 		var table_selector_jq_friendly,
-			jqVersion;
+			jqVersion,
+			i;
 
 		if (table_arg.fnSettings().sAjaxSource === null) {
-			if (yadcf.getOptions(table_arg.selector)[column_number].filter_type === "select") {
-				table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_arg.selector);
-				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val(filter_value);
-				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).change();
+			for (i = 0; i < yadcf.getOptions(table_arg.selector).length; i++) {
+				if (yadcf.getOptions(table_arg.selector)[i].column_number === column_number) {
+					if (yadcf.getOptions(table_arg.selector)[i].filter_type === "select") {
+						table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_arg.selector);
+						$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val(filter_value);
+						$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).change();
+					}
+					break;
+				}
 			}
         } else {
-			if (yadcf.getOptions(table_arg.selector)[column_number].filter_type === "select" || yadcf.getOptions(table_arg.selector)[column_number].filter_type === undefined) {
-				exFilterColumnQueue.push(function () {
-					table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_arg.selector);
-					$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val(filter_value);
-					$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).change();
-				});
+			for (i = 0; i < yadcf.getOptions(table_arg.selector).length; i++) {
+				if (yadcf.getOptions(table_arg.selector)[i].column_number === column_number) {
+					if (yadcf.getOptions(table_arg.selector)[i].filter_type === "select" || yadcf.getOptions(table_arg.selector)[i].filter_type === undefined) {
+						exFilterColumnQueue.push(exInternalFilterColumnAJAXQueue(table_arg, column_number, filter_value));
+					}
+					break;
+				}
 			}
         }
 	}
