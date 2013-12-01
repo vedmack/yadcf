@@ -6,7 +6,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.4.5
+* Version:     0.4.6
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
 * Contact:     vedmack@gmail.com	
@@ -615,7 +615,9 @@ var yadcf = (function ($) {
 			},
 			table_selector_jq_friendly,
 			min_val,
-			max_val;
+			max_val,
+			col_num_visible,
+			col_num_visible_iter;
 
 
 		for (i; i < args.length; i++) {
@@ -731,7 +733,14 @@ var yadcf = (function ($) {
 
 
 			if (filter_container_id === undefined) {
-				filter_selector_string = table_selector + " thead th:eq(" + column_number + ")";
+				col_num_visible = column_number;
+
+				for (col_num_visible_iter = 0; col_num_visible_iter < oTable.fnSettings().aoColumns.length && col_num_visible_iter < column_number; col_num_visible_iter++) {
+					if (oTable.fnSettings().aoColumns[col_num_visible_iter].bVisible === false) {
+						col_num_visible--;
+					}
+				}
+				filter_selector_string = table_selector + " thead th:eq(" + col_num_visible + ")";
 				$filter_selector = $(filter_selector_string).find(".yadcf-filter");
 			} else {
 				filter_selector_string = "#" + filter_container_id;

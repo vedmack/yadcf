@@ -1,5 +1,12 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.4.6
+
+* Added first external API function : exFilterColumn, allows to trigger filter externally/programmatically (currently support only filter_type : "select") , perfect for showing table after its being filtered (onload) (https://github.com/vedmack/yadcf/issues/14) 
+* Added support for aoColumns { "bVisible": false } (https://github.com/vedmack/yadcf/issues/16)
+* Added support for column_data_type & html_data_type in Range Number Slider Filter (https://github.com/vedmack/yadcf/issues/15)
+
+
 ## 0.4.2
 
 * Added new attribute to yadcf constructor: ignore_char, Tells the range_number and range_number_slide to ignore specific char while filtering (that char can used as number separator) https://github.com/vedmack/yadcf/issues/9

@@ -37,6 +37,9 @@ Features:
  - define the order in which the values in the filter will be sorted
  - support all major browser (including IE8)
  - define in which date format the date will be parsed and displayed in datepicker widget
+ - support aoColumns { "bVisible": false }
+- External API functions:
+ - exFilterColumn: Allows to trigger filter externally/programmatically (currently support only filter_type : "select") , perfect for showing table after its being filtered (onload)
 
 
 Examples:
