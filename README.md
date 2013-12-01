@@ -39,7 +39,7 @@ Features:
  - define in which date format the date will be parsed and displayed in datepicker widget
  - support aoColumns { "bVisible": false }
 - External API functions:
- - exFilterColumn: Allows to trigger filter externally/programmatically (currently support only filter_type : "select") , perfect for showing table after its being filtered (onload)
+ - exFilterColumn: Allows to trigger filter externally/programmatically (currently support only filter_type : "select") , perfect for showing table after its being filtered (onload)	
 
 
 Examples:
