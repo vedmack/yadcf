@@ -31,6 +31,7 @@ Features:
 - Miscellaneous: 
  - predefined data source for filter (array of strings)
  - ability to place the filter in an external html element (for example: inside a div element)
+ - ability to control matching mode of the filter (Possible values: contains / exact)
  - change the filter's default label (Select value, etc)
  - change the filter's reset button text (x, clear etc)
  - define how the values in the filter will be sorted
