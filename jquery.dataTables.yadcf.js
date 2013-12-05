@@ -6,7 +6,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.4.6
+* Version:     0.4.7 (lab)
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
 * Contact:     vedmack@gmail.com	
@@ -108,6 +108,14 @@
 				Required:			false
 				Type:				String
 				Description:		Tells the range_number and range_number_slide to ignore specific char while filtering (that char can used as number separator)
+				
+* filter_match_mode
+				Required:			false
+				Type:				String
+				Default value:		contains
+				Possible values:	contains / exact
+				Description:		Allows to control the matching mode of the filter (supported in select and auto_complete filters)
+
 *				
 *				
 *				
@@ -142,7 +150,7 @@ var yadcf = (function ($) {
 		return tmpStr.replace(":", "-").replace("(", "").replace(")", "").replace(".", "-").replace("#", "-");
 	}
 
-	function doFilter(arg, table_selector_jq_friendly, column_number) {
+	function doFilter(arg, table_selector_jq_friendly, column_number, filter_match_mode) {
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 		var oTable = oTables[table_selector_jq_friendly],
 			selected_value;
@@ -163,7 +171,11 @@ var yadcf = (function ($) {
 		selected_value = $.trim($(arg).find('option:selected').text());
 
 		if (arg.value !== "-1") {
-			oTable.fnFilter(selected_value, column_number, false, false, true, true);
+			if (filter_match_mode === "contains") {
+				oTable.fnFilter(selected_value, column_number, false, false, true, true);
+			} else if (filter_match_mode === "exact") {
+				oTable.fnFilter("^" + selected_value + "$", column_number, true, false, true, true);
+			}
 		} else {
 			oTable.fnFilter("", column_number);
 			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
@@ -171,7 +183,7 @@ var yadcf = (function ($) {
 		resetIApiIndex();
 	}
 
-	function doFilterAutocomplete(arg, table_selector_jq_friendly, column_number) {
+	function doFilterAutocomplete(arg, table_selector_jq_friendly, column_number, filter_match_mode) {
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 		var oTable = oTables[table_selector_jq_friendly];
 
@@ -187,7 +199,11 @@ var yadcf = (function ($) {
 		$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
 
 		$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", arg.value);
-		oTable.fnFilter(arg.value, column_number, false, false, true, true);
+		if (filter_match_mode === "contains") {
+			oTable.fnFilter(arg.value, column_number, false, false, true, true);
+		} else if (filter_match_mode === "exact") {
+			oTable.fnFilter("^" + arg.value + "$", column_number, true, false, true, true);
+		}
 		resetIApiIndex();
 	}
 
@@ -196,8 +212,9 @@ var yadcf = (function ($) {
 		var table_column = event.target.id.replace("yadcf-filter-", ""),
 			dashIndex = table_column.lastIndexOf("-"),
 			table_selector_jq_friendly = table_column.substring(0, dashIndex),
-			col_num = parseInt(table_column.substring(dashIndex + 1), 10);
-		doFilterAutocomplete(ui.item, table_selector_jq_friendly, col_num);
+			col_num = parseInt(table_column.substring(dashIndex + 1), 10),
+			filter_match_mode = $(event.target).attr("filter_match_mode");
+		doFilterAutocomplete(ui.item, table_selector_jq_friendly, col_num, filter_match_mode);
 	}
 
 	function sortNumAsc(a, b) {
@@ -595,6 +612,7 @@ var yadcf = (function ($) {
 			sort_order,
 			date_format,
 			ignore_char,
+			filter_match_mode,
 
 			options,
 			options_tmp,
@@ -611,7 +629,8 @@ var yadcf = (function ($) {
 				sort_as : "alpha",
 				sort_order : "asc",
 				date_format : "mm/dd/yyyy",
-				ignore_char : undefined
+				ignore_char : undefined,
+				filter_match_mode : "contains"
 			},
 			table_selector_jq_friendly,
 			min_val,
@@ -642,6 +661,7 @@ var yadcf = (function ($) {
 			if (args[i].ignore_char !== undefined) {
 				ignore_char = new RegExp(args[i].ignore_char, "g");
 			}
+			filter_match_mode = args[i].filter_match_mode;
 
 			if (column_number === undefined) {
 				alert("You must specify column number");
@@ -796,7 +816,7 @@ var yadcf = (function ($) {
 						filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
 
 						$(filter_selector_string).append("<select id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" " +
-							"onchange=\"yadcf.doFilter(this, '" + table_selector_jq_friendly + "', " + column_number + ")\" onclick='yadcf.stopPropagation(event);'>" + options + "</select>");
+							"onchange=\"yadcf.doFilter(this, '" + table_selector_jq_friendly + "', " + column_number + ", '" + filter_match_mode + "')\" onclick='yadcf.stopPropagation(event);'>" + options + "</select>");
 						$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +
 							"onclick=\"yadcf.stopPropagation(event);yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
 
@@ -807,7 +827,7 @@ var yadcf = (function ($) {
 						filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
 
 						$(filter_selector_string).append("<input id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" onclick='yadcf.stopPropagation(event);"
-							+ "' placeholder='" + filter_default_label + "'" + " onkeyup=\"yadcf.autocompleteKeyUP('" + table_selector_jq_friendly + "',event);\"></input>");
+							+ "' placeholder='" + filter_default_label + "'" + " filter_match_mode='" + filter_match_mode + "'" + " onkeyup=\"yadcf.autocompleteKeyUP('" + table_selector_jq_friendly + "',event);\"></input>");
 						$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, options);
 
 						$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +
@@ -840,7 +860,7 @@ var yadcf = (function ($) {
 					if (args[i].filter_type === "select") {
 
 						$("<select id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" " +
-							"onchange=\"yadcf.doFilter(this, '" + table_selector_jq_friendly + "', " + column_number + ")\" onclick='yadcf.stopPropagation(event);'>" +
+							"onchange=\"yadcf.doFilter(this, '" + table_selector_jq_friendly + "', " + column_number + ", '" + filter_match_mode + "')\" onclick='yadcf.stopPropagation(event);'>" +
 							options + "</select>").appendTo("#" + filter_container_id + " div.yadcf-filter-wrapper");
 
 						$("#" + filter_container_id).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +
@@ -848,7 +868,7 @@ var yadcf = (function ($) {
 
 					} else if (args[i].filter_type === "auto_complete") {
 						$(filter_selector_string).append("<input id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" onclick='yadcf.stopPropagation(event);"
-							+ "' placeholder='" + filter_default_label + "'>" + "</input>");
+							+ "' placeholder='" + filter_default_label + "'" + " filter_match_mode='" + filter_match_mode + "'>" + "</input>");
 						$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, options);
 
 						$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +

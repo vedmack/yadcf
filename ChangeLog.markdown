@@ -1,5 +1,10 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.4.7
+
+* New feature: filter_match_mode, Allows to control the matching mode of the filter (supported in select and auto_complete filters), Possible values: contains / exact
+
+
 ## 0.4.6
 
 * Added first external API function : exFilterColumn, allows to trigger filter externally/programmatically (currently support only filter_type : "select") , perfect for showing table after its being filtered (onload) (https://github.com/vedmack/yadcf/issues/14) 
