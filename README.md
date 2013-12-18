@@ -30,6 +30,7 @@ Features:
  - when a certain filter is being used it will be highlighted (the color of highlight can easily be changed with css)
 - Miscellaneous: 
  - predefined data source for filter (array of strings)
+ - mData support (including deeply nested objects)
  - ability to place the filter in an external html element (for example: inside a div element)
  - ability to control matching mode of the filter (Possible values: contains / exact)
  - change the filter's default label (Select value, etc)
@@ -82,6 +83,8 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 * sort_as
 * sort_order
 * date_format
+* ignore_char
+* filter_match_mode
 
 License
 =====

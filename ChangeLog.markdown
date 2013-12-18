@@ -1,5 +1,11 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.5.0
+
+* Added support for mData (including deeply nested objects) https://github.com/vedmack/yadcf/issues/20
+* Bug fix
+
+
 ## 0.4.7
 
 * New feature: filter_match_mode, Allows to control the matching mode of the filter (supported in select and auto_complete filters), Possible values: contains / exact

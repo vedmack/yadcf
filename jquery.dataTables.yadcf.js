@@ -6,7 +6,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.4.7
+* Version:     0.5.0
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
 * Contact:     vedmack@gmail.com	
@@ -230,7 +230,7 @@ var yadcf = (function ($) {
 		for (i = 0; i < array.length; i++) {
 			if (array[i] !== null) {
 				if (ignore_char !== undefined) {
-					array[i] = array[i].replace(ignore_char, "");
+					array[i] = array[i].toString().replace(ignore_char, "");
 				}
 				narray.push(array[i]);
 			}
@@ -243,7 +243,7 @@ var yadcf = (function ($) {
 		for (i = 0; i < array.length; i++) {
 			if (array[i] !== null) {
 				if (ignore_char !== undefined) {
-					array[i] = array[i].replace(ignore_char, "");
+					array[i] = array[i].toString().replace(ignore_char, "");
 				}
 				narray.push(array[i]);
 			}
@@ -270,7 +270,7 @@ var yadcf = (function ($) {
 				if (ignore_char_local !== undefined) {
 					min = min.replace(ignore_char_local, "");
 					max = max.replace(ignore_char_local, "");
-					val = val.replace(ignore_char_local, "");
+					val = val.toString().replace(ignore_char_local, "");
 				}
 
 				min = (min !== "") ? (+min) : min;
@@ -379,7 +379,7 @@ var yadcf = (function ($) {
 				if (ignore_char_local !== undefined) {
 					min = min.replace(ignore_char_local, "");
 					max = max.replace(ignore_char_local, "");
-					val = val.replace(ignore_char_local, "");
+					val = val.toString().replace(ignore_char_local, "");
 				}
 
 				min = (min !== "") ? (+min) : min;
@@ -593,6 +593,15 @@ var yadcf = (function ($) {
 			"onclick=\"yadcf.stopPropagation(event);yadcf.rangeNumberSliderClear('" + table_selector_jq_friendly + "',event); return false;\" class=\"yadcf-filter-reset-button range-number-slider-reset-button\">");
 	}
 
+	function dot2obj(tmpObj, dot_refs) {
+		var i = 0;
+		dot_refs = dot_refs.split(".");
+		for (i = 0; i < dot_refs.length; i++) {
+			tmpObj = tmpObj[dot_refs[i]];
+		}
+		return tmpObj;
+	}
+
 	function appendSelectFilter(oTable, args, table_selector) {
 
 		var i = 0,
@@ -601,6 +610,7 @@ var yadcf = (function ($) {
 
 			data,
 			filter_container_id,
+			column_number_data,
 			column_number,
 			column_data_type,
 			html_data_type,
@@ -621,7 +631,7 @@ var yadcf = (function ($) {
 			data_length,
 			col_inner_elements,
 			col_inner_data,
-			col_filter_array = {},
+			col_filter_array,
 			ii,
 			default_options = {
 				filter_type : "select",
@@ -646,6 +656,11 @@ var yadcf = (function ($) {
 			data = args[i].data;
 			filter_container_id = args[i].filter_container_id;
 			column_number = args[i].column_number;
+			column_number = +column_number;
+			column_number_data = undefined;
+			if (isNaN(oTable.fnSettings().aoColumns[column_number].mData)) {
+			    column_number_data = oTable.fnSettings().aoColumns[column_number].mData;
+			}
 			column_data_type = args[i].column_data_type;
 			html_data_type = args[i].html_data_type;
 			text_data_delimiter = args[i].text_data_delimiter;
@@ -695,6 +710,7 @@ var yadcf = (function ($) {
 			}
 
 			options = [];
+			col_filter_array = {};
 
 			if (data === undefined) {
 				data = oTable._('tr');
@@ -702,7 +718,12 @@ var yadcf = (function ($) {
 
 				for (j = 0; j < data_length; j++) {
 					if (column_data_type === "html") {
-						col_inner_elements = $(data[j][column_number]);
+						if (column_number_data === undefined) {
+							col_inner_elements = $(data[j][column_number]);
+						} else {
+							col_inner_elements = dot2obj(data[j], column_number_data);
+							col_inner_elements = $(col_inner_elements);
+						}
 						for (k = 0; k < col_inner_elements.length; k++) {
 							switch (html_data_type) {
 							case "text":
@@ -722,7 +743,12 @@ var yadcf = (function ($) {
 						}
 					} else if (column_data_type === "text") {
 						if (text_data_delimiter !== undefined) {
-							col_inner_elements = data[j][column_number].split(text_data_delimiter);
+							if (column_number_data === undefined) {
+								col_inner_elements = data[j][column_number].split(text_data_delimiter);
+							} else {
+								col_inner_elements = dot2obj(data[j], column_number_data);
+								col_inner_elements = col_inner_elements.split(text_data_delimiter);
+							}
 							for (k = 0; k < col_inner_elements.length; k++) {
 								col_inner_data = col_inner_elements[k];
 								if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
@@ -731,7 +757,11 @@ var yadcf = (function ($) {
 								}
 							}
 						} else {
-							col_inner_data = data[j][column_number];
+							if (column_number_data === undefined) {
+								col_inner_data = data[j][column_number];
+							} else {
+								col_inner_data = dot2obj(data[j], column_number_data);
+							}
 							if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
 								col_filter_array[col_inner_data] = col_inner_data;
 								options.push(col_inner_data);
