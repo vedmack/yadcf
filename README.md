@@ -51,6 +51,8 @@ Examples:
 
 [AJAX source example](http://yadcf-showcase.appspot.com/ajax_source.html)
 
+[AJAX mData (deep) example](http://yadcf-showcase.appspot.com/ajax_mData_source.html)
+
 [Multiple tables example](http://yadcf-showcase.appspot.com/multiple_tables.html)
 
 
