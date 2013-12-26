@@ -5,7 +5,6 @@ Description:
 =====
 
 This jQuery plug-in allows the user to easily add filter components to table columns, the plug-in works on top of the DataTables jQuery plug-in.
-If you are using this plugin it would be nice if you drop me an email to vedmack@gmail.com with some feedback.
 
 
 Features:
@@ -95,8 +94,7 @@ Copyright 2013
 Dual licensed under two licenses: GPL v2 license or a BSD (3-point) license (just like DataTables itself)
 
 
-
-
-
+=====
+If you like my plugin, you can show your appreciation by following me in [Twitter](https://twitter.com/danielreznick) or [GitHub](https://github.com/vedmack).
 
 [![githalytics.com alpha](https://cruel-carlota.pagodabox.com/98b24f2a1ca5deaaaa08b94dd52594ec "githalytics.com")](http://githalytics.com/vedmack/yadcf)
