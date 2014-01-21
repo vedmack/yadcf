@@ -41,7 +41,8 @@ Features:
  - support aoColumns { "bVisible": false }
 - External API functions:
  - exFilterColumn: Allows to trigger filter externally/programmatically (currently support only filter_type : "select") , perfect for showing table after its being filtered (onload)
-
+- Notable datatables API support
+ - bStateSave / bDeferRender
 
 Examples:
 =====

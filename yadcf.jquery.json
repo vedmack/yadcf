@@ -9,7 +9,7 @@
 	"column",
     "plugin"
   ],
-  "version": "0.5.0",
+  "version": "0.5.6",
   "author": {
     "name": "Daniel Reznick",
     "url": "https://github.com/vedmack"
@@ -29,6 +29,6 @@
   "docs": "https://github.com/vedmack/yadcf/blob/master/README.md",
   "download": "https://github.com/vedmack/yadcf/archive/master.zip",
   "dependencies": {
-    "jquery": ">=1.4"
+    "jquery": ">=1.7"
   }
 }

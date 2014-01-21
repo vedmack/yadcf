@@ -1,5 +1,11 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.5.6
+
+* Added support for bStateSave https://github.com/vedmack/yadcf/issues/22
+* Added support for bDeferRender https://github.com/vedmack/yadcf/issues/25
+
+
 ## 0.5.0
 
 * Added support for mData (including deeply nested objects) https://github.com/vedmack/yadcf/issues/20
