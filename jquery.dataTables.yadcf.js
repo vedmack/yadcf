@@ -966,6 +966,9 @@ var yadcf = (function ($) {
 				if (args[i].filter_type === "select") {
 					$filter_selector.empty();
 					$filter_selector.append(options);
+					if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().aoPreSearchCols[column_number].sSearch) {
+						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(oTable.fnSettings().aoPreSearchCols[column_number].sSearch).addClass("inuse");
+					}
 				} else if (args[i].filter_type === "auto_complete") {
 					$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, options);
 				}
