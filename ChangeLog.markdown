@@ -1,5 +1,11 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.5.8
+
+* Added new filter type: date input, make use of the jQuery UI Datepicker widget, filter_type: "date" (https://github.com/vedmack/yadcf/issues/26)
+* Several code enhancements
+
+
 ## 0.5.6
 
 * Added support for bStateSave https://github.com/vedmack/yadcf/issues/22

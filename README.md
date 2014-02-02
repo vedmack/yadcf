@@ -13,6 +13,7 @@ Features:
 - Various filter options: 
  - select input
  - autocomplete input - make use of the jQuery UI Autocomplete widget (with some enhancements)
+ - date input - make use of the jQuery UI Datepicker widget (with some enhancements)
  - range of numbers
  - range of numbers with slider widget - make use of the jQuery UI Slider widget (with some enhancements)
  - range of dates - make use of the jQuery UI Datepicker widget (with some enhancements)
