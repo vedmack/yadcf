@@ -7,6 +7,13 @@ Description:
 This jQuery plug-in allows the user to easily add filter components to table columns, the plug-in works on top of the DataTables jQuery plug-in.
 
 
+Contact/Social:
+=====
+If you want to ask a question use my [google group](https://groups.google.com/forum/#!forum/daniels_code)
+
+If you like my plugin, you can show your appreciation by following me in [Twitter](https://twitter.com/danielreznick) / [GitHub](https://github.com/vedmack).
+
+
 Features:
 =====
 
@@ -88,11 +95,6 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 * date_format
 * ignore_char
 * filter_match_mode
-
-
-Social:
-=====
-If you like my plugin, you can show your appreciation by following me in [Twitter](https://twitter.com/danielreznick) / [GitHub](https://github.com/vedmack).
 
 
 License:
