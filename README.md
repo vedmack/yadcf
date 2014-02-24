@@ -35,7 +35,8 @@ Features:
  - next to each filter a reset button will appear (this button allows the user to reset the filter)
 - Filter in use visual notification:
  - when a certain filter is being used it will be highlighted (the color of highlight can easily be changed with css)
-- Miscellaneous: 
+- Miscellaneous:
+ - integration with the Chosen plugin
  - predefined data source for filter (array of strings)
  - mData support (including deeply nested objects)
  - ability to place the filter in an external html element (for example: inside a div element)
@@ -56,6 +57,8 @@ Examples:
 =====
 
 [DOM source example](http://yadcf-showcase.appspot.com/DOM_source.html)
+
+[DOM source with chosen example](http://yadcf-showcase.appspot.com/DOM_source_chosen.html)
 
 [AJAX source example](http://yadcf-showcase.appspot.com/ajax_source.html)
 
@@ -95,6 +98,8 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 * date_format
 * ignore_char
 * filter_match_mode
+* select_type
+* select_type_options
 
 
 License:

@@ -1,24 +1,26 @@
 /*global $, jQuery*/
 /*jslint plusplus: true, nomen: true */
 
-/*
-*
+/*!
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.5.8
+* Version:     0.6.0
+* 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
-* Contact:     vedmack@gmail.com	
+* Contact:     vedmack@gmail.com
+* Twitter:	   @danielreznick
+* Q&A		   https://groups.google.com/forum/#!forum/daniels_code	
 * 
 * Copyright 2013 Daniel Reznick, all rights reserved.
-*
 * Dual licensed under two licenses: GPL v2 license or a BSD (3-point) license (just like DataTables itself)
 * 
 * This source file is distributed in the hope that it will be useful, but 
 * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
 * or FITNESS FOR A PARTICULAR PURPOSE. See the license files for details.
-* 
+*/
+/*
 * Parameters:
 *
 *					
@@ -115,6 +117,22 @@
 				Default value:		contains
 				Possible values:	contains / exact
 				Description:		Allows to control the matching mode of the filter (supported in select and auto_complete filters)
+				
+* select_type
+				Required:			false
+				Type:				String
+				Default value:		undefined
+				Possible values:	chosen
+				Description:		Turns the simple select element into "Chosen select" (make use of the Chosen jQuery plugin)
+				
+				
+* select_type_options
+				Required:			false
+				Type:				Object
+				Default value:		{}
+				Description:		This parameter will be passed "as is" the the Chosen plugin constructor
+				
+								
 
 *				
 *				
@@ -161,6 +179,9 @@ var yadcf = (function ($) {
 			$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", "-1");
 			oTable.fnFilter("", column_number);
 			resetIApiIndex();
+			if (yadcf.getOptions(oTable.selector)[column_number].select_type === 'chosen') {
+				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("chosen:updated");
+			}
 			return;
 		}
 
@@ -841,7 +862,9 @@ var yadcf = (function ($) {
 				sort_order : "asc",
 				date_format : "mm/dd/yyyy",
 				ignore_char : undefined,
-				filter_match_mode : "contains"
+				filter_match_mode : "contains",
+				select_type : undefined,
+				select_type_options : {}
 			},
 			table_selector_jq_friendly,
 			min_val,
@@ -1038,6 +1061,9 @@ var yadcf = (function ($) {
 					if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().aoPreSearchCols[column_number].sSearch) {
 						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(oTable.fnSettings().aoPreSearchCols[column_number].sSearch).addClass("inuse");
 					}
+					if (args[i].select_type !== undefined && args[i].select_type === 'chosen') {
+						$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("chosen:updated");
+					}
 				} else if (args[i].filter_type === "auto_complete") {
 					$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, options);
 				}
@@ -1065,6 +1091,12 @@ var yadcf = (function ($) {
 					if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().aoPreSearchCols[column_number].sSearch) {
 						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(oTable.fnSettings().aoPreSearchCols[column_number].sSearch).addClass("inuse");
 					}
+
+					if (args[i].select_type !== undefined && args[i].select_type === 'chosen') {
+						$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).chosen(args[i].select_type_options);
+						$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).next().attr("onclick", "yadcf.stopPropagation(event);");
+					}
+
 				} else if (args[i].filter_type === "auto_complete") {
 
 					//add a wrapper to hold both filter and reset button
