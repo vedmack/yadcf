@@ -4,7 +4,7 @@
 
 * Added integration with Chosen plugin (for the select filter)
 * For the integration with Chosen: added two new attributes, 'select_type' to allow turning of simple select into chosen select 
-  and 'select_type_options' used to pass an object to the chosen constructor , don't forget to inslcude the chsoen js file and read/look at the docs/showcase
+  and 'select_type_options' used to pass an object to the chosen constructor , don't forget to include the chosen js file and read/look at the docs/showcase
 
 
 ## 0.5.8
