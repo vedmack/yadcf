@@ -19,6 +19,7 @@ Features:
 
 - Various filter options: 
  - select input
+ - text input
  - autocomplete input - make use of the jQuery UI Autocomplete widget (with some enhancements)
  - date input - make use of the jQuery UI Datepicker widget (with some enhancements)
  - range of numbers
@@ -40,7 +41,7 @@ Features:
  - predefined data source for filter (array of strings)
  - mData support (including deeply nested objects)
  - ability to place the filter in an external html element (for example: inside a div element)
- - ability to control matching mode of the filter (Possible values: contains / exact)
+ - ability to control matching mode of the filter (Possible values: contains / exact / startsWith)
  - change the filter's default label (Select value, etc)
  - change the filter's reset button text (x, clear etc)
  - define how the values in the filter will be sorted
@@ -48,6 +49,7 @@ Features:
  - support all major browser (including IE8)
  - define in which date format the date will be parsed and displayed in datepicker widget
  - support aoColumns { "bVisible": false }
+ - support for case sensitive filtering
 - External API functions:
  - exFilterColumn: Allows to trigger filter externally/programmatically (currently support only filter_type : "select") , perfect for showing table after its being filtered (onload)
 - Notable datatables API support
@@ -100,6 +102,7 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 * filter_match_mode
 * select_type
 * select_type_options
+* case_insensitive
 
 
 License:
