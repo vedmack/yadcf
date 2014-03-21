@@ -5,7 +5,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.6.3
+* Version:     0.6.4
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -178,8 +178,16 @@ var yadcf = (function ($) {
 		return tmpStr.replace(":", "-").replace("(", "").replace(")", "").replace(".", "-").replace("#", "-");
 	}
 
+	function extractColumnInfoFromOptions(options, column_number, property) {
+		var i;
+		for (i = 0; i < options.length; i++) {
+			if (options[i].column_number === column_number) {
+				return options[i][property];
+			}
+		}
+	}
 	function yadcfMatchFilter(oTable, selected_value, filter_match_mode, column_number) {
-		var case_insensitive = yadcf.getOptions(oTable.selector)[column_number].case_insensitive;
+		var case_insensitive = extractColumnInfoFromOptions(yadcf.getOptions(oTable.selector), column_number, "case_insensitive");
 		if (filter_match_mode === "contains") {
 			oTable.fnFilter(selected_value, column_number, false, false, true, case_insensitive);
 		} else if (filter_match_mode === "exact") {
@@ -200,7 +208,7 @@ var yadcf = (function ($) {
 			$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", "-1");
 			oTable.fnFilter("", column_number);
 			resetIApiIndex();
-			if (yadcf.getOptions(oTable.selector)[column_number].select_type === 'chosen') {
+			if (extractColumnInfoFromOptions(yadcf.getOptions(oTable.selector), column_number, "select_type") === 'chosen') {
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("chosen:updated");
 			}
 			return;

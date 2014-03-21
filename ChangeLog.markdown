@@ -1,5 +1,10 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.6.4
+
+* Bug fix 
+
+
 ## 0.6.3
 
 * Added new filter type: text input (a simple input text) filter_type: "text" (https://github.com/vedmack/yadcf/issues/34)
