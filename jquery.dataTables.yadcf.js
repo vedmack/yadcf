@@ -75,9 +75,9 @@
 									
 * filter_reset_button_text
 				Required:			false
-				Type:				String
+				Type:				String / boolean
 				Default value:		x
-				Description:		The text that will appear inside the reset button next to the select drop down
+				Description:		The text that will appear inside the reset button next to the select drop down (set this to false (boolean) in order to hide it from that column filter)
 
 * enable_auto_complete (this attribute is deprecated , and will become obsolete in the future , so you better start using filter_type: "auto_complete")
 				Required:			false

@@ -10,6 +10,7 @@
 * Added new filter type: text input (a simple input text) filter_type: "text" (https://github.com/vedmack/yadcf/issues/34)
 * Added new feature: case_insensitive, can be set to false or true (default) (https://github.com/vedmack/yadcf/issues/35)
 * Added new mode "startsWith" for filter_match_mode (https://github.com/vedmack/yadcf/issues/37)
+* Added new feature: hide filter reset button (merged pull https://github.com/vedmack/yadcf/pull/30  <- Thanks to Gator92)
 
 
 ## 0.6.0
