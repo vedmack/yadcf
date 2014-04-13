@@ -1,5 +1,10 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.6.7
+
+* Added support for the DataTables 1.10.0-beta.2 https://github.com/vedmack/yadcf/issues/38
+* Bug fix https://github.com/vedmack/yadcf/issues/42
+
 ## 0.6.4
 
 * Bug fix 

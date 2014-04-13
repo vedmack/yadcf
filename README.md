@@ -17,6 +17,7 @@ If you like my plugin, you can show your appreciation by following me in [Twitte
 Features:
 =====
 
+- Support DataTables 1.10.0-beta.2
 - Various filter options: 
  - select input
  - text input
@@ -67,6 +68,8 @@ Examples:
 [AJAX mData (deep) example](http://yadcf-showcase.appspot.com/ajax_mData_source.html)
 
 [Multiple tables example](http://yadcf-showcase.appspot.com/multiple_tables.html)
+
+[DOM Ajax Multiple 1.10 beta 2 example](http://yadcf-showcase.appspot.com/DOM_Ajax_Multiple_1.10.html)
 
 
 Usage:

@@ -5,7 +5,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.6.4
+* Version:     0.6.7
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -195,6 +195,18 @@ var yadcf = (function ($) {
 		} else if (filter_match_mode === "startsWith") {
 			oTable.fnFilter("^" + selected_value, column_number, true, false, true, case_insensitive);
 		}
+	}
+
+	function yadcfParseMatchFilter(tmpStr, filter_match_mode) {
+		var retVal;
+		if (filter_match_mode === "contains") {
+			retVal = tmpStr;
+		} else if (filter_match_mode === "exact") {
+			retVal = tmpStr.substring(1, tmpStr.length - 1);
+		} else if (filter_match_mode === "startsWith") {
+			retVal = tmpStr.substring(1, tmpStr.length);
+		}
+		return retVal;
 	}
 
 	function doFilter(arg, table_selector_jq_friendly, column_number, filter_match_mode) {
@@ -682,8 +694,8 @@ var yadcf = (function ($) {
 			min_tip_inner,
 			max_tip_inner;
 
-		min_tip_inner = "<span id=\"" + min_tip_id + "\" class=\"yadcf-filter-range-number-slider-min-tip-inner\">" + min_tip_val + "</span>";
-		max_tip_inner = "<span id=\"" + max_tip_id + "\" class=\"yadcf-filter-range-number-slider-max-tip-inner\">" + max_tip_val + "</span>";
+		min_tip_inner = "<div id=\"" + min_tip_id + "\" class=\"yadcf-filter-range-number-slider-min-tip-inner\">" + min_tip_val + "</div>";
+		max_tip_inner = "<div id=\"" + max_tip_id + "\" class=\"yadcf-filter-range-number-slider-max-tip-inner\">" + max_tip_val + "</div>";
 
 		$(first_handle).addClass("yadcf-filter-range-number-slider-min-tip").html(min_tip_inner);
 		$(last_handle).addClass("yadcf-filter-range-number-slider-max-tip").html(max_tip_inner);
@@ -1090,7 +1102,9 @@ var yadcf = (function ($) {
 					$filter_selector.empty();
 					$filter_selector.append(options);
 					if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().aoPreSearchCols[column_number].sSearch) {
-						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(oTable.fnSettings().aoPreSearchCols[column_number].sSearch).addClass("inuse");
+						tmpStr = oTable.fnSettings().aoPreSearchCols[column_number].sSearch;
+						tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
+						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
 					}
 					if (args[i].select_type !== undefined && args[i].select_type === 'chosen') {
 						$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("chosen:updated");
@@ -1122,7 +1136,9 @@ var yadcf = (function ($) {
 					}
 
 					if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().aoPreSearchCols[column_number].sSearch) {
-						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(oTable.fnSettings().aoPreSearchCols[column_number].sSearch).addClass("inuse");
+						tmpStr = oTable.fnSettings().aoPreSearchCols[column_number].sSearch;
+						tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
+						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
 					}
 
 					if (args[i].select_type !== undefined && args[i].select_type === 'chosen') {
@@ -1161,11 +1177,7 @@ var yadcf = (function ($) {
 
 					if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().aoPreSearchCols[column_number].sSearch) {
 						tmpStr = oTable.fnSettings().aoPreSearchCols[column_number].sSearch;
-						if (getOptions(oTable.selector)[column_number].filter_match_mode === "exact") {
-							tmpStr = tmpStr.substring(1, tmpStr.length - 1);
-						} else if (getOptions(oTable.selector)[column_number].filter_match_mode === "startsWith") {
-							tmpStr = tmpStr.substring(1, tmpStr.length);
-						}
+						tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
 						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
 					}
 
@@ -1197,7 +1209,9 @@ var yadcf = (function ($) {
 					select: autocompleteSelect
 				});
 				if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().aoPreSearchCols[column_number].sSearch) {
-					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(oTable.fnSettings().aoPreSearchCols[column_number].sSearch).addClass("inuse");
+					tmpStr = oTable.fnSettings().aoPreSearchCols[column_number].sSearch;
+					tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
+					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
 				}
 			}
 		}
@@ -1471,6 +1485,31 @@ var yadcf = (function ($) {
 		}
 	}
 
+	//taken and modified from DataTables 1.10.0-beta.2 source 
+	function yadcfVersionCheck(version) {
+		var aThis = $.fn.dataTable.ext.sVersion.split('.'),
+			aThat = version.split('.'),
+			iThis,
+			iThat,
+			i,
+			iLen;
+
+		for (i = 0, iLen = aThat.length; i < iLen; i++) {
+			iThis = parseInt(aThis[i], 10) || 0;
+			iThat = parseInt(aThat[i], 10) || 0;
+
+			// Parts are the same, keep comparing
+			if (iThis === iThat) {
+				continue;
+			}
+
+			// Parts are different, return immediately
+			return iThis > iThat;
+		}
+
+		return true;
+	}
+
 	function initAndBindTable(oTable, table_selector, index) {
 
 		var table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector),
@@ -1486,18 +1525,34 @@ var yadcf = (function ($) {
 			appendFilters(oTable, yadcf.getOptions(table_selector_tmp), table_selector);
         } else {
 			appendFilters(oTable, yadcf.getOptions(table_selector), table_selector);
-			$(document).on("draw", oTable.selector, function (event, ui) {
-				appendFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
-			});
+			if (yadcfVersionCheck('1.10')) {
+				$(document).on("draw.dt", oTable.selector, function (event, ui) {
+					appendFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
+				});
+			} else {
+				$(document).on("draw", oTable.selector, function (event, ui) {
+					appendFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
+				});
+			}
         }
 		if (oTable.fnSettings().oFeatures.bStateSave === true) {
-			$(oTable.selector).on('stateSaveParams', function (e, settings, data) {
-				if (settings.oLoadedState && settings.oLoadedState.yadcfState !== undefined) {
-					data.yadcfState = settings.oLoadedState.yadcfState;
-				} else {
-					data.naruto = 'kurama';
-				}
-			});
+			if (yadcfVersionCheck('1.10')) {
+				$(oTable.selector).on('stateSaveParams.dt', function (e, settings, data) {
+					if (settings.oLoadedState && settings.oLoadedState.yadcfState !== undefined) {
+						data.yadcfState = settings.oLoadedState.yadcfState;
+					} else {
+						data.naruto = 'kurama';
+					}
+				});
+			} else {
+				$(oTable.selector).on('stateSaveParams', function (e, settings, data) {
+					if (settings.oLoadedState && settings.oLoadedState.yadcfState !== undefined) {
+						data.yadcfState = settings.oLoadedState.yadcfState;
+					} else {
+						data.naruto = 'kurama';
+					}
+				});
+			}
 			//when using DOM source
 			if (oTable.fnSettings().sAjaxSource === null) {
 				//we need to make sure that the yadcf state will be saved after page reload
