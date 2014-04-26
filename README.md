@@ -20,6 +20,7 @@ Features:
 - Support DataTables 1.10.0-beta.2
 - Various filter options: 
  - select input
+ - multiple selection input
  - text input
  - autocomplete input - make use of the jQuery UI Autocomplete widget (with some enhancements)
  - date input - make use of the jQuery UI Datepicker widget (with some enhancements)
@@ -38,7 +39,7 @@ Features:
 - Filter in use visual notification:
  - when a certain filter is being used it will be highlighted (the color of highlight can easily be changed with css)
 - Miscellaneous:
- - integration with the Chosen plugin
+ - integration with the Chosen plugin (for single and multiple select)
  - predefined data source for filter (array of strings)
  - mData support (including deeply nested objects)
  - ability to place the filter in an external html element (for example: inside a div element)

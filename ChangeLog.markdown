@@ -1,9 +1,15 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.6.9
+
+* Added new filter type: multiple selection, filter_type: "multi_select". With or without Chosen plugin support (select_type: 'chosen') (https://github.com/vedmack/yadcf/issues/41) , thanks goes to Ryan Harris https://github.com/vedmack/yadcf/pull/23
+
+
 ## 0.6.7
 
 * Added support for the DataTables 1.10.0-beta.2 https://github.com/vedmack/yadcf/issues/38
 * Bug fix https://github.com/vedmack/yadcf/issues/42
+
 
 ## 0.6.4
 
