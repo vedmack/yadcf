@@ -53,7 +53,7 @@ Features:
  - support aoColumns { "bVisible": false }
  - support for case sensitive filtering
 - External API functions:
- - exFilterColumn: Allows to trigger filter externally/programmatically (currently support only filter_type : "select") , perfect for showing table after its being filtered (onload)
+ - exFilterColumn: Allows to trigger filter/s externally/programmatically (support ALL filter types!!!) , perfect for showing table with pre filtered columns
 - Notable datatables API support
  - bStateSave / bDeferRender
 

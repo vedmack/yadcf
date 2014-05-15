@@ -1,5 +1,12 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+
+## 0.7.0
+
+* Reimplemented exFilterColumn to support ALL filter types!!!  + Now it can be used even for multiple pre filtered columns https://github.com/vedmack/yadcf/issues/46
+* Bug fix https://github.com/vedmack/yadcf/issues/47
+
+
 ## 0.6.9
 
 * Added new filter type: multiple selection, filter_type: "multi_select". With or without Chosen plugin support (select_type: 'chosen') (https://github.com/vedmack/yadcf/issues/41) , thanks goes to Ryan Harris https://github.com/vedmack/yadcf/pull/23
