@@ -35,7 +35,7 @@ Guidelines for bug reports:
 2. **Use the [GitHub issue search](https://github.com/vedmack/yadcfh/search?type=Issues)** &mdash; check if the issue has already been
    reported.
 
-3. **Post Yadcf and Datatables code constructors**
+3. **Post Yadcf and Datatables code constructors snippets**
 
 4. **Isolate the problem** &mdash; ideally create a [reduced test
    case](http://css-tricks.com/6263-reduced-test-cases/) and a live example
