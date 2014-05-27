@@ -32,7 +32,7 @@ Guidelines for bug reports:
 
 1. Make sure you are using the **latest version**.
 
-2. **Use the [GitHub issue search](https://github.com/vedmack/yadcfh/search?type=Issues)** &mdash; check if the issue has already been
+2. **Use the [GitHub issue search](https://github.com/vedmack/yadcf/search?type=Issues)** &mdash; check if the issue has already been
    reported.
 
 3. **Post Yadcf and Datatables code constructors snippets**
