@@ -1,5 +1,12 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.7.2
+
+* Added another external API function : exGetColumnFilterVal, Allows to retreive column current filtered value (support ALL filter types!!!) https://github.com/vedmack/yadcf/issues/45
+* "data" property supports array of objects [{value: 'Some Data 1', label: 'One'}, {value: 'Some Data 3', label: 'Three'}] (supported in select / multi_select filters) https://github.com/vedmack/yadcf/issues/48
+* Bug fix https://github.com/vedmack/yadcf/issues/49
+* Several code optimizations
+
 
 ## 0.7.0
 

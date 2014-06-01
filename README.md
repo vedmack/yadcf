@@ -40,7 +40,7 @@ Features:
  - when a certain filter is being used it will be highlighted (the color of highlight can easily be changed with css)
 - Miscellaneous:
  - integration with the Chosen plugin (for single and multiple select)
- - predefined data source for filter (array of strings)
+ - predefined data source for filter (array of strings or objects)
  - mData support (including deeply nested objects)
  - ability to place the filter in an external html element (for example: inside a div element)
  - ability to control matching mode of the filter (Possible values: contains / exact / startsWith)
@@ -54,6 +54,7 @@ Features:
  - support for case sensitive filtering
 - External API functions:
  - exFilterColumn: Allows to trigger filter/s externally/programmatically (support ALL filter types!!!) , perfect for showing table with pre filtered columns
+ - exGetColumnFilterVal: Allows to retreive  column current filtered value (support ALL filter types!!!)	
 - Notable datatables API support
  - bStateSave / bDeferRender
 
