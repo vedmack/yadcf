@@ -6,8 +6,8 @@
     "jquery",
     "datatables",
 	"filter",
-	"plugin",
-	"column"    
+	"column",
+    "plugin"
   ],
   "version": "0.7.4",
   "author": {

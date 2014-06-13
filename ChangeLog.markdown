@@ -1,5 +1,6 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+
 ## 0.7.4
 
 * Added optional delay for filter_type: "text" (allows to delay filtering while typing characters) https://github.com/vedmack/yadcf/issues/51
