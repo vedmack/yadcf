@@ -1,5 +1,12 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.7.4
+
+* Added optional delay for filter_type: "text" (allows to delay filtering while typing characters) https://github.com/vedmack/yadcf/issues/51
+* Allow hide filter reset button for filter_type: "multi_select" https://github.com/vedmack/yadcf/issues/55
+* Added placeholder for multiple select mode (without Chosen integration) https://github.com/vedmack/yadcf/issues/54
+
+
 ## 0.7.2
 
 * Added another external API function : exGetColumnFilterVal, Allows to retreive column current filtered value (support ALL filter types!!!) https://github.com/vedmack/yadcf/issues/45
