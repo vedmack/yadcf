@@ -3,7 +3,7 @@
 
 ## 0.7.4
 
-* Added optional delay for filter_type: "text" (allows to delay filtering while typing characters) https://github.com/vedmack/yadcf/issues/51
+* Added optional delay (usage example filter_delay: 1000) for filter_type: "text" (allows to delay filtering while typing characters) https://github.com/vedmack/yadcf/issues/51
 * Allow hide filter reset button for filter_type: "multi_select" https://github.com/vedmack/yadcf/issues/55
 * Added placeholder for multiple select mode (without Chosen integration) https://github.com/vedmack/yadcf/issues/54
 
