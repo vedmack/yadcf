@@ -5,7 +5,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.7.7.beta.1
+* Version:     0.8.0.beta.1
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -629,7 +629,9 @@ var yadcf = (function ($) {
 		}
 		resetIApiIndex();
 
-		addRangeNumberFilterCapability(table_selector_jq_friendly, fromId, toId, column_number, ignore_char);
+		if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+			addRangeNumberFilterCapability(table_selector_jq_friendly, fromId, toId, column_number, ignore_char);
+		}
 
 	}
 
@@ -765,7 +767,9 @@ var yadcf = (function ($) {
 		}
 		resetIApiIndex();
 
-		addRangeDateFilterCapability(table_selector_jq_friendly, fromId, toId, column_number, date_format);
+		if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+			addRangeDateFilterCapability(table_selector_jq_friendly, fromId, toId, column_number, date_format);
+		}
 	}
 
 	function addDateFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, filter_default_label, date_format) {
@@ -974,7 +978,9 @@ var yadcf = (function ($) {
 		}
 		resetIApiIndex();
 
-		addRangeNumberSliderFilterCapability(table_selector_jq_friendly, min_tip_id, max_tip_id, column_number, ignore_char);
+		if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+			addRangeNumberSliderFilterCapability(table_selector_jq_friendly, min_tip_id, max_tip_id, column_number, ignore_char);
+		}
 	}
 
 	function dot2obj(tmpObj, dot_refs) {
@@ -1512,7 +1518,8 @@ var yadcf = (function ($) {
 			min,
 			max,
 			fromId,
-			toId;
+			toId,
+			column_number;
 
 		if (event.target.id.indexOf("-from-") !== -1) {
 			fromId = event.target.id;
@@ -1541,7 +1548,13 @@ var yadcf = (function ($) {
 
 		if (((max instanceof Date) && (min instanceof Date) && (max >= min)) || min === "" || max === "") {
 
-			oTable.fnDraw();
+			column_number = parseInt($(event.target).attr("id").replace('-from-date-', '').replace('-to-date-', '').replace('yadcf-filter-' + table_selector_jq_friendly, ''), 10);
+
+			if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+				oTable.fnDraw();
+			} else {
+				oTable.fnFilter(min + '-yadcf_delim-' + max, column_number);
+			}
 
 			if (min instanceof Date) {
 				$("#" + fromId).addClass("inuse");
@@ -1590,7 +1603,14 @@ var yadcf = (function ($) {
 		max = (max !== "") ? (+max) : max;
 
 		if ((!isNaN(max) && !isNaN(min) && (max >= min)) || min === "" || max === "") {
-			oTable.fnDraw();
+
+			column_number = parseInt($(event.target).attr("id").replace('-from-', '').replace('-to-', '').replace('yadcf-filter-' + table_selector_jq_friendly, ''), 10);
+
+			if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+				oTable.fnDraw();
+			} else {
+				oTable.fnFilter(min + '-yadcf_delim-' + max, column_number);
+			}
 			if (document.getElementById(fromId).value !== "") {
 				$("#" + fromId).addClass("inuse");
 			}
@@ -1606,7 +1626,6 @@ var yadcf = (function ($) {
 				oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 			}
 			if (oTable.fnSettings().oFeatures.bStateSave === true) {
-				column_number = parseInt($(event.target).attr("id").replace('-from-', '').replace('-to-', '').replace('yadcf-filter-' + table_selector_jq_friendly, ''), 10);
 				if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
 					oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
 						{
