@@ -5,7 +5,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.0.beta.1
+* Version:     0.8.0.beta.2
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -666,28 +666,64 @@ var yadcf = (function ($) {
 			table_selector_jq_friendly = column_number.substring(0, dashIndex),
 			yadcfState,
 			from,
-			to;
+			to,
+			min,
+			max,
+			min_server,
+			max_server,
+			date_format;
 
 		column_number = column_number.substring(dashIndex + 1);
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 
 		oTable = oTables[table_selector_jq_friendly];
-		oTable.fnDraw();
+		date_format = yadcf.getOptions(oTable.selector)[column_number].date_format;
+		date_format = date_format.replace("yyyy", "yy");
 
 		$("#" + $(event).attr("id")).addClass("inuse");
+
+		if ($(event).attr("id").indexOf("-from-") !== -1) {
+			from = document.getElementById($(event).attr("id")).value;
+			to = document.getElementById($(event).attr("id").replace("-from-", "-to-")).value;
+		} else {
+			to = document.getElementById($(event).attr("id")).value;
+			from = document.getElementById($(event).attr("id").replace("-to-", "-from-")).value;
+		}
+
+		if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+			oTable.fnDraw();
+		} else {
+			min = from;
+			max = to;
+
+			try {
+				if (min.length === (date_format.length + 2)) {
+					min = (min !== "") ? $.datepicker.parseDate(date_format, min) : min;
+				}
+			} catch (err1) {}
+			try {
+				if (max.length === (date_format.length + 2)) {
+					max = (max !== "") ? $.datepicker.parseDate(date_format, max) : max;
+				}
+			} catch (err2) {}
+			if (min instanceof Date) {
+				min_server = min.getTime();
+			} else {
+				min_server = min;
+			}
+			if (max instanceof Date) {
+				max_server = max.getTime();
+			} else {
+				max_server = max;
+			}
+			oTable.fnFilter(min_server + '-yadcf_delim-' + max_server, column_number);
+		}
 
 		if (!oTable.fnSettings().oLoadedState) {
 			oTable.fnSettings().oLoadedState = {};
 			oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 		}
 		if (oTable.fnSettings().oFeatures.bStateSave === true) {
-			if ($(event).attr("id").indexOf("-from-") !== -1) {
-				from = document.getElementById($(event).attr("id")).value;
-				to = document.getElementById($(event).attr("id").replace("-from-", "-to-")).value;
-			} else {
-				to = document.getElementById($(event).attr("id")).value;
-				from = document.getElementById($(event).attr("id").replace("-to-", "-from-")).value;
-			}
 			if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
 				oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
 					{
@@ -1413,18 +1449,24 @@ var yadcf = (function ($) {
 			yadcfState,
 			column_number;
 
+		column_number = parseInt($(event.target).parent().attr("id").replace('yadcf-filter-wrapper-' + table_selector_jq_friendly + '-', ''), 10);
+
 		$(event.target).parent().find(".yadcf-filter-range").val("");
 		if ($(event.target).parent().find(".yadcf-filter-range-number").length > 0) {
 			$($(event.target).parent().find(".yadcf-filter-range")[0]).focus();
 		}
 
-		oTable.fnDraw();
+		if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+			oTable.fnDraw();
+		} else {
+			oTable.fnFilter('-yadcf_delim-', column_number);
+		}
+
 		if (!oTable.fnSettings().oLoadedState) {
 			oTable.fnSettings().oLoadedState = {};
 			oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 		}
 		if (oTable.fnSettings().oFeatures.bStateSave === true) {
-			column_number = parseInt($(event.target).parent().attr("id").replace('yadcf-filter-wrapper-' + table_selector_jq_friendly + '-', ''), 10);
 			if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
 				oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
 					{
@@ -1516,7 +1558,9 @@ var yadcf = (function ($) {
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 		var oTable = oTables[table_selector_jq_friendly],
 			min,
+			min_server,
 			max,
+			max_server,
 			fromId,
 			toId,
 			column_number;
@@ -1553,7 +1597,17 @@ var yadcf = (function ($) {
 			if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 				oTable.fnDraw();
 			} else {
-				oTable.fnFilter(min + '-yadcf_delim-' + max, column_number);
+				if (min instanceof Date) {
+					min_server = min.getTime();
+				} else {
+					min_server = min;
+				}
+				if (max instanceof Date) {
+					max_server = max.getTime();
+				} else {
+					max_server = max;
+				}
+				oTable.fnFilter(min_server + '-yadcf_delim-' + max_server, column_number);
 			}
 
 			if (min instanceof Date) {
