@@ -17,7 +17,8 @@ If you like my plugin, you can show your appreciation by following me in [Twitte
 Features:
 =====
 
-- Support DataTables 1.10.0-beta.2
+- Support DataTables 1.10.0
+- Support all data source: DOM, Javascript, Ajax and server-side processing (1.10.0)
 - Various filter options: 
  - select input
  - multiple selection input
@@ -40,7 +41,7 @@ Features:
  - when a certain filter is being used it will be highlighted (the color of highlight can easily be changed with css)
 - Miscellaneous:
  - integration with the Chosen plugin (for single and multiple select)
- - filter delay (for text filter)
+ - filter delay (for text / range_number / range_date filters / range_number_slider)
  - predefined data source for filter (array of strings or objects)
  - mData support (including deeply nested objects)
  - ability to place the filter in an external html element (for example: inside a div element)
@@ -72,7 +73,9 @@ Examples:
 
 [Multiple tables example](http://yadcf-showcase.appspot.com/multiple_tables.html)
 
-[DOM Ajax Multiple 1.10 beta 2 example](http://yadcf-showcase.appspot.com/DOM_Ajax_Multiple_1.10.html)
+[Server side source example](http://yadcf-showcase.appspot.com/server_side_source.html)
+
+[DOM Ajax Multiple 1.10](http://yadcf-showcase.appspot.com/DOM_Ajax_Multiple_1.10.html)
 
 
 Usage:
@@ -109,12 +112,13 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 * select_type
 * select_type_options
 * case_insensitive
+* filter_delay
 
 
 License:
 =====
 
-Copyright 2013
+Copyright 2014
 Dual licensed under two licenses: GPL v2 license or a BSD (3-point) license (just like DataTables itself)
 
 

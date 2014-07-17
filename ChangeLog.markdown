@@ -1,5 +1,9 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.8.0
+
+* Added support for server-side processing filtering(1.10.0) - all filters are fully working on server-side processing
+* filter_delay is now supported in text / range_number / range_date filters / range_number_slider filters, this option can be really handy when working with server-side processing (but not only)
 
 ## 0.7.4
 

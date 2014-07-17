@@ -1,12 +1,11 @@
 /*global $, jQuery, exFilterColumn*/
 /*jslint plusplus: true, nomen: true */
 
-
 /*!
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.7.4
+* Version:     0.8.0
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -14,7 +13,7 @@
 * Twitter:	   @danielreznick
 * Q&A		   https://groups.google.com/forum/#!forum/daniels_code	
 * 
-* Copyright 2013 Daniel Reznick, all rights reserved.
+* Copyright 2014 Daniel Reznick, all rights reserved.
 * Dual licensed under two licenses: GPL v2 license or a BSD (3-point) license (just like DataTables itself)
 * 
 * This source file is distributed in the hope that it will be useful, but 
@@ -147,7 +146,7 @@
 				Type:				integer
 				Default value:		undefined
 				Description:		Delay filter execution for a XXX milliseconds - filter will fire XXX milliseconds after the last keyup.
-				Special Notes:		Currently supported only by the "text" filter
+				Special Notes:		Currently supported in text / range_number / range_date filters / range_number_slider
 
 *				
 *				
@@ -170,7 +169,22 @@
 									column number:  column number from which we want the value
 				Usage Example:		yadcf.exGetColumnFilterVal(oTable,1);
 				Return value:		String (for simple filter) / Object (for range filter) with from and to properties / Array of strings for multi_select filter
+
 *
+*				
+*				
+* Server-side processing API (see more on showcase):
+* 
+* From server to client:
+* In order to populate the filters with data from server (select / auto_complete / range_number_slider (min and max values), you should add to your current json respond the following properties: 
+* lets say for first column you add yadcf_data_0 filled with array of values, for column second column yadcf_data_1 and so on...
+* 
+* From client to server:
+* Read the filtered value like this (for first column) req.getParameter("columns[0][search][value]"); <- java code , php/.Net/etc you just need to get it from the request
+* Range filter value will arrive delimited by  -yadcf_delim- , so just split it into an array or something like this: String[] minMax = sSearch_0.split("-yadcf_delim-");
+*
+*					
+* -------------
 *
 */
 var yadcf = (function ($) {
@@ -630,7 +644,9 @@ var yadcf = (function ($) {
 		}
 		resetIApiIndex();
 
-		addRangeNumberFilterCapability(table_selector_jq_friendly, fromId, toId, column_number, ignore_char);
+		if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+			addRangeNumberFilterCapability(table_selector_jq_friendly, fromId, toId, column_number, ignore_char);
+		}
 
 	}
 
@@ -665,28 +681,64 @@ var yadcf = (function ($) {
 			table_selector_jq_friendly = column_number.substring(0, dashIndex),
 			yadcfState,
 			from,
-			to;
+			to,
+			min,
+			max,
+			min_server,
+			max_server,
+			date_format;
 
 		column_number = column_number.substring(dashIndex + 1);
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 
 		oTable = oTables[table_selector_jq_friendly];
-		oTable.fnDraw();
+		date_format = yadcf.getOptions(oTable.selector)[column_number].date_format;
+		date_format = date_format.replace("yyyy", "yy");
 
 		$("#" + $(event).attr("id")).addClass("inuse");
+
+		if ($(event).attr("id").indexOf("-from-") !== -1) {
+			from = document.getElementById($(event).attr("id")).value;
+			to = document.getElementById($(event).attr("id").replace("-from-", "-to-")).value;
+		} else {
+			to = document.getElementById($(event).attr("id")).value;
+			from = document.getElementById($(event).attr("id").replace("-to-", "-from-")).value;
+		}
+
+		if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+			oTable.fnDraw();
+		} else {
+			min = from;
+			max = to;
+
+			try {
+				if (min.length === (date_format.length + 2)) {
+					min = (min !== "") ? $.datepicker.parseDate(date_format, min) : min;
+				}
+			} catch (err1) {}
+			try {
+				if (max.length === (date_format.length + 2)) {
+					max = (max !== "") ? $.datepicker.parseDate(date_format, max) : max;
+				}
+			} catch (err2) {}
+			if (min instanceof Date) {
+				min_server = min.getTime();
+			} else {
+				min_server = min;
+			}
+			if (max instanceof Date) {
+				max_server = max.getTime();
+			} else {
+				max_server = max;
+			}
+			oTable.fnFilter(min_server + '-yadcf_delim-' + max_server, column_number);
+		}
 
 		if (!oTable.fnSettings().oLoadedState) {
 			oTable.fnSettings().oLoadedState = {};
 			oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 		}
 		if (oTable.fnSettings().oFeatures.bStateSave === true) {
-			if ($(event).attr("id").indexOf("-from-") !== -1) {
-				from = document.getElementById($(event).attr("id")).value;
-				to = document.getElementById($(event).attr("id").replace("-from-", "-to-")).value;
-			} else {
-				to = document.getElementById($(event).attr("id")).value;
-				from = document.getElementById($(event).attr("id").replace("-to-", "-from-")).value;
-			}
 			if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
 				oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
 					{
@@ -766,7 +818,9 @@ var yadcf = (function ($) {
 		}
 		resetIApiIndex();
 
-		addRangeDateFilterCapability(table_selector_jq_friendly, fromId, toId, column_number, date_format);
+		if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+			addRangeDateFilterCapability(table_selector_jq_friendly, fromId, toId, column_number, date_format);
+		}
 	}
 
 	function addDateFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, filter_default_label, date_format) {
@@ -829,59 +883,78 @@ var yadcf = (function ($) {
 			max_val,
 			slider_inuse,
 			yadcfState,
-			column_number = $(event.target).attr('id').replace("yadcf-filter-", "").replace(table_selector_jq_friendly, "").replace("-slider-", "");
+			column_number = $(event.target).attr('id').replace("yadcf-filter-", "").replace(table_selector_jq_friendly, "").replace("-slider-", ""),
+			options,
+			keyUp;
 
-		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 		oTable = oTables[table_selector_jq_friendly];
+		options = getOptions(oTable.selector)[column_number];
 
-		oTable.fnDraw();
+		keyUp = function () {
 
-		min_val = +$($(event.target).parent().find(".yadcf-filter-range-number-slider-min-tip-hidden")).text();
-		max_val = +$($(event.target).parent().find(".yadcf-filter-range-number-slider-max-tip-hidden")).text();
+			$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
+
+			if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+				oTable.fnDraw();
+			} else {
+				oTable.fnFilter(ui.values[0] + '-yadcf_delim-' + ui.values[1], column_number);
+			}
+
+			min_val = +$($(event.target).parent().find(".yadcf-filter-range-number-slider-min-tip-hidden")).text();
+			max_val = +$($(event.target).parent().find(".yadcf-filter-range-number-slider-max-tip-hidden")).text();
 
 
-		if (min_val !== ui.values[0]) {
-			$($(event.target).find(".ui-slider-handle")[0]).addClass("inuse");
-			slider_inuse = true;
-		} else {
-			$($(event.target).find(".ui-slider-handle")[0]).removeClass("inuse");
-		}
-		if (max_val !== ui.values[1]) {
-			$($(event.target).find(".ui-slider-handle")[1]).addClass("inuse");
-			slider_inuse = true;
-		} else {
-			$($(event.target).find(".ui-slider-handle")[1]).removeClass("inuse");
-		}
+			if (min_val !== ui.values[0]) {
+				$($(event.target).find(".ui-slider-handle")[0]).addClass("inuse");
+				slider_inuse = true;
+			} else {
+				$($(event.target).find(".ui-slider-handle")[0]).removeClass("inuse");
+			}
+			if (max_val !== ui.values[1]) {
+				$($(event.target).find(".ui-slider-handle")[1]).addClass("inuse");
+				slider_inuse = true;
+			} else {
+				$($(event.target).find(".ui-slider-handle")[1]).removeClass("inuse");
+			}
 
-		if (slider_inuse === true) {
-			$(event.target).find(".ui-slider-range").addClass("inuse");
-		} else {
-			$(event.target).find(".ui-slider-range").removeClass("inuse");
-		}
-		if (!oTable.fnSettings().oLoadedState) {
-			oTable.fnSettings().oLoadedState = {};
-			oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
-		}
-		if (oTable.fnSettings().oFeatures.bStateSave === true) {
-			if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
-				oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
-					{
+			if (slider_inuse === true) {
+				$(event.target).find(".ui-slider-range").addClass("inuse");
+			} else {
+				$(event.target).find(".ui-slider-range").removeClass("inuse");
+			}
+			if (!oTable.fnSettings().oLoadedState) {
+				oTable.fnSettings().oLoadedState = {};
+				oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
+			}
+			if (oTable.fnSettings().oFeatures.bStateSave === true) {
+				if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
+					oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
+						{
+							'from' : ui.values[0],
+							'to' : ui.values[1]
+						};
+				} else {
+					yadcfState = {};
+					yadcfState[table_selector_jq_friendly] = [];
+					yadcfState[table_selector_jq_friendly][column_number] = {
 						'from' : ui.values[0],
 						'to' : ui.values[1]
 					};
-			} else {
-				yadcfState = {};
-				yadcfState[table_selector_jq_friendly] = [];
-				yadcfState[table_selector_jq_friendly][column_number] = {
-					'from' : ui.values[0],
-					'to' : ui.values[1]
-				};
-				oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+					oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+				}
+				oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 			}
-			oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
-		}
 
-		resetIApiIndex();
+			resetIApiIndex();
+		};
+
+		if (options.filter_delay === undefined) {
+			keyUp();
+		} else {
+			yadcfDelay(function () {
+				keyUp();
+			}, options.filter_delay);
+		}
 	}
 
 	function addRangeNumberSliderFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, min_val, max_val, ignore_char) {
@@ -975,7 +1048,9 @@ var yadcf = (function ($) {
 		}
 		resetIApiIndex();
 
-		addRangeNumberSliderFilterCapability(table_selector_jq_friendly, min_tip_id, max_tip_id, column_number, ignore_char);
+		if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+			addRangeNumberSliderFilterCapability(table_selector_jq_friendly, min_tip_id, max_tip_id, column_number, ignore_char);
+		}
 	}
 
 	function dot2obj(tmpObj, dot_refs) {
@@ -1408,18 +1483,24 @@ var yadcf = (function ($) {
 			yadcfState,
 			column_number;
 
+		column_number = parseInt($(event.target).parent().attr("id").replace('yadcf-filter-wrapper-' + table_selector_jq_friendly + '-', ''), 10);
+
 		$(event.target).parent().find(".yadcf-filter-range").val("");
 		if ($(event.target).parent().find(".yadcf-filter-range-number").length > 0) {
 			$($(event.target).parent().find(".yadcf-filter-range")[0]).focus();
 		}
 
-		oTable.fnDraw();
+		if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+			oTable.fnDraw();
+		} else {
+			oTable.fnFilter('-yadcf_delim-', column_number);
+		}
+
 		if (!oTable.fnSettings().oLoadedState) {
 			oTable.fnSettings().oLoadedState = {};
 			oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 		}
 		if (oTable.fnSettings().oFeatures.bStateSave === true) {
-			column_number = parseInt($(event.target).parent().attr("id").replace('yadcf-filter-wrapper-' + table_selector_jq_friendly + '-', ''), 10);
 			if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
 				oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
 					{
@@ -1456,6 +1537,10 @@ var yadcf = (function ($) {
 		$("#" + $(event.target).prev().find(".yadcf-filter-range-number-slider").attr("id")).slider("option", "values", [min_val, max_val]);
 
 		$($(event.target).prev().find(".ui-slider-handle")[0]).attr("tabindex", -1).focus();
+
+		$($(event.target).prev().find(".ui-slider-handle")[0]).removeClass("inuse");
+		$($(event.target).prev().find(".ui-slider-handle")[1]).removeClass("inuse");
+		$(event.target).prev().find(".ui-slider-range").removeClass("inuse");
 
 		oTable.fnDraw();
 		resetIApiIndex();
@@ -1511,56 +1596,88 @@ var yadcf = (function ($) {
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 		var oTable = oTables[table_selector_jq_friendly],
 			min,
+			min_server,
 			max,
+			max_server,
 			fromId,
-			toId;
+			toId,
+			column_number,
+			options,
+			keyUp;
 
-		if (event.target.id.indexOf("-from-") !== -1) {
-			fromId = event.target.id;
-			toId = event.target.id.replace("-from-", "-to-");
+		column_number = parseInt($(event.target).attr("id").replace('-from-date-', '').replace('-to-date-', '').replace('yadcf-filter-' + table_selector_jq_friendly, ''), 10);
+		options = getOptions(oTable.selector)[column_number];
 
-			min = document.getElementById(fromId).value;
-			max = document.getElementById(toId).value;
+		keyUp = function () {
+			if (event.target.id.indexOf("-from-") !== -1) {
+				fromId = event.target.id;
+				toId = event.target.id.replace("-from-", "-to-");
+
+				min = document.getElementById(fromId).value;
+				max = document.getElementById(toId).value;
+			} else {
+				toId = event.target.id;
+				fromId = event.target.id.replace("-to-", "-from-");
+
+				max =   document.getElementById(toId).value;
+				min = document.getElementById(fromId).value;
+			}
+
+			try {
+				if (min.length === (date_format.length + 2)) {
+					min = (min !== "") ? $.datepicker.parseDate(date_format, min) : min;
+				}
+			} catch (err1) {}
+			try {
+				if (max.length === (date_format.length + 2)) {
+					max = (max !== "") ? $.datepicker.parseDate(date_format, max) : max;
+				}
+			} catch (err2) {}
+
+			if (((max instanceof Date) && (min instanceof Date) && (max >= min)) || min === "" || max === "") {
+
+				if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+					oTable.fnDraw();
+				} else {
+					if (min instanceof Date) {
+						min_server = min.getTime();
+					} else {
+						min_server = min;
+					}
+					if (max instanceof Date) {
+						max_server = max.getTime();
+					} else {
+						max_server = max;
+					}
+					oTable.fnFilter(min_server + '-yadcf_delim-' + max_server, column_number);
+				}
+
+				if (min instanceof Date) {
+					$("#" + fromId).addClass("inuse");
+				} else {
+					$("#" + fromId).removeClass("inuse");
+				}
+				if (max instanceof Date) {
+					$("#" + toId).addClass("inuse");
+				} else {
+					$("#" + toId).removeClass("inuse");
+				}
+
+				if ($.trim(event.target.value) === "" && $(event.target).hasClass("inuse")) {
+					$("#" + event.target.id).removeClass("inuse");
+				}
+
+			}
+			resetIApiIndex();
+		};
+
+		if (options.filter_delay === undefined) {
+			keyUp(table_selector_jq_friendly, event);
 		} else {
-			toId = event.target.id;
-			fromId = event.target.id.replace("-to-", "-from-");
-
-			max =   document.getElementById(toId).value;
-			min = document.getElementById(fromId).value;
+			yadcfDelay(function () {
+				keyUp(table_selector_jq_friendly, event);
+			}, options.filter_delay);
 		}
-
-		try {
-			if (min.length === (date_format.length + 2)) {
-				min = (min !== "") ? $.datepicker.parseDate(date_format, min) : min;
-			}
-		} catch (err1) {}
-		try {
-			if (max.length === (date_format.length + 2)) {
-				max = (max !== "") ? $.datepicker.parseDate(date_format, max) : max;
-			}
-		} catch (err2) {}
-
-		if (((max instanceof Date) && (min instanceof Date) && (max >= min)) || min === "" || max === "") {
-
-			oTable.fnDraw();
-
-			if (min instanceof Date) {
-				$("#" + fromId).addClass("inuse");
-			} else {
-				$("#" + fromId).removeClass("inuse");
-			}
-			if (max instanceof Date) {
-				$("#" + toId).addClass("inuse");
-			} else {
-				$("#" + toId).removeClass("inuse");
-			}
-
-			if ($.trim(event.target.value) === "" && $(event.target).hasClass("inuse")) {
-				$("#" + event.target.id).removeClass("inuse");
-			}
-
-		}
-		resetIApiIndex();
 	}
 
 	function rangeNumberKeyUP(table_selector_jq_friendly, event) {
@@ -1571,62 +1688,82 @@ var yadcf = (function ($) {
 			fromId,
 			toId,
 			yadcfState,
-			column_number;
+			column_number,
+			options,
+			keyUp;
 
-		if (event.target.id.indexOf("-from-") !== -1) {
-			fromId = event.target.id;
-			toId = event.target.id.replace("-from-", "-to-");
+		column_number = parseInt($(event.target).attr("id").replace('-from-', '').replace('-to-', '').replace('yadcf-filter-' + table_selector_jq_friendly, ''), 10);
+		options = getOptions(oTable.selector)[column_number];
 
-			min = document.getElementById(fromId).value;
-			max = document.getElementById(toId).value;
-		} else {
-			toId = event.target.id;
-			fromId = event.target.id.replace("-to-", "-from-");
+		keyUp = function () {
 
-			max =   document.getElementById(toId).value;
-			min = document.getElementById(fromId).value;
-		}
+			if (event.target.id.indexOf("-from-") !== -1) {
+				fromId = event.target.id;
+				toId = event.target.id.replace("-from-", "-to-");
 
-		min = (min !== "") ? (+min) : min;
-		max = (max !== "") ? (+max) : max;
+				min = document.getElementById(fromId).value;
+				max = document.getElementById(toId).value;
+			} else {
+				toId = event.target.id;
+				fromId = event.target.id.replace("-to-", "-from-");
 
-		if ((!isNaN(max) && !isNaN(min) && (max >= min)) || min === "" || max === "") {
-			oTable.fnDraw();
-			if (document.getElementById(fromId).value !== "") {
-				$("#" + fromId).addClass("inuse");
-			}
-			if (document.getElementById(toId).value !== "") {
-				$("#" + toId).addClass("inuse");
+				max =   document.getElementById(toId).value;
+				min = document.getElementById(fromId).value;
 			}
 
-			if ($.trim(event.target.value) === "" && $(event.target).hasClass("inuse")) {
-				$("#" + event.target.id).removeClass("inuse");
-			}
-			if (!oTable.fnSettings().oLoadedState) {
-				oTable.fnSettings().oLoadedState = {};
-				oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
-			}
-			if (oTable.fnSettings().oFeatures.bStateSave === true) {
-				column_number = parseInt($(event.target).attr("id").replace('-from-', '').replace('-to-', '').replace('yadcf-filter-' + table_selector_jq_friendly, ''), 10);
-				if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
-					oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
-						{
+			min = (min !== "") ? (+min) : min;
+			max = (max !== "") ? (+max) : max;
+
+			if ((!isNaN(max) && !isNaN(min) && (max >= min)) || min === "" || max === "") {
+
+				if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+					oTable.fnDraw();
+				} else {
+					oTable.fnFilter(min + '-yadcf_delim-' + max, column_number);
+				}
+				if (document.getElementById(fromId).value !== "") {
+					$("#" + fromId).addClass("inuse");
+				}
+				if (document.getElementById(toId).value !== "") {
+					$("#" + toId).addClass("inuse");
+				}
+
+				if ($.trim(event.target.value) === "" && $(event.target).hasClass("inuse")) {
+					$("#" + event.target.id).removeClass("inuse");
+				}
+				if (!oTable.fnSettings().oLoadedState) {
+					oTable.fnSettings().oLoadedState = {};
+					oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
+				}
+				if (oTable.fnSettings().oFeatures.bStateSave === true) {
+					if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
+						oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
+							{
+								'from' : min,
+								'to' : max
+							};
+					} else {
+						yadcfState = {};
+						yadcfState[table_selector_jq_friendly] = [];
+						yadcfState[table_selector_jq_friendly][column_number] = {
 							'from' : min,
 							'to' : max
 						};
-				} else {
-					yadcfState = {};
-					yadcfState[table_selector_jq_friendly] = [];
-					yadcfState[table_selector_jq_friendly][column_number] = {
-						'from' : min,
-						'to' : max
-					};
-					oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+						oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+					}
+					oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 				}
-				oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 			}
+			resetIApiIndex();
+		};
+
+		if (options.filter_delay === undefined) {
+			keyUp();
+		} else {
+			yadcfDelay(function () {
+				keyUp();
+			}, options.filter_delay);
 		}
-		resetIApiIndex();
 	}
 
 	function textKeyUP(table_selector_jq_friendly, event, clear) {
@@ -1707,7 +1844,7 @@ var yadcf = (function ($) {
         oTables[table_selector_jq_friendly] = oTable;
 		oTablesIndex[table_selector_jq_friendly] = index;
 
-        if (oTable.fnSettings().sAjaxSource === null) {
+        if (oTable.fnSettings().sAjaxSource === null && oTable.fnSettings().ajax === null) {
 			table_selector_tmp = table_selector;
 			if (table_selector.indexOf(":eq") !== -1) {
 				table_selector_tmp = table_selector.substring(0, table_selector.lastIndexOf(":eq"));
@@ -1718,6 +1855,16 @@ var yadcf = (function ($) {
 			if (yadcfVersionCheck('1.10')) {
 				$(document).on("draw.dt", oTable.selector, function (event, ui) {
 					appendFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
+				});
+				$(document).on('xhr.dt', function (e, settings, json) {
+					var col_num;
+					for (col_num in yadcf.getOptions(settings.oInstance.selector)) {
+						if (yadcf.getOptions(settings.oInstance.selector).hasOwnProperty(col_num)) {
+							if (json['yadcf_data_' + col_num] !== undefined) {
+								yadcf.getOptions(settings.oInstance.selector)[col_num].data = json['yadcf_data_' + col_num];
+							}
+						}
+					}
 				});
 			} else {
 				$(document).on("draw", oTable.selector, function (event, ui) {
@@ -1744,7 +1891,7 @@ var yadcf = (function ($) {
 				});
 			}
 			//when using DOM source
-			if (oTable.fnSettings().sAjaxSource === null) {
+			if (oTable.fnSettings().sAjaxSource === null && oTable.fnSettings().ajax === null) {
 				//we need to make sure that the yadcf state will be saved after page reload
 				oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 				//redraw the table in order to apply the filters
