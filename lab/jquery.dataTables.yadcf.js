@@ -1131,7 +1131,7 @@ var yadcf = (function ($) {
 				column_number = columnObj.column_number;
 				column_number = +column_number;
 				column_number_data = undefined;
-				if (isNaN(oTable.fnSettings().aoColumns[column_number].mData)) {
+				if (isNaN(oTable.fnSettings().aoColumns[column_number].mData) && typeof oTable.fnSettings().aoColumns[column_number].mData !== 'object') {
 					column_number_data = oTable.fnSettings().aoColumns[column_number].mData;
 				}
 				column_data_type = columnObj.column_data_type;
