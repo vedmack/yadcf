@@ -5,7 +5,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.2.beta
+* Version:     0.8.2.beta-2
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -123,15 +123,15 @@
 				Required:			false
 				Type:				String
 				Default value:		undefined
-				Possible values:	chosen
-				Description:		Turns the simple select element into "Chosen select" (make use of the Chosen jQuery plugin)
+				Possible values:	chosen / select2
+				Description:		Turns the simple select element into "Chosen/Select2 select" (make use of the Chosen/Select2 jQuery plugin)
 				
 				
 * select_type_options
 				Required:			false
 				Type:				Object
 				Default value:		{}
-				Description:		This parameter will be passed "as is" the the Chosen plugin constructor
+				Description:		This parameter will be passed "as is" to the Chosen/Select2 plugin constructor
 				
 				
 * case_insensitive
@@ -1333,10 +1333,12 @@ var yadcf = (function ($) {
 					options = options_tmp;
 				}
 
-				if ($filter_selector.length === 1) {
+				if ($filter_selector.length >= 1) {
 					if (columnObj.filter_type === "select" || columnObj.filter_type === "multi_select") {
-						$filter_selector.empty();
-						$filter_selector.append(options);
+						if ($filter_selector.length === 1) {
+							$filter_selector.empty();
+							$filter_selector.append(options);
+						}
 						if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().aoPreSearchCols[column_number].sSearch) {
 							tmpStr = oTable.fnSettings().aoPreSearchCols[column_number].sSearch;
 							if (columnObj.filter_type === "select") {
@@ -1386,6 +1388,8 @@ var yadcf = (function ($) {
 						if (columnObj.select_type !== undefined && columnObj.select_type === 'chosen') {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).chosen(columnObj.select_type_options);
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).next().attr("onclick", "yadcf.stopPropagation(event);");
+						} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2(columnObj.select_type_options);
 						}
 
 					} else if (columnObj.filter_type === "multi_select") {
@@ -1415,6 +1419,8 @@ var yadcf = (function ($) {
 						if (columnObj.select_type !== undefined && columnObj.select_type === 'chosen') {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).chosen(columnObj.select_type_options);
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).next().attr("onclick", "yadcf.stopPropagation(event);");
+						} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2(columnObj.select_type_options);
 						}
 
 					} else if (columnObj.filter_type === "auto_complete") {
