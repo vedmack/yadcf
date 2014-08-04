@@ -11,14 +11,14 @@ Contact/Social:
 =====
 If you want to ask a question use my [google group](https://groups.google.com/forum/#!forum/daniels_code)
 
-If you like my plugin, you can show your appreciation by following me in [Twitter](https://twitter.com/danielreznick) / [GitHub](https://github.com/vedmack).
+If you like my plugin, you can show your appreciation by following me on [Twitter](https://twitter.com/danielreznick) / [GitHub](https://github.com/vedmack).
 
 
 Features:
 =====
 
-- Support DataTables 1.10.0
-- Support all data source: DOM, Javascript, Ajax and server-side processing (1.10.0)
+- Support DataTables 1.10.0 - Use yadcf.init(...) for new API (Capital "D")
+- Support all data source: DOM, Javascript, Ajax and server-side processing (1.10.0 +)
 - Various filter options: 
  - select input
  - multiple selection input
@@ -40,7 +40,8 @@ Features:
 - Filter in use visual notification:
  - when a certain filter is being used it will be highlighted (the color of highlight can easily be changed with css)
 - Miscellaneous:
- - integration with the Chosen plugin (for single and multiple select)
+ - integration with the Chosen / Select2 plugins (for single and multiple select)
+ - integration with the Datatables ColVis plugin (1.10.0 +)
  - filter delay (for text / range_number / range_date filters / range_number_slider)
  - predefined data source for filter (array of strings or objects)
  - mData support (including deeply nested objects)
@@ -66,6 +67,8 @@ Examples:
 [DOM source example](http://yadcf-showcase.appspot.com/DOM_source.html)
 
 [DOM source with chosen example](http://yadcf-showcase.appspot.com/DOM_source_chosen.html)
+
+[DOM source with select2 example](http://yadcf-showcase.appspot.com/DOM_source_select2.html)
 
 [AJAX source example](http://yadcf-showcase.appspot.com/ajax_source.html)
 

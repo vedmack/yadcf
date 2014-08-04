@@ -1,5 +1,12 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.8.2
+
+* Added integration with Datatables new API (Capital "D") - use new yadcf init function, yadcf.init(table, array of objects); usage example: http://yadcf-showcase.appspot.com/DOM_Ajax_Multiple_1.10.html
+* Added integration with Select2 plugin https://github.com/vedmack/yadcf/issues/63
+* Added integration with DataTables ColVis plugin https://github.com/vedmack/yadcf/issues/56
+
+
 ## 0.8.0
 
 * Added support for server-side processing filtering(1.10.0) - all filters are fully working on server-side processing
