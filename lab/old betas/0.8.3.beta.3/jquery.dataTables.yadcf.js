@@ -4,14 +4,14 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.3.beta.4
+* Version:     0.8.3.beta.3
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
 * Contact:     vedmack@gmail.com
 * Twitter:	   @danielreznick
 * Q&A		   https://groups.google.com/forum/#!forum/daniels_code	
-*tate
+* 
 * Copyright 2013 Daniel Reznick, all rights reserved.
 * Dual licensed under two licenses: GPL v2 license or a BSD (3-point) license (just like DataTables itself)
 * 
@@ -910,7 +910,7 @@ var yadcf = (function ($) {
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 		oTable = oTables[table_selector_jq_friendly];
 
-		if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
+		if (oTable.fnSettings().oFeatures.bStateSave === true || oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
 			$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(oTable.fnSettings().aoPreSearchCols[column_number].sSearch).addClass("inuse");
 		}
 
@@ -1373,7 +1373,7 @@ var yadcf = (function ($) {
 
 						$filter_selector.empty();
 						$filter_selector.append(options);
-						if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
+						if (oTable.fnSettings().oFeatures.bStateSave === true || oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
 							tmpStr = oTable.fnSettings().aoPreSearchCols[column_number].sSearch;
 							if (columnObj.filter_type === "select") {
 								tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
@@ -1427,7 +1427,7 @@ var yadcf = (function ($) {
 							}
 						}
 
-						if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
+						if (oTable.fnSettings().oFeatures.bStateSave === true || oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
 							tmpStr = oTable.fnSettings().aoPreSearchCols[column_number].sSearch;
 							tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
@@ -1454,7 +1454,7 @@ var yadcf = (function ($) {
 								"onclick=\"yadcf.stopPropagation(event);yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
 						}
 
-						if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
+						if (oTable.fnSettings().oFeatures.bStateSave === true || oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
 							tmpStr = oTable.fnSettings().aoPreSearchCols[column_number].sSearch;
 							tmpStr = yadcfParseMatchFilterMultiSelect(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
 							tmpStr = tmpStr.split("|");
@@ -1500,7 +1500,7 @@ var yadcf = (function ($) {
 								"onclick=\"yadcf.stopPropagation(event);yadcf.textKeyUP('" + table_selector_jq_friendly + "', event, 'clear'); return false;\" class=\"yadcf-filter-reset-button\">");
 						}
 
-						if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
+						if (oTable.fnSettings().oFeatures.bStateSave === true || oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
 							tmpStr = oTable.fnSettings().aoPreSearchCols[column_number].sSearch;
 							tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
@@ -1533,7 +1533,7 @@ var yadcf = (function ($) {
 						source: $(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number),
 						select: autocompleteSelect
 					});
-					if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
+					if (oTable.fnSettings().oFeatures.bStateSave === true || oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
 						tmpStr = oTable.fnSettings().aoPreSearchCols[column_number].sSearch;
 						tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
 						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
@@ -2044,10 +2044,7 @@ var yadcf = (function ($) {
 			toId,
 			sliderId,
 			optionsObj;
-		//check if the table arg is from new datatables API (capital "D")
-		if (table_arg.settings !== undefined) {
-			table_arg = table_arg.settings()[0].oInstance;
-		}
+
 		table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_arg.selector);
 		if ((table_arg.fnSettings().sAjaxSource === null && table_arg.fnSettings().ajax === null) || ajaxSource === true) {
 			for (j = 0; j < col_filter_arr.length; j++) {
