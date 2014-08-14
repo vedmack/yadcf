@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.3.beta.5 
+* Version:     0.8.3.beta.4 
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1027,8 +1027,7 @@ var yadcf = (function ($) {
 			if (!isFinite($('#' + min_tip_id).text()) || !isFinite($('#' + max_tip_id).text()) || !isFinite(min_val) || !isFinite(max_val) ||
 					!isFinite($(filter_selector_string).find('.yadcf-filter-range-number-slider-min-tip-hidden.hide').text()) ||
 					!isFinite($(filter_selector_string).find('.yadcf-filter-range-number-slider-max-tip-hidden.hide').text())) {
-				$(filter_selector_string).empty();
-
+				$("#" + filter_wrapper_id).remove();
 			} else {
 				return;
 			}
@@ -1399,10 +1398,8 @@ var yadcf = (function ($) {
 							$(filter_selector_string + " div.DataTables_sort_wrapper").css("display", "inline-block");
 						}
 					} else {
-						if ($("#yadcf-filter-wrapper-" + filter_container_id).length === 0) {
-							$("#" + filter_container_id).append("<div id=\"yadcf-filter-wrapper-" + filter_container_id + "\" class=\"yadcf-filter-wrapper\"></div>");
-							filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
-						}
+						$("#" + filter_container_id).append("<div id=\"yadcf-filter-wrapper-" + filter_container_id + "\" class=\"yadcf-filter-wrapper\"></div>");
+						filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
 					}
 
 					if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
