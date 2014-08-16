@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.3.beta.6
+* Version:     0.8.3.beta.5 
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1028,6 +1028,7 @@ var yadcf = (function ($) {
 					!isFinite($(filter_selector_string).find('.yadcf-filter-range-number-slider-min-tip-hidden.hide').text()) ||
 					!isFinite($(filter_selector_string).find('.yadcf-filter-range-number-slider-max-tip-hidden.hide').text())) {
 				$(filter_selector_string).empty();
+
 			} else {
 				return;
 			}
@@ -1399,9 +1400,9 @@ var yadcf = (function ($) {
 						}
 					} else {
 						if ($("#yadcf-filter-wrapper-" + filter_container_id).length === 0) {
-							$("#" + filter_container_id).append("<div id=\"yadcf-filter-wrapper-" + filter_container_id + "\"></div>");
+							$("#" + filter_container_id).append("<div id=\"yadcf-filter-wrapper-" + filter_container_id + "\" class=\"yadcf-filter-wrapper\"></div>");
+							filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
 						}
-						filter_selector_string = "#yadcf-filter-wrapper-" + filter_container_id;
 					}
 
 					if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
