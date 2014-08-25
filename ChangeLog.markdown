@@ -146,4 +146,4 @@
 
 * Added enable_auto_complete option
 * Several code enhancements (added ids to filters etc...)
-
+ 

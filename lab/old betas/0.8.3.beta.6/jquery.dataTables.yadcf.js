@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.3.beta.7
+* Version:     0.8.3.beta.6
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -368,8 +368,7 @@ var yadcf = (function ($) {
 		var oTable = oTables[table_selector_jq_friendly],
 			aEscapedTerms = [],
 			selected_values = $(arg).val(),
-			i,
-			stringForSearch;
+			i;
 
 		$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", selected_values);
 
@@ -381,14 +380,12 @@ var yadcf = (function ($) {
 				}
 			}
 			if (selected_values.length !== 0) {
-				stringForSearch = selected_values.join("|");
-				stringForSearch = stringForSearch.replace(/([.*+?^=!:${}()\[\]\/\\])/g, "\\$1");
 				if (filter_match_mode === "contains") {
-					oTable.fnFilter(stringForSearch, column_number, true, false, true);
+					oTable.fnFilter(selected_values.join("|"), column_number, true, false, true);
 				} else if (filter_match_mode === "exact") {
-					oTable.fnFilter("^(" + stringForSearch + ")$", column_number, true, false, true);
+					oTable.fnFilter("^(" + selected_values.join("|") + ")$", column_number, true, false, true);
 				} else if (filter_match_mode === "startsWith") {
-					oTable.fnFilter("^(" + stringForSearch + ")", column_number, true, false, true);
+					oTable.fnFilter("^(" + selected_values.join("|") + ")", column_number, true, false, true);
 				}
 			} else {
 				oTable.fnFilter("", column_number);
@@ -1383,7 +1380,6 @@ var yadcf = (function ($) {
 								$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
 							} else if (columnObj.filter_type === "multi_select") {
 								tmpStr = yadcfParseMatchFilterMultiSelect(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
-								tmpStr = tmpStr.replace(/\\/g, "");
 								tmpStr = tmpStr.split("|");
 								$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr);
 							}
@@ -1463,7 +1459,6 @@ var yadcf = (function ($) {
 						if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
 							tmpStr = oTable.fnSettings().aoPreSearchCols[column_number].sSearch;
 							tmpStr = yadcfParseMatchFilterMultiSelect(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
-							tmpStr = tmpStr.replace(/\\/g, "");
 							tmpStr = tmpStr.split("|");
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr);
 						}
