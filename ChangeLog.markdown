@@ -1,5 +1,14 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.8.3
+
+* Added new filter type: filter based on custom function, filter_type: "custom_func". Read docs (in yadcf js) and see showcase example http://yadcf-showcase.appspot.com/DOM_source.html, https://github.com/vedmack/yadcf/issues/61
+* exFilterColumn is now support sever side mode (non range filters only) https://github.com/vedmack/yadcf/issues/69 
+* Fixed range sliders combined with filter_container_id property https://github.com/vedmack/yadcf/issues/68
+* Escape special chars in multi select filter https://github.com/vedmack/yadcf/issues/74
+* Additional minor bug fixes
+
+
 ## 0.8.2
 
 * Added integration with Datatables new API (Capital "D") - use new yadcf init function, yadcf.init(table, array of objects); usage example: http://yadcf-showcase.appspot.com/DOM_Ajax_Multiple_1.10.html
@@ -21,7 +30,7 @@
 
 ## 0.7.2
 
-* Added another external API function : exGetColumnFilterVal, Allows to retreive column current filtered value (support ALL filter types!!!) https://github.com/vedmack/yadcf/issues/45
+* Added another external API function : exGetColumnFilterVal, Allows to retrieve column current filtered value (support ALL filter types!!!) https://github.com/vedmack/yadcf/issues/45
 * "data" property supports array of objects [{value: 'Some Data 1', label: 'One'}, {value: 'Some Data 3', label: 'Three'}] (supported in select / multi_select filters) https://github.com/vedmack/yadcf/issues/48
 * Bug fix https://github.com/vedmack/yadcf/issues/49
 * Several code optimizations
@@ -146,4 +155,4 @@
 
 * Added enable_auto_complete option
 * Several code enhancements (added ids to filters etc...)
- 
+

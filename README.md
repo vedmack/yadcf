@@ -28,6 +28,7 @@ Features:
  - range of numbers
  - range of numbers with slider widget - make use of the jQuery UI Slider widget (with some enhancements)
  - range of dates - make use of the jQuery UI Datepicker widget (with some enhancements)
+ - custom function
 - Parsing various types of columns: 
  - plain text 
  - plain text with delimiter
@@ -110,6 +111,7 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 
 * column_number
 * filter_type
+* custom_func
 * data
 * column_data_type
 * text_data_delimiter
