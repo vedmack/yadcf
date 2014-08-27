@@ -1,5 +1,11 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+
+## 0.8.4 (still beta)
+
+* Fixed IE8 issues https://github.com/vedmack/yadcf/issues/73
+
+
 ## 0.8.3
 
 * Added new filter type: filter based on custom function, filter_type: "custom_func". Read docs (in yadcf js) and see showcase example http://yadcf-showcase.appspot.com/DOM_source.html, https://github.com/vedmack/yadcf/issues/61
