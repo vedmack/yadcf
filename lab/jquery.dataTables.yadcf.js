@@ -1,4 +1,4 @@
-/*global $, jQuery, exFilterColumn*/ 
+/*global $, jQuery, exFilterColumn*/
 /*jslint plusplus: true, nomen: true */
 /*!
 * Yet Another DataTables Column Filter - (yadcf)
@@ -234,6 +234,10 @@ var yadcf = (function ($) {
 			},
 			adaptContainerCssClassImpl = function (dummy) { return ''; };
 
+		if (options_arg.length === undefined) {
+			options[selector_arg] = options_arg;
+			return;
+		}
 		for (i = 0; i < options_arg.length; i++) {
 			if (options_arg[i].select_type === 'select2') {
 				default_options.select_type_options = {adaptContainerCssClass: adaptContainerCssClassImpl};
@@ -262,6 +266,24 @@ var yadcf = (function ($) {
 
 	function generateTableSelectorJQFriendly(tmpStr) {
 		return tmpStr.replace(":", "-").replace("(", "").replace(")", "").replace(".", "-").replace("#", "-");
+	}
+
+	function escapeRegExp(string) {
+		return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+	}
+
+	function replaceAll(string, find, replace) {
+		return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+	}
+
+	function generateTableSelectorJQFriendlyNew(tmpStr) {
+		tmpStr = replaceAll(tmpStr, ":", "-");
+		tmpStr = replaceAll(tmpStr, "(", "");
+		tmpStr = replaceAll(tmpStr, ")", "");
+		tmpStr = replaceAll(tmpStr, ",", "");
+		tmpStr = replaceAll(tmpStr, ".", "-");
+		tmpStr = replaceAll(tmpStr, "#", "-");
+		return tmpStr;
 	}
 
 	yadcfDelay = (function () {
@@ -1228,7 +1250,7 @@ var yadcf = (function ($) {
 					} else if (columnObj.filter_type === "multi_select") {
 						filter_default_label = "Select values";
 					} else if (columnObj.filter_type === "auto_complete" || columnObj.filter_type === "text") {
-						filter_default_label = "Type a value";
+						filter_default_label = 'Type to filter';
 					} else if (columnObj.filter_type === "range_number" || columnObj.filter_type === "range_date") {
 						filter_default_label = ["from", "to"];
 					} else if (columnObj.filter_type === "date") {
@@ -1871,6 +1893,38 @@ var yadcf = (function ($) {
 		}
 	}
 
+	function textKeyUpMultiTables(tablesSelectors, event, clear) {
+
+		var table_selector_jq_friendly,
+			keyUp,
+			options = getOptions(tablesSelectors);
+		event = eventTargetFixUp(event);
+
+		keyUp = function (tablesSelectors, event, clear) {
+			table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendlyNew(tablesSelectors);
+
+			if (clear !== undefined || event.target.value === '') {
+				$("#yadcf-filter-" + table_selector_jq_friendly).val("").focus();
+				$("#yadcf-filter-" + table_selector_jq_friendly).removeClass("inuse");
+				$(tablesSelectors).DataTable().search('').draw();
+				return;
+			}
+
+			$("#yadcf-filter-" + table_selector_jq_friendly).addClass("inuse");
+
+			$(tablesSelectors).DataTable().search(event.target.value).draw();
+
+		};
+
+		if (options.filter_delay === undefined) {
+			keyUp(tablesSelectors, event, clear);
+		} else {
+			yadcfDelay(function () {
+				keyUp(tablesSelectors, event, clear);
+			}, options.filter_delay);
+		}
+	}
+
 	function textKeyUP(table_selector_jq_friendly, event, clear) {
 		event = eventTargetFixUp(event);
 		var column_number = parseInt($(event.target).attr("id").replace("yadcf-filter-" + table_selector_jq_friendly + "-", "").replace('-reset', ''), 10),
@@ -2051,6 +2105,47 @@ var yadcf = (function ($) {
 			}
 			$.fn.dataTableExt.iApiIndex = 0;
 		}
+	}
+
+	function appendFiltersMultipleTables(tablesSelectors, filterOptions) {
+		var filter_selector_string = "#" + filterOptions.filter_container_id,
+			$filter_selector = $(filter_selector_string).find(".yadcf-filter"),
+			table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendlyNew(tablesSelectors);
+
+		if (filterOptions.filter_type === "text") {
+
+			//add a wrapper to hold both filter and reset button
+			$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-" + table_selector_jq_friendly + "\" class=\"yadcf-filter-wrapper\"></div>");
+			filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
+
+			$(filter_selector_string).append("<input type=\"text\" id=\"yadcf-filter-" + table_selector_jq_friendly + "\" class=\"yadcf-filter\" onclick='yadcf.stopPropagation(event);"
+				+ "' placeholder='" + filterOptions.filter_default_label + "'" + " onkeyup=\"yadcf.textKeyUpMultiTables('" + tablesSelectors + "',event);\"></input>");
+
+			if (filterOptions.filter_reset_button_text !== false) {
+				$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filterOptions.filter_reset_button_text + "\" type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-reset\"" +
+					"onclick=\"yadcf.stopPropagation(event);yadcf.textKeyUpMultiTables('" + tablesSelectors + "', event, 'clear'); return false;\" class=\"yadcf-filter-reset-button\">");
+			}
+		}
+	}
+
+	function initFilterMultipleTables(tablesArray, filterOptions) {
+		var i,
+			tablesSelectors = '',
+			default_options = {
+				filter_type : "text",
+				filter_default_label : 'Type to filter',
+				filter_container_id: '',
+				filter_reset_button_text: 'x'
+			};
+		for (i = 0; i < tablesArray.length; i++) {
+			tablesSelectors += tablesArray[i].settings()[0].oInstance.selector + ',';
+		}
+		tablesSelectors = tablesSelectors.substring(0, tablesSelectors.length - 1);
+		filterOptions = $.extend({}, default_options, filterOptions);
+
+		setOptions(tablesSelectors, filterOptions);
+
+		appendFiltersMultipleTables(tablesSelectors, filterOptions);
 	}
 
     function stopPropagation(evt) {
@@ -2249,7 +2344,10 @@ var yadcf = (function ($) {
 		dateSelectSingle : dateSelectSingle,
 		textKeyUP : textKeyUP,
 		doFilterCustomDateFunc : doFilterCustomDateFunc,
-		eventTargetFixUp : eventTargetFixUp
+		eventTargetFixUp : eventTargetFixUp,
+		initFilterMultipleTables: initFilterMultipleTables,
+		textKeyUpMultiTables: textKeyUpMultiTables,
+		generateTableSelectorJQFriendlyNew: generateTableSelectorJQFriendlyNew
     };
 
 }(jQuery));
