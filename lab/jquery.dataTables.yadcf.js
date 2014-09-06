@@ -1,4 +1,4 @@
-/*global $, jQuery, exFilterColumn*/
+/*global $, jQuery, exFilterColumn*/ 
 /*jslint plusplus: true, nomen: true */
 /*!
 * Yet Another DataTables Column Filter - (yadcf)
