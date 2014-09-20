@@ -3,7 +3,11 @@
 
 ## 0.8.4 (still beta)
 
+* exGetColumnFilterVal support new Datatable  (Capital "D") https://groups.google.com/forum/#!topic/daniels_code/4ryW4_0P2EE
+* New feature, added initFilterMultipleTables function (one filter for multiple tables - filter at once!) https://github.com/vedmack/yadcf/issues/80
 * Fixed IE8 issues https://github.com/vedmack/yadcf/issues/73
+* Better support for columnDefs
+* Bug fixes
 
 
 ## 0.8.3
