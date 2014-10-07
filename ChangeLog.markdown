@@ -1,13 +1,17 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
 
-## 0.8.4 (still beta)
+## 0.8.4
 
+* New feature, added initFilterMultipleTables function, one (currently only filter_type: "text") filter for multiple tables - filter at once! https://github.com/vedmack/yadcf/issues/80
+* New feature, added exResetAllFilters function: Allows to reset all filters externally/programmatically (support ALL filter types!!!) , perfect for adding a "reset all" button to your page! https://github.com/vedmack/yadcf/issues/78
 * exGetColumnFilterVal support new Datatable  (Capital "D") https://groups.google.com/forum/#!topic/daniels_code/4ryW4_0P2EE
-* New feature, added initFilterMultipleTables function (one filter for multiple tables - filter at once!) https://github.com/vedmack/yadcf/issues/80
 * Fixed IE8 issues https://github.com/vedmack/yadcf/issues/73
+* Added MIT license https://github.com/vedmack/yadcf/issues/82
 * Better support for columnDefs
+* Date filtering with server side configuration will send the value / from-to (if range date) as is (without converting into milliseconds)
 * Bug fixes
+
 
 
 ## 0.8.3
