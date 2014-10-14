@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.5.beta.2
+* Version:     0.8.5.beta.1
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1046,8 +1046,28 @@ var yadcf = (function ($) {
 		filter_wrapper_id = "yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number;
 
 		if ($("#" + filter_wrapper_id).length > 0) {
-			return;
+			if (!isFinite($('#' + min_tip_id).text()) || !isFinite($('#' + max_tip_id).text()) || !isFinite(min_val) || !isFinite(max_val) ||
+					!isFinite($(filter_selector_string).find('.yadcf-filter-range-number-slider-min-tip-hidden.hide').text()) ||
+					!isFinite($(filter_selector_string).find('.yadcf-filter-range-number-slider-max-tip-hidden.hide').text())) {
+				$(filter_selector_string).empty();
+			} else {
+				return;
+			}
 		}
+
+		//add a wrapper to hold both filter and reset button
+		$(filter_selector_string).append("<div onclick=\"yadcf.stopPropagation(event);\" id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper\"></div>");
+		filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
+		filter_selector_string_tmp = filter_selector_string;
+
+		$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-inner-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-number-slider-filter-wrapper-inner\"></div>");
+		filter_selector_string = filter_selector_string + " div.yadcf-number-slider-filter-wrapper-inner";
+
+		$(filter_selector_string).append("<div id=\"" + sliderId + "\" class=\"yadcf-filter-range-number-slider\"></div>");
+		filter_selector_string = filter_selector_string + " #" + sliderId;
+
+		$(filter_selector_string).append("<span class=\"yadcf-filter-range-number-slider-min-tip-hidden hide\">" + min_val + "</span>");
+		$(filter_selector_string).append("<span class=\"yadcf-filter-range-number-slider-max-tip-hidden hide\">" + max_val + "</span>");
 
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 		oTable = oTables[table_selector_jq_friendly];
@@ -1063,21 +1083,6 @@ var yadcf = (function ($) {
 		}
 
 		if (isFinite(min_val) && isFinite(max_val) && isFinite(min_state_val) && isFinite(max_state_val)) {
-
-			//add a wrapper to hold both filter and reset button
-			$(filter_selector_string).append("<div onclick=\"yadcf.stopPropagation(event);\" id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper\"></div>");
-			filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
-			filter_selector_string_tmp = filter_selector_string;
-
-			$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-inner-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-number-slider-filter-wrapper-inner\"></div>");
-			filter_selector_string = filter_selector_string + " div.yadcf-number-slider-filter-wrapper-inner";
-
-			$(filter_selector_string).append("<div id=\"" + sliderId + "\" class=\"yadcf-filter-range-number-slider\"></div>");
-			filter_selector_string = filter_selector_string + " #" + sliderId;
-
-			$(filter_selector_string).append("<span class=\"yadcf-filter-range-number-slider-min-tip-hidden hide\">" + min_val + "</span>");
-			$(filter_selector_string).append("<span class=\"yadcf-filter-range-number-slider-max-tip-hidden hide\">" + max_val + "</span>");
-
 			$("#" + sliderId).slider({
 				range: true,
 				min: min_val,
@@ -1340,6 +1345,10 @@ var yadcf = (function ($) {
 					filter_selector_string = "#" + filter_container_id;
 					$filter_selector = $(filter_selector_string).find(".yadcf-filter");
 				}
+				//because of some weird select2 anomaly, sometimes the select2-container grabs the yadcf-filter class
+				if ($filter_selector.length === 2 && columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
+					$filter_selector = $(filter_selector_string).find("select.yadcf-filter");
+				}
 
 				table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector);
 
@@ -1361,13 +1370,7 @@ var yadcf = (function ($) {
 				}
 
 				if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
-
 					options_tmp = "<option value=\"" + "-1" + "\">" + filter_default_label + "</option>";
-
-					if (columnObj.select_type === 'select2' && columnObj.select_type_options.placeholder !== undefined && columnObj.select_type_options.allowClear === true) {
-						options_tmp = "<option value=\"\"></option>";
-					}
-
 					if (typeof options[0] === 'object') {
 						for (ii = 0; ii < options.length; ii++) {
 							options_tmp += "<option value=\"" + options[ii].value + "\">" + options[ii].label + "</option>";

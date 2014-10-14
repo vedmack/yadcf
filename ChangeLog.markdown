@@ -2,8 +2,9 @@
 
 ## 0.8.5 (Still beta)
 
-* Bugs fix https://github.com/vedmack/yadcf/issues/89 
-           https://github.com/vedmack/yadcf/issues/90
+* New Feature, Select2 allow use of placeholder with allowClear properties https://github.com/vedmack/yadcf/issues/91
+* Bugs fix	https://github.com/vedmack/yadcf/issues/89 
+			https://github.com/vedmack/yadcf/issues/68 (sub issue)
 		   
 
 ## 0.8.4
