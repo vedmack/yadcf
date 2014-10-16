@@ -29,6 +29,7 @@ Features:
  - range of numbers with slider widget - make use of the jQuery UI Slider widget (with some enhancements)
  - range of dates - make use of the jQuery UI Datepicker widget (with some enhancements)
  - custom function
+- Filters can be placed in the header (thead) or in the footer (tfoot) , second argument of yadcf constructor or third argument of init function
 - Parsing various types of columns: 
  - plain text 
  - plain text with delimiter

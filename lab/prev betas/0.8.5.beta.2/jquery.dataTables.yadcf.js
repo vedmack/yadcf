@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.5.beta.3
+* Version:     0.8.5.beta.2
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -199,14 +199,8 @@
 * Range filter value will arrive delimited by  -yadcf_delim- , so just split it into an array or something like this: String[] minMax = sSearch_0.split("-yadcf_delim-");
 *
 *					
-* Filters position
-*
-*					
 * -------------
-
-* Filters can be placed in the header (thead) or in the footer (tfoot) , it is defined by the second argument of yadcf constructor 
-  or third argument of init function. Header location is the default position, use 'footer' in order to place the filters in the tfoot position
-  
+*
 */
 var yadcf = (function ($) {
 
@@ -369,9 +363,7 @@ var yadcf = (function ($) {
 	}
 
 	function doFilterCustomDateFunc(arg, table_selector_jq_friendly, column_number) {
-		var oTable = oTables[table_selector_jq_friendly],
-			yadcfState;
-
+		var oTable = oTables[table_selector_jq_friendly];
 		if (arg === "clear" || arg.value === "-1") {
 			if (arg === "clear") {
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("-1").focus();
@@ -379,27 +371,6 @@ var yadcf = (function ($) {
 			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
 		} else {
 			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
-		}
-
-		if (!oTable.fnSettings().oLoadedState) {
-			oTable.fnSettings().oLoadedState = {};
-			oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
-		}
-		if (oTable.fnSettings().oFeatures.bStateSave === true) {
-			if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
-				oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
-					{
-						'from' : arg.value
-					};
-			} else {
-				yadcfState = {};
-				yadcfState[table_selector_jq_friendly] = [];
-				yadcfState[table_selector_jq_friendly][column_number] = {
-					'from' : arg.value
-				};
-				oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
-			}
-			oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 		}
 
 		oTable.fnDraw();
@@ -595,7 +566,7 @@ var yadcf = (function ($) {
 	function addCustomFunctionFilterCapability(table_selector_jq_friendly, filterId, col_num) {
 
 		$.fn.dataTableExt.afnFiltering.push(
-			function (oSettings, aData, iDataIndex, stateVal) {
+			function (oSettings, aData, iDataIndex) {
 				var filterVal = document.getElementById(filterId) !== null ? document.getElementById(filterId).value : "",
 					columnVal = aData[col_num] === "-" ? 0 : aData[col_num],
 					retVal = false,
@@ -1203,8 +1174,7 @@ var yadcf = (function ($) {
 			col_num_visible_iter,
 			tmpStr,
 			columnObjKey,
-			columnObj,
-			filters_position;
+			columnObj;
 
 
 		for (columnObjKey in args) {
@@ -1360,8 +1330,7 @@ var yadcf = (function ($) {
 							col_num_visible--;
 						}
 					}
-					filters_position = $(document).data(table_selector + "_filters_position");
-					filter_selector_string = table_selector + " " + filters_position + " th:eq(" + col_num_visible + ")";
+					filter_selector_string = table_selector + " thead th:eq(" + col_num_visible + ")";
 					$filter_selector = $(filter_selector_string).find(".yadcf-filter");
 				} else {
 					if ($("#" + filter_container_id).length === 0) {
@@ -1484,17 +1453,6 @@ var yadcf = (function ($) {
 							if (filter_reset_button_text !== false) {
 								$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +
 									"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterCustomDateFunc('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
-							}
-
-							if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
-								if (oTable.fnSettings().oLoadedState.yadcfState && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
-									tmpStr = oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from;
-									if (tmpStr === '-1' || tmpStr === undefined) {
-										$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr);
-									} else {
-										$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
-									}
-								}
 							}
 							if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 								addCustomFunctionFilterCapability(table_selector_jq_friendly, "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_number);
@@ -2014,13 +1972,6 @@ var yadcf = (function ($) {
 		return true;
 	}
 
-	function isDOMSource(tableVar) {
-		if (tableVar.fnSettings().sAjaxSource == null && tableVar.fnSettings().ajax == null) {
-			return true;
-		}
-		return false;
-	}
-
 	function initAndBindTable(oTable, table_selector, index) {
 
 		var table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector),
@@ -2028,7 +1979,7 @@ var yadcf = (function ($) {
         oTables[table_selector_jq_friendly] = oTable;
 		oTablesIndex[table_selector_jq_friendly] = index;
 
-        if (isDOMSource(oTable)) {
+        if (oTable.fnSettings().sAjaxSource === null && oTable.fnSettings().ajax === null) {
 			table_selector_tmp = table_selector;
 			if (table_selector.indexOf(":eq") !== -1) {
 				table_selector_tmp = table_selector.substring(0, table_selector.lastIndexOf(":eq"));
@@ -2084,7 +2035,7 @@ var yadcf = (function ($) {
 				});
 			}
 			//when using DOM source
-			if (isDOMSource(oTable)) {
+			if (oTable.fnSettings().sAjaxSource === null && oTable.fnSettings().ajax === null) {
 				//we need to make sure that the yadcf state will be saved after page reload
 				oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 				//redraw the table in order to apply the filters
@@ -2093,14 +2044,7 @@ var yadcf = (function ($) {
 		}
 	}
 
-    $.fn.yadcf = function (options_arg, filters_position) {
-
-		if (filters_position === undefined || filters_position === 'header') {
-			filters_position = 'thead';
-		} else {
-			filters_position = 'tfoot';
-		}
-		$(document).data(this.selector + "_filters_position", filters_position);
+    $.fn.yadcf = function (options_arg) {
 
 		if ($(this.selector).length === 1) {
 			setOptions(this.selector, options_arg);
@@ -2119,18 +2063,10 @@ var yadcf = (function ($) {
         return this;
     };
 
-	function init(oTable, options_arg, filters_position) {
+	function init(oTable, options_arg) {
 		var instance = oTable.settings()[0].oInstance,
 			i = 0,
 			selector;
-
-		if (filters_position === undefined || filters_position === 'header') {
-			filters_position = 'thead';
-		} else {
-			filters_position = 'tfoot';
-		}
-		$(document).data(instance.selector + "_filters_position", filters_position);
-
 		if ($(instance.selector).length === 1) {
 			setOptions(instance.selector, options_arg);
 			initAndBindTable(instance, instance.selector, 0);
@@ -2218,7 +2154,7 @@ var yadcf = (function ($) {
 			table_arg = table_arg.settings()[0].oInstance;
 		}
 		table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_arg.selector);
-		if (isDOMSource(table_arg) || ajaxSource === true) {
+		if ((table_arg.fnSettings().sAjaxSource === null && (table_arg.fnSettings().ajax === null ||  table_arg.fnSettings().ajax === undefined)) || ajaxSource === true) {
 			for (j = 0; j < col_filter_arr.length; j++) {
 				column_number = col_filter_arr[j][0];
 				optionsObj = getOptions(table_arg.selector)[column_number];
