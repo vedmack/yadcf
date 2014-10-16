@@ -2325,7 +2325,7 @@ var yadcf = (function ($) {
 		}
 
 		optionsObj = getOptions(table_arg.selector)[column_number];
-		if (typeof optionsObj == 'undefined') {
+		if (typeof optionsObj === 'undefined') {
 			return;
 		}
 		table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_arg.selector);
