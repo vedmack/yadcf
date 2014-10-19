@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.5.beta.4
+* Version:     0.8.5.beta.3
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1207,13 +1207,6 @@ var yadcf = (function ($) {
 			filters_position;
 
 
-		table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector);
-
-		filters_position = $(document).data(table_selector + "_filters_position");
-		if (oTable.fnSettings().oScroll.sX !== '' || oTable.fnSettings().oScroll.sY !== '') {
-			table_selector = '.yadcf-datatables-table-' + table_selector_jq_friendly;
-		}
-
 		for (columnObjKey in args) {
 			if (args.hasOwnProperty(columnObjKey)) {
 				columnObj = args[columnObjKey];
@@ -1367,8 +1360,8 @@ var yadcf = (function ($) {
 							col_num_visible--;
 						}
 					}
-
-					filter_selector_string = table_selector + ' ' + filters_position + ' th:eq(' + col_num_visible + ')';
+					filters_position = $(document).data(table_selector + "_filters_position");
+					filter_selector_string = table_selector + " " + filters_position + " th:eq(" + col_num_visible + ")";
 					$filter_selector = $(filter_selector_string).find(".yadcf-filter");
 				} else {
 					if ($("#" + filter_container_id).length === 0) {
@@ -1378,6 +1371,8 @@ var yadcf = (function ($) {
 					filter_selector_string = "#" + filter_container_id;
 					$filter_selector = $(filter_selector_string).find(".yadcf-filter");
 				}
+
+				table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector);
 
 				if (columnObj.filter_type === "select" || columnObj.filter_type === "auto_complete" || columnObj.filter_type === "multi_select" || columnObj.filter_type === "custom_func") {
 					if (sort_as === "alpha") {
@@ -2026,30 +2021,12 @@ var yadcf = (function ($) {
 		return false;
 	}
 
-	function scrollXYHandler(oTable, table_selector) {
-		var $tmpSelector,
-			filters_position = $(document).data(table_selector + "_filters_position"),
-			table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector);
-
-		if (filters_position === 'thead') {
-			filters_position = '.dataTables_scrollHead';
-		} else {
-			filters_position = '.dataTables_scrollFoot';
-		}
-		if (oTable.fnSettings().oScroll.sX !== '' || oTable.fnSettings().oScroll.sY !== '') {
-			$tmpSelector = $(table_selector).closest('.dataTables_scroll').find(filters_position + ' table');
-			$tmpSelector.addClass('yadcf-datatables-table-' + table_selector_jq_friendly);
-		}
-	}
-
 	function initAndBindTable(oTable, table_selector, index) {
 
 		var table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector),
 			table_selector_tmp;
         oTables[table_selector_jq_friendly] = oTable;
 		oTablesIndex[table_selector_jq_friendly] = index;
-
-		scrollXYHandler(oTable, table_selector);
 
         if (isDOMSource(oTable)) {
 			table_selector_tmp = table_selector;

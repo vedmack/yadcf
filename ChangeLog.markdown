@@ -2,6 +2,7 @@
 
 ## 0.8.5 (Still beta)
 
+* New Feature, added support for sScrollX / sScrollY https://github.com/vedmack/yadcf/issues/43
 * New Feature, filters can be placed in the footer or header https://github.com/vedmack/yadcf/issues/85
 * New Feature, filter_type: 'custom_func' support state saving https://github.com/vedmack/yadcf/issues/92
 * New Feature, Select2 allow use of placeholder with allowClear properties https://github.com/vedmack/yadcf/issues/91

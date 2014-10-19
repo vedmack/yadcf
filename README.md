@@ -61,7 +61,7 @@ Features:
  - exFilterColumn: Allows to trigger filter/s externally/programmatically (support ALL filter types!!!) , perfect for showing table with pre filtered columns
  - exGetColumnFilterVal: Allows to retreive  column current filtered value (support ALL filter types!!!)	
 - Notable datatables API support
- - bStateSave / bDeferRender
+ - sScrollX / sScrollY / bStateSave / bDeferRender
 
 Examples:
 =====
