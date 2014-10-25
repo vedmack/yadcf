@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.5.beta.5
+* Version:     0.8.5.beta.4
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1327,11 +1327,12 @@ var yadcf = (function ($) {
 								}
 							} else {
 								if (column_number_data === undefined) {
-								    col_inner_data = data[j]._aData[column_number];
-								} else if (data[j]._aFilterData !== undefined && data[j]._aFilterData !== null) {
-								    col_inner_data = data[j]._aFilterData[column_number];
+									col_inner_data = data[j]._aData[column_number];
 								} else {
-								    col_inner_data = dot2obj(data[j]._aData, column_number_data);
+									col_inner_data = dot2obj(data[j]._aData, column_number_data);
+								}
+								if (data[j]._aFilterData !== undefined && data[j]._aFilterData !== null) {
+									col_inner_data = data[j]._aFilterData[column_number];
 								}
 								if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
 									col_filter_array[col_inner_data] = col_inner_data;
@@ -2351,7 +2352,6 @@ var yadcf = (function ($) {
 
 		switch (optionsObj.filter_type) {
 		case 'select':
-		case 'custom_func':
 			retVal = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val();
 			if (retVal === '-1') {
 				retVal = '';
@@ -2392,8 +2392,6 @@ var yadcf = (function ($) {
 			retVal.from = $('#' + fromId).text();
 			retVal.to = $('#' + toId).text();
 			break;
-		default:
-			console.log('exGetColumnFilterVal error: no such filter_type: ' + optionsObj.filter_type);
 		}
 		return retVal;
 	}
