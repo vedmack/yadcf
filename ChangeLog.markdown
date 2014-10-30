@@ -1,6 +1,6 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
-## 0.8.5 (Still beta)
+## 0.8.5
 
 * New Feature, added support for sScrollX / sScrollY https://github.com/vedmack/yadcf/issues/43
 * New Feature, filters can be placed in the footer or header https://github.com/vedmack/yadcf/issues/85
