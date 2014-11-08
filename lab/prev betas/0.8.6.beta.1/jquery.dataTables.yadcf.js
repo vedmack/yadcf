@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.6.beta.2
+* Version:     0.8.6.beta.1
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -273,31 +273,6 @@ var yadcf = (function ($) {
 			tmpOptions[col_num_as_int] = $.extend(true, {}, default_options, options_arg[i]);
 		}
 		options[selector_arg] = tmpOptions;
-	}
-
-	//taken and modified from DataTables 1.10.0-beta.2 source 
-	function yadcfVersionCheck(version) {
-		var aThis = $.fn.dataTable.ext.sVersion.split('.'),
-			aThat = version.split('.'),
-			iThis,
-			iThat,
-			i,
-			iLen;
-
-		for (i = 0, iLen = aThat.length; i < iLen; i++) {
-			iThis = parseInt(aThis[i], 10) || 0;
-			iThat = parseInt(aThat[i], 10) || 0;
-
-			// Parts are the same, keep comparing
-			if (iThis === iThat) {
-				continue;
-			}
-
-			// Parts are different, return immediately
-			return iThis > iThat;
-		}
-
-		return true;
 	}
 
 	function resetIApiIndex() {
@@ -1192,19 +1167,6 @@ var yadcf = (function ($) {
 		return tmpObj;
 	}
 
-	function removeFilters(oTable, args, table_selector) {
-		$('.yadcf-filter-wrapper').remove();
-		if (yadcfVersionCheck('1.10')) {
-			$(document).off('draw.dt', oTable.selector);
-			$(document).off('xhr.dt', oTable.selector);
-			$(document).off('column-visibility.dt', oTable.selector);
-			$(document).off('destroy.dt', oTable.selector);
-		} else {
-			$(document).off('draw', oTable.selector);
-			$(document).off('destroy', oTable.selector);
-		}
-	}
-
 	function appendFilters(oTable, args, table_selector) {
 
 		var i = 0,
@@ -2057,6 +2019,31 @@ var yadcf = (function ($) {
 		}
 	}
 
+	//taken and modified from DataTables 1.10.0-beta.2 source 
+	function yadcfVersionCheck(version) {
+		var aThis = $.fn.dataTable.ext.sVersion.split('.'),
+			aThat = version.split('.'),
+			iThis,
+			iThat,
+			i,
+			iLen;
+
+		for (i = 0, iLen = aThat.length; i < iLen; i++) {
+			iThis = parseInt(aThis[i], 10) || 0;
+			iThat = parseInt(aThat[i], 10) || 0;
+
+			// Parts are the same, keep comparing
+			if (iThis === iThat) {
+				continue;
+			}
+
+			// Parts are different, return immediately
+			return iThis > iThat;
+		}
+
+		return true;
+	}
+
 	function isDOMSource(tableVar) {
 		if (tableVar.fnSettings().sAjaxSource == null && tableVar.fnSettings().ajax == null) {
 			return true;
@@ -2098,10 +2085,10 @@ var yadcf = (function ($) {
         } else {
 			appendFilters(oTable, yadcf.getOptions(table_selector), table_selector);
 			if (yadcfVersionCheck('1.10')) {
-				$(document).off('draw.dt', oTable.selector).on('draw.dt', oTable.selector, function (event, ui) {
+				$(document).off('draw.dt').on('draw.dt', oTable.selector, function (event, ui) {
 					appendFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
 				});
-				$(document).off('xhr.dt', oTable.selector).on('xhr.dt', oTable.selector, function (e, settings, json) {
+				$(document).off('xhr.dt').on('xhr.dt', function (e, settings, json) {
 					var col_num;
 					for (col_num in yadcf.getOptions(settings.oInstance.selector)) {
 						if (yadcf.getOptions(settings.oInstance.selector).hasOwnProperty(col_num)) {
@@ -2111,7 +2098,7 @@ var yadcf = (function ($) {
 						}
 					}
 				});
-				$(document).off('column-visibility.dt', oTable.selector).on('column-visibility.dt', oTable.selector, function (e, settings, col_num, state) {
+				$(document).off('column-visibility.dt').on('column-visibility.dt', function (e, settings, col_num, state) {
 					var obj = {};
 					if (state === true) {
 						obj[col_num] = yadcf.getOptions(settings.oInstance.selector)[col_num];
@@ -2120,28 +2107,12 @@ var yadcf = (function ($) {
 							settings.oInstance.selector);
 					}
 				});
-				$(document).off('destroy.dt', oTable.selector).on('destroy.dt', oTable.selector, function (event, ui) {
-					removeFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
-				});
 			} else {
-				$(document).off('draw', oTable.selector).on('draw', oTable.selector, function (event, ui) {
+				$(document).off('draw').on('draw', oTable.selector, function (event, ui) {
 					appendFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
-				});
-				$(document).off('destroy', oTable.selector).on('destroy', oTable.selector, function (event, ui) {
-					removeFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
 				});
 			}
         }
-		//destroy event affects both DOM and Ajax
-		if (yadcfVersionCheck('1.10')) {
-			$(document).off('destroy.dt', oTable.selector).on('destroy.dt', oTable.selector, function (event, ui) {
-				removeFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
-			});
-		} else {
-			$(document).off('destroy', oTable.selector).on('destroy', oTable.selector, function (event, ui) {
-				removeFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
-			});
-		}
 		if (oTable.fnSettings().oFeatures.bStateSave === true) {
 			if (yadcfVersionCheck('1.10')) {
 				$(oTable.selector).off('stateSaveParams.dt').on('stateSaveParams.dt', function (e, settings, data) {
