@@ -135,4 +135,4 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 License:
 =====
 
-Copyright 2014 Licensed under the MIT License
+Copyright (c) 2014 Daniel Reznick, released under the MIT license
