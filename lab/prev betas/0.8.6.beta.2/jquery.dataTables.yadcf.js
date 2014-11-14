@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.6.beta.3
+* Version:     0.8.6.beta.2
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1977,54 +1977,11 @@ var yadcf = (function ($) {
 		}
 	}
 
-	function doFilterMultiTables(tablesSelectors, event, clear) {
-
-		var table_selector_jq_friendly,
-			options = getOptions(tablesSelectors),
-			regex = false,
-			smart = true,
-			caseInsen = true,
-			serachVal;
-
-		event = eventTargetFixUp(event);
-
-		table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendlyNew(tablesSelectors);
-
-		if (clear !== undefined || event.target.value === '-1') {
-			$("#yadcf-filter-" + table_selector_jq_friendly).val("").focus();
-			$("#yadcf-filter-" + table_selector_jq_friendly).removeClass("inuse");
-			$(tablesSelectors).DataTable().search('').draw();
-			return;
-		}
-
-		$("#yadcf-filter-" + table_selector_jq_friendly).addClass("inuse");
-
-		serachVal = event.target.value;
-		smart = false;
-		caseInsen = options.case_insensitive;
-/*
-		if (options.filter_match_mode === "contains") {
-			regex = false;
-		} else if (options.filter_match_mode === "exact") {
-			regex = true;
-			serachVal = "^" + serachVal + "$";
-		} else if (options.filter_match_mode === "startsWith") {
-			regex = true;
-			serachVal = "^" + serachVal;
-		}*/
-		$(tablesSelectors).DataTable().search(serachVal, regex, smart, caseInsen).draw();
-	}
-
 	function textKeyUpMultiTables(tablesSelectors, event, clear) {
 
 		var table_selector_jq_friendly,
 			keyUp,
-			options = getOptions(tablesSelectors),
-			regex = false,
-			smart = true,
-			caseInsen = true,
-			serachVal;
-
+			options = getOptions(tablesSelectors);
 		event = eventTargetFixUp(event);
 
 		keyUp = function (tablesSelectors, event, clear) {
@@ -2039,21 +1996,7 @@ var yadcf = (function ($) {
 
 			$("#yadcf-filter-" + table_selector_jq_friendly).addClass("inuse");
 
-			serachVal = event.target.value;
-			smart = false;
-			caseInsen = options.case_insensitive;
-/*
-			if (options.filter_match_mode === "contains") {
-				regex = false;
-			} else if (options.filter_match_mode === "exact") {
-				regex = true;
-				serachVal = "^" + serachVal + "$";
-			} else if (options.filter_match_mode === "startsWith") {
-				regex = true;
-				serachVal = "^" + serachVal;
-			}
-*/
-			$(tablesSelectors).DataTable().search(serachVal, regex, smart, caseInsen).draw();
+			$(tablesSelectors).DataTable().search(event.target.value).draw();
 
 		};
 
@@ -2282,59 +2225,21 @@ var yadcf = (function ($) {
 	function appendFiltersMultipleTables(tablesSelectors, filterOptions) {
 		var filter_selector_string = "#" + filterOptions.filter_container_id,
 			$filter_selector = $(filter_selector_string).find(".yadcf-filter"),
-			table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendlyNew(tablesSelectors),
-			options_tmp,
-			ii;
+			table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendlyNew(tablesSelectors);
 
-		//add a wrapper to hold both filter and reset button
-		$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-" + table_selector_jq_friendly + "\" class=\"yadcf-filter-wrapper\"></div>");
-		filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
+		if (filterOptions.filter_type === "text") {
 
-		switch (filterOptions.filter_type) {
-		case 'text':
+			//add a wrapper to hold both filter and reset button
+			$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-" + table_selector_jq_friendly + "\" class=\"yadcf-filter-wrapper\"></div>");
+			filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
+
 			$(filter_selector_string).append("<input type=\"text\" id=\"yadcf-filter-" + table_selector_jq_friendly + "\" class=\"yadcf-filter\" onclick='yadcf.stopPropagation(event);"
 				+ "' placeholder='" + filterOptions.filter_default_label + "'" + " onkeyup=\"yadcf.textKeyUpMultiTables('" + tablesSelectors + "',event);\"></input>");
+
 			if (filterOptions.filter_reset_button_text !== false) {
 				$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filterOptions.filter_reset_button_text + "\" type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-reset\"" +
 					"onclick=\"yadcf.stopPropagation(event);yadcf.textKeyUpMultiTables('" + tablesSelectors + "', event, 'clear'); return false;\" class=\"yadcf-filter-reset-button\">");
 			}
-			break;
-		case 'select':
-			options_tmp = "<option value=\"" + "-1" + "\">" + filterOptions.filter_default_label + "</option>";
-			if (filterOptions.select_type === 'select2' && filterOptions.select_type_options.placeholder !== undefined && filterOptions.select_type_options.allowClear === true) {
-				options_tmp = "<option value=\"\"></option>";
-			}
-
-			if (filterOptions.data === undefined) {
-				alert('initFilterMultipleTables missing the data attribute');
-				return;
-			}
-
-			if (typeof filterOptions.data[0] === 'object') {
-				for (ii = 0; ii < filterOptions.data.length; ii++) {
-					options_tmp += "<option value=\"" + filterOptions.data[ii].value + "\">" + filterOptions.data[ii].label + "</option>";
-				}
-			} else {
-				for (ii = 0; ii < filterOptions.data.length; ii++) {
-					options_tmp += "<option value=\"" + filterOptions.data[ii] + "\">" + filterOptions.data[ii] + "</option>";
-				}
-			}
-			$(filter_selector_string).append("<select id=\"yadcf-filter-" + table_selector_jq_friendly + "\" class=\"yadcf-filter\" " +
-				"onchange=\"yadcf.doFilterMultiTables('" + tablesSelectors + "',event)\" onclick='yadcf.stopPropagation(event);'>" + options_tmp + "</select>");
-
-			if (filterOptions.select_type !== undefined && filterOptions.select_type === 'chosen') {
-				$("#yadcf-filter-" + table_selector_jq_friendly).chosen(filterOptions.select_type_options);
-				$("#yadcf-filter-" + table_selector_jq_friendly).next().attr("onclick", "yadcf.stopPropagation(event);");
-			} else if (filterOptions.select_type !== undefined && filterOptions.select_type === 'select2') {
-				$("#yadcf-filter-" + table_selector_jq_friendly).select2(filterOptions.select_type_options);
-			}
-			if (filterOptions.filter_reset_button_text !== false) {
-				$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filterOptions.filter_reset_button_text + "\" type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-reset\"" +
-					"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterMultiTables('" + tablesSelectors + "', event, 'clear'); return false;\" class=\"yadcf-filter-reset-button\">");
-			}
-			break;
-		default:
-			alert('Filters Multiple Tables does not support ' + filterOptions.filter_type);
 		}
 	}
 
@@ -2343,24 +2248,10 @@ var yadcf = (function ($) {
 			tablesSelectors = '',
 			default_options = {
 				filter_type : "text",
+				filter_default_label : 'Type to filter',
 				filter_container_id: '',
-				filter_reset_button_text: 'x',
-				case_insensitive: true
+				filter_reset_button_text: 'x'
 			};
-
-		if (filterOptions.filter_default_label === undefined) {
-			if (filterOptions.filter_type === "select" || filterOptions.filter_type === 'custom_func') {
-				filterOptions.filter_default_label = "Select value";
-			} else if (filterOptions.filter_type === "multi_select" || filterOptions.filter_type === 'multi_select_custom_func') {
-				filterOptions.filter_default_label = "Select values";
-			} else if (filterOptions.filter_type === "auto_complete" || filterOptions.filter_type === "text") {
-				filterOptions.filter_default_label = 'Type to filter';
-			} else if (filterOptions.filter_type === "range_number" || filterOptions.filter_type === "range_date") {
-				filterOptions.filter_default_label = ["from", "to"];
-			} else if (filterOptions.filter_type === "date") {
-				filterOptions.filter_default_label = "Select a date";
-			}
-		}
 		for (i = 0; i < tablesArray.length; i++) {
 			tablesSelectors += tablesArray[i].settings()[0].oInstance.selector + ',';
 		}
@@ -2597,7 +2488,6 @@ var yadcf = (function ($) {
 					table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
 					break;
 				case 'multi_select':
-				case 'multi_select_custom_func':
 					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val('-1');
 					$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", undefined);
 					table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
@@ -2676,7 +2566,6 @@ var yadcf = (function ($) {
 		eventTargetFixUp : eventTargetFixUp,
 		initFilterMultipleTables: initFilterMultipleTables,
 		textKeyUpMultiTables: textKeyUpMultiTables,
-		doFilterMultiTables: doFilterMultiTables,
 		generateTableSelectorJQFriendlyNew: generateTableSelectorJQFriendlyNew
     };
 
