@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.6.beta.4
+* Version:     0.8.6.beta.3 
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1333,26 +1333,22 @@ var yadcf = (function ($) {
 								col_inner_elements = dot2obj(data[j]._aData, column_number_data);
 								col_inner_elements = $(col_inner_elements);
 							}
-							if (col_inner_elements.length > 0) {
-								for (k = 0; k < col_inner_elements.length; k++) {
-									switch (html_data_type) {
-									case "text":
-										col_inner_data = $(col_inner_elements[k]).text();
-										break;
-									case "value":
-										col_inner_data = $(col_inner_elements[k]).val();
-										break;
-									case "id":
-										col_inner_data = col_inner_elements[k].id;
-										break;
-									}
-									if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
-										col_filter_array[col_inner_data] = col_inner_data;
-										options.push(col_inner_data);
-									}
+							for (k = 0; k < col_inner_elements.length; k++) {
+								switch (html_data_type) {
+								case "text":
+									col_inner_data = $(col_inner_elements[k]).text();
+									break;
+								case "value":
+									col_inner_data = $(col_inner_elements[k]).val();
+									break;
+								case "id":
+									col_inner_data = col_inner_elements[k].id;
+									break;
 								}
-							} else {
-								options.push(col_inner_elements.selector);
+								if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
+									col_filter_array[col_inner_data] = col_inner_data;
+									options.push(col_inner_data);
+								}
 							}
 						} else if (column_data_type === "text") {
 							if (text_data_delimiter !== undefined) {
