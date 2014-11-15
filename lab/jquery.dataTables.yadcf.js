@@ -1346,13 +1346,13 @@ var yadcf = (function ($) {
 										col_inner_data = col_inner_elements[k].id;
 										break;
 									}
-									if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
-										col_filter_array[col_inner_data] = col_inner_data;
-										options.push(col_inner_data);
-									}
 								}
 							} else {
-								options.push(col_inner_elements.selector);
+								col_inner_data = col_inner_elements.selector;
+							}
+							if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
+								col_filter_array[col_inner_data] = col_inner_data;
+								options.push(col_inner_data);
 							}
 						} else if (column_data_type === "text") {
 							if (text_data_delimiter !== undefined) {
