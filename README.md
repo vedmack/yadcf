@@ -61,7 +61,7 @@ Features:
  - exFilterColumn: Allows to trigger filter/s externally/programmatically (support ALL filter types!!!) , perfect for showing table with pre filtered columns
  - exGetColumnFilterVal: Allows to retreive  column current filtered value (support ALL filter types!!!)	
 - Notable datatables API support
- - sScrollX / sScrollY / bStateSave / bDeferRender
+ - sScrollX / sScrollY / bStateSave / bDeferRender / HTML5 data-* attributes
 
 Examples:
 =====
@@ -130,6 +130,7 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 * select_type_options
 * case_insensitive
 * filter_delay
+* html5_data
 
 
 License:

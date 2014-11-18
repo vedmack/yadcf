@@ -1,5 +1,13 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.8.6
+
+* New filter type: multi select filter based on custom function, filter_type: "multi_select_custom_func", https://github.com/vedmack/yadcf/issues/99
+* Added new attribute, html5_data, for HTML5 data-* attributes support(http://www.datatables.net/examples/advanced_init/html5-data-attributes.html), https://github.com/vedmack/yadcf/issues/106
+* Support for datatables destroy event, https://github.com/vedmack/yadcf/issues/102
+* Fallback for column_data_type: "html" without real html but simple text
+
+
 ## 0.8.5
 
 * New Feature, added support for sScrollX / sScrollY https://github.com/vedmack/yadcf/issues/43
