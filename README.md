@@ -126,6 +126,7 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 * date_format
 * ignore_char
 * filter_match_mode
+* allow_blank
 * select_type
 * select_type_options
 * case_insensitive
