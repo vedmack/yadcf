@@ -139,7 +139,7 @@
 				Required:			false
 				Type:				boolean
 				Default value:		true
-				Description:		Allows to have a "" (blank value or empty string) as data (supported in text / html)
+				Description:		Allows to have a "" (blank value or empty string) as option for the select filter_type (supported in text / html)
 
 
 * select_type
@@ -1409,7 +1409,7 @@ var yadcf = (function ($) {
 								} else {
 								    col_inner_data = dot2obj(data[j]._aData, column_number_data);
 								}
-								if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
+								if (!(col_filter_array.hasOwnProperty(col_inner_data)) && (allow_blank || col_inner_data.trim() !== "")) {
 									col_filter_array[col_inner_data] = col_inner_data;
 									options.push(col_inner_data);
 								}
