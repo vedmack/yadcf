@@ -1248,6 +1248,7 @@ var yadcf = (function ($) {
 			date_format,
 			ignore_char,
 			filter_match_mode,
+			allow_blank,
 
 			options,
 			options_tmp,
@@ -1304,6 +1305,7 @@ var yadcf = (function ($) {
 					ignore_char = new RegExp(columnObj.ignore_char, "g");
 				}
 				filter_match_mode = columnObj.filter_match_mode;
+				allow_blank = columnObj.allow_blank;
 
 				if (column_number === undefined) {
 					alert("You must specify column number");
@@ -1372,7 +1374,7 @@ var yadcf = (function ($) {
 							} else {
 								col_inner_data = col_inner_elements.selector;
 							}
-							if (!(col_filter_array.hasOwnProperty(col_inner_data)) && (options.allow_blank || col_inner_data.trim() !== "")) {
+							if (!(col_filter_array.hasOwnProperty(col_inner_data)) && (allow_blank || col_inner_data.trim() !== "")) {
 								col_filter_array[col_inner_data] = col_inner_data;
 								options.push(col_inner_data);
 							}
@@ -1386,7 +1388,7 @@ var yadcf = (function ($) {
 								}
 								for (k = 0; k < col_inner_elements.length; k++) {
 									col_inner_data = col_inner_elements[k];
-									if (!(col_filter_array.hasOwnProperty(col_inner_data)) && (options.allow_blank || col_inner_data.trim() !== "")) {
+									if (!(col_filter_array.hasOwnProperty(col_inner_data)) && (allow_blank || col_inner_data.trim() !== "")) {
 										col_filter_array[col_inner_data] = col_inner_data;
 										options.push(col_inner_data);
 									}
