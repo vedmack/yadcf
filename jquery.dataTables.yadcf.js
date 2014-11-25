@@ -134,7 +134,14 @@
 				Default value:		contains
 				Possible values:	contains / exact / startsWith
 				Description:		Allows to control the matching mode of the filter (supported in select / auto_complete / text filters)
-				
+
+* allow_blank
+				Required:			false
+				Type:				boolean
+				Default value:		true
+				Description:		Allows to have a "" (blank value or empty string) as option for the select filter_type (supported in text / html)
+
+
 * select_type
 				Required:			false
 				Type:				String
@@ -251,6 +258,7 @@ var yadcf = (function ($) {
 				date_format : "mm/dd/yyyy",
 				ignore_char : undefined,
 				filter_match_mode : "contains",
+				allow_blank: true,
 				select_type : undefined,
 				select_type_options : {},
 				case_insensitive : true
@@ -1240,6 +1248,7 @@ var yadcf = (function ($) {
 			date_format,
 			ignore_char,
 			filter_match_mode,
+			allow_blank,
 
 			options,
 			options_tmp,
@@ -1296,6 +1305,7 @@ var yadcf = (function ($) {
 					ignore_char = new RegExp(columnObj.ignore_char, "g");
 				}
 				filter_match_mode = columnObj.filter_match_mode;
+				allow_blank = columnObj.allow_blank;
 
 				if (column_number === undefined) {
 					alert("You must specify column number");
@@ -1364,7 +1374,7 @@ var yadcf = (function ($) {
 							} else {
 								col_inner_data = col_inner_elements.selector;
 							}
-							if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
+							if (!(col_filter_array.hasOwnProperty(col_inner_data)) && (allow_blank || col_inner_data.trim() !== "")) {
 								col_filter_array[col_inner_data] = col_inner_data;
 								options.push(col_inner_data);
 							}
@@ -1378,7 +1388,7 @@ var yadcf = (function ($) {
 								}
 								for (k = 0; k < col_inner_elements.length; k++) {
 									col_inner_data = col_inner_elements[k];
-									if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
+									if (!(col_filter_array.hasOwnProperty(col_inner_data)) && (allow_blank || col_inner_data.trim() !== "")) {
 										col_filter_array[col_inner_data] = col_inner_data;
 										options.push(col_inner_data);
 									}
@@ -1399,7 +1409,7 @@ var yadcf = (function ($) {
 								} else {
 								    col_inner_data = dot2obj(data[j]._aData, column_number_data);
 								}
-								if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
+								if (!(col_filter_array.hasOwnProperty(col_inner_data)) && (allow_blank || col_inner_data.trim() !== "")) {
 									col_filter_array[col_inner_data] = col_inner_data;
 									options.push(col_inner_data);
 								}
