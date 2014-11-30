@@ -1,5 +1,10 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.8.7 (still in progress)
+
+* Allow advanced selection of value from html code inside the td element - html_data_type support now 'selector' type  (must provide value for 'with html_data_selector' too), https://github.com/vedmack/yadcf/issues/116
+
+
 ## 0.8.6
 
 * New filter type: multi select filter based on custom function, filter_type: "multi_select_custom_func", https://github.com/vedmack/yadcf/issues/99

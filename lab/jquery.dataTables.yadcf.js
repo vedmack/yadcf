@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.7.beta.1
+* Version:     0.8.7.beta.2
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -69,9 +69,19 @@
 				Required:			false
 				Type:				String
 				Default value:		text
-				Possible values:	text / value / id			
+				Possible values:	text / value / id / selector			
 				Description:		When using "html" for column_data_type argument you can choose how exactly to parse your html element/s in column , for example use "text" for the following <span class="someClass">Some text</span>
+				Special notes:		when using selector you must provide a valid selector string for the html_data_selector property
 
+* html_data_selector
+				Required:			false
+				Type:				String
+				Default value:		undefined
+				Possible values:	any valid selector string, for example 'li:eq(1)'
+				Description:		allows for advanced text value selection within the html located in the td element
+				Special notes:		know that the selector string "begin is search" from (and not outside) the first element of the html inside the td
+									(supported by range_number_slider / select / auto_complete)
+				
 * html5_data
 				Required:			false
 				Type:				String
@@ -308,6 +318,17 @@ var yadcf = (function ($) {
 		return true;
 	}
 
+	function calculateColumnNumber(column_number, pTable) {
+		var col_num_visible_iter,
+			col_num_visible = column_number;
+		for (col_num_visible_iter = 0; col_num_visible_iter < pTable.fnSettings().aoColumns.length && col_num_visible_iter < column_number; col_num_visible_iter++) {
+			if (pTable.fnSettings().aoColumns[col_num_visible_iter].bVisible === false) {
+				col_num_visible++;
+			}
+		}
+		return col_num_visible;
+	}
+
 	function resetIApiIndex() {
 		$.fn.dataTableExt.iApiIndex = 0;
 
@@ -444,12 +465,21 @@ var yadcf = (function ($) {
 		oTable.fnDraw();
 	}
 
-	function doFilter(arg, table_selector_jq_friendly, column_number, filter_match_mode) {
+	function doFilter(arg, table_selector_jq_friendly, event, filter_match_mode) {
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
+		event = eventTargetFixUp(event);
+
 		var oTable = oTables[table_selector_jq_friendly],
 			selected_value,
-			columnObj = yadcf.getOptions(oTable.selector)[column_number];
+			column_number,
+			columnObj;
 
+		if ($(event.target).closest('th').length === 1) {
+			column_number = calculateColumnNumber($(event.target).closest('th').index(), oTable);
+		} else {
+			column_number = parseInt($(event.target).attr("id").replace("yadcf-filter-" + table_selector_jq_friendly + "-", "").replace('-reset', ''), 10);
+		}
+		columnObj = yadcf.getOptions(oTable.selector)[column_number];
 		if (arg === "clear") {
 			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("-1").focus();
 			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
@@ -614,7 +644,11 @@ var yadcf = (function ($) {
 				if (ignore_char_local !== undefined) {
 					min = min.replace(ignore_char_local, "");
 					max = max.replace(ignore_char_local, "");
-					val = val.toString().replace(ignore_char_local, "");
+					if (val) {
+						val = val.toString().replace(ignore_char_local, "");
+					} else {
+						val = "";
+					}
 				}
 
 				min = (min !== "") ? (+min) : min;
@@ -703,10 +737,10 @@ var yadcf = (function ($) {
 	function addRangeNumberSliderFilterCapability(table_selector_jq_friendly, fromId, toId, col_num, ignore_char) {
 
 		$.fn.dataTableExt.afnFiltering.push(
-			function (oSettings, aData, iDataIndex) {
+			function (oSettings, aData, iDataIndex, rowData) {
 				var min = $('#' + fromId).text(),
 					max = $('#' + toId).text(),
-					val = aData[col_num] === "-" ? 0 : aData[col_num],
+					val,
 					retVal = false,
 					table_selector_jq_friendly_local = table_selector_jq_friendly,
 					current_table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(oSettings.oInstance.selector),
@@ -714,8 +748,13 @@ var yadcf = (function ($) {
 					column_data_type,
 					html_data_type,
 					i,
-					columnObjKey;
+					columnObjKey,
+					columnObj;
 
+				if (rowData !== undefined) {
+					aData = rowData;
+				}
+				val = aData[col_num] === "-" ? 0 : aData[col_num];
 				if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
 					return true;
 				}
@@ -723,9 +762,9 @@ var yadcf = (function ($) {
 				if (!isFinite(min) || !isFinite(max)) {
 					return true;
 				}
-
-				column_data_type = yadcf.getOptions(oSettings.oInstance.selector)[col_num].column_data_type;
-				html_data_type = yadcf.getOptions(oSettings.oInstance.selector)[col_num].html_data_type;
+				columnObj = yadcf.getOptions(oSettings.oInstance.selector)[col_num];
+				column_data_type = columnObj.column_data_type;
+				html_data_type = columnObj.html_data_type;
 
 				if (column_data_type === "html" || column_data_type === "rendered_html") {
 					if (html_data_type === undefined) {
@@ -742,13 +781,20 @@ var yadcf = (function ($) {
 						case "id":
 							val = val.id;
 							break;
+						case "selector":
+							val = $(val).find(columnObj.html_data_selector).text();
+							break;
 						}
 					}
 				}
 				if (ignore_char_local !== undefined) {
 					min = min.replace(ignore_char_local, "");
 					max = max.replace(ignore_char_local, "");
-					val = val.toString().replace(ignore_char_local, "");
+					if (val) {
+						val = val.toString().replace(ignore_char_local, "");
+					} else {
+						val = "";
+					}
 				}
 
 				min = (min !== "") ? (+min) : min;
@@ -1361,15 +1407,24 @@ var yadcf = (function ($) {
 									case "id":
 										col_inner_data = col_inner_elements[k].id;
 										break;
+									case "selector":
+										col_inner_data = $(col_inner_elements[k]).find(columnObj.html_data_selector).text();
+										break;
+									}
+
+									if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
+										col_filter_array[col_inner_data] = col_inner_data;
+										options.push(col_inner_data);
 									}
 								}
 							} else {
 								col_inner_data = col_inner_elements.selector;
+								if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
+									col_filter_array[col_inner_data] = col_inner_data;
+									options.push(col_inner_data);
+								}
 							}
-							if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
-								col_filter_array[col_inner_data] = col_inner_data;
-								options.push(col_inner_data);
-							}
+
 						} else if (column_data_type === "text") {
 							if (text_data_delimiter !== undefined) {
 								if (column_number_data === undefined) {
@@ -1420,6 +1475,9 @@ var yadcf = (function ($) {
 										break;
 									case "id":
 										col_inner_data = col_inner_elements[k].id;
+										break;
+									case "selector":
+										col_inner_data = $(col_inner_elements[k]).find(columnObj.html_data_selector).text();
 										break;
 									}
 								}
@@ -1569,10 +1627,10 @@ var yadcf = (function ($) {
 
 						if (columnObj.filter_type === "select") {
 							$(filter_selector_string).append("<select id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" " +
-								"onchange=\"yadcf.doFilter(this, '" + table_selector_jq_friendly + "', " + column_number + ", '" + filter_match_mode + "')\" onclick='yadcf.stopPropagation(event);'>" + options + "</select>");
+								"onchange=\"yadcf.doFilter(this, '" + table_selector_jq_friendly + "', event, '" + filter_match_mode + "')\" onclick='yadcf.stopPropagation(event);'>" + options + "</select>");
 							if (filter_reset_button_text !== false) {
 								$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +
-									"onclick=\"yadcf.stopPropagation(event);yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
+									"onclick=\"yadcf.stopPropagation(event);yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', event); return false;\" class=\"yadcf-filter-reset-button\">");
 							}
 						} else {
 							$(filter_selector_string).append("<select id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" " +
@@ -1622,7 +1680,7 @@ var yadcf = (function ($) {
 
 							if (filter_reset_button_text !== false) {
 								$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " +
-									"onclick=\"yadcf.stopPropagation(event);yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">");
+									"onclick=\"yadcf.stopPropagation(event);yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', event); return false;\" class=\"yadcf-filter-reset-button\">");
 							}
 
 							if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
@@ -2120,27 +2178,35 @@ var yadcf = (function ($) {
 
 	function textKeyUP(table_selector_jq_friendly, event, clear) {
 		event = eventTargetFixUp(event);
-		var column_number = parseInt($(event.target).attr("id").replace("yadcf-filter-" + table_selector_jq_friendly + "-", "").replace('-reset', ''), 10),
+		var column_number,
 			oTable = oTables[table_selector_jq_friendly],
-			options = getOptions(oTable.selector)[column_number],
+			keyUp,
+			options;
 
-			keyUp = function (table_selector_jq_friendly, event, clear) {
-				$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
+		if ($(event.target).closest('th').length === 1) {
+			column_number = calculateColumnNumber($(event.target).closest('th').index(), oTable);
+		} else {
+			column_number = parseInt($(event.target).attr("id").replace("yadcf-filter-" + table_selector_jq_friendly + "-", "").replace('-reset', ''), 10);
+		}
+		options = getOptions(oTable.selector)[column_number];
 
-				if (clear !== undefined || event.target.value === '') {
-					$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
-					$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
-					oTable.fnFilter("", column_number);
-					resetIApiIndex();
-					return;
-				}
+		keyUp = function (table_selector_jq_friendly, event, clear) {
+			$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 
-				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
-
-				yadcfMatchFilter(oTable, event.target.value, options.filter_match_mode, column_number);
-
+			if (clear !== undefined || event.target.value === '') {
+				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
+				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
+				oTable.fnFilter("", column_number);
 				resetIApiIndex();
-			};
+				return;
+			}
+
+			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
+
+			yadcfMatchFilter(oTable, event.target.value, options.filter_match_mode, column_number);
+
+			resetIApiIndex();
+		};
 
 		if (options.filter_delay === undefined) {
 			keyUp(table_selector_jq_friendly, event, clear);
