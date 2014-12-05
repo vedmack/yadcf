@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.7.beta.3
+* Version:     0.8.7.beta.4
 * 
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1415,14 +1415,14 @@ var yadcf = (function ($) {
 										break;
 									}
 
-									if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
+									if ($.trim(col_inner_data) !== '' && !(col_filter_array.hasOwnProperty(col_inner_data))) {
 										col_filter_array[col_inner_data] = col_inner_data;
 										options.push(col_inner_data);
 									}
 								}
 							} else {
 								col_inner_data = col_inner_elements.selector;
-								if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
+								if ($.trim(col_inner_data) !== '' && !(col_filter_array.hasOwnProperty(col_inner_data))) {
 									col_filter_array[col_inner_data] = col_inner_data;
 									options.push(col_inner_data);
 								}
@@ -1438,7 +1438,7 @@ var yadcf = (function ($) {
 								}
 								for (k = 0; k < col_inner_elements.length; k++) {
 									col_inner_data = col_inner_elements[k];
-									if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
+									if ($.trim(col_inner_data) !== '' && !(col_filter_array.hasOwnProperty(col_inner_data))) {
 										col_filter_array[col_inner_data] = col_inner_data;
 										options.push(col_inner_data);
 									}
@@ -1459,7 +1459,7 @@ var yadcf = (function ($) {
 								} else {
 								    col_inner_data = dot2obj(data[j]._aData, column_number_data);
 								}
-								if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
+								if ($.trim(col_inner_data) !== '' && !(col_filter_array.hasOwnProperty(col_inner_data))) {
 									col_filter_array[col_inner_data] = col_inner_data;
 									options.push(col_inner_data);
 								}
@@ -1487,7 +1487,7 @@ var yadcf = (function ($) {
 							} else {
 								col_inner_data = col_inner_elements.selector;
 							}
-							if (!(col_filter_array.hasOwnProperty(col_inner_data))) {
+							if ($.trim(col_inner_data) !== '' && !(col_filter_array.hasOwnProperty(col_inner_data))) {
 								col_filter_array[col_inner_data] = col_inner_data;
 								options.push(col_inner_data);
 							}
