@@ -1,6 +1,6 @@
 Yet Another DataTables Column Filter - (yadcf)
 =====
-
+ 
 Description:
 =====
 

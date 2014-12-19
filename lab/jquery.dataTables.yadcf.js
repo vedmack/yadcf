@@ -5,7 +5,7 @@
 * 
 * File:        jquery.dataTables.yadcf.js
 * Version:     0.8.7.beta.5
-* 
+*  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
 * Contact:     vedmack@gmail.com
