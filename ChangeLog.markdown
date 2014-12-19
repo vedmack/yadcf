@@ -5,6 +5,7 @@
 * Allow advanced selection of value from html code inside the td element - html_data_type support now 'selector' type  (must provide value for 'with html_data_selector' too), https://github.com/vedmack/yadcf/issues/116
 * Support (partial) for ColReorder (for filter_type 'select' and 'text') https://github.com/vedmack/yadcf/issues/107
 * Skip empty strings in the column (avoid entering empty strings into the select / auto_complete filters) https://github.com/vedmack/yadcf/pull/112
+* Support complex headers (rowspan / colspan) https://github.com/vedmack/yadcf/issues/119
 
 
 ## 0.8.6

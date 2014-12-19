@@ -60,8 +60,8 @@ Features:
 - External API functions:
  - exFilterColumn: Allows to trigger filter/s externally/programmatically (support ALL filter types!!!) , perfect for showing table with pre filtered columns
  - exGetColumnFilterVal: Allows to retreive  column current filtered value (support ALL filter types!!!)	
-- Notable datatables API support
- - sScrollX / sScrollY / bStateSave / bDeferRender / HTML5 data-* attributes
+- Notable datatables API / Features support
+ - sScrollX / sScrollY / bStateSave / bDeferRender / HTML5 data-* attributes / Complex headers
 
 Examples:
 =====
