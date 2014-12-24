@@ -2722,7 +2722,7 @@ var yadcf = (function ($) {
 				$(document).removeData("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val");
 
 				switch (optionsObj.filter_type) {
-				case 'select':
+				case 'select', 'custom_func':
 					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val('-1').removeClass('inuse');
 					table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
 					break;
