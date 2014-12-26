@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.7.beta.5
+* Version:     0.8.7.beta.6
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2548,7 +2548,6 @@ var yadcf = (function ($) {
 				filter_value = col_filter_arr[j][1];
 
 				switch (optionsObj.filter_type) {
-				case 'select':
 				case 'auto_complete':
 				case 'text':
 				case 'date':
@@ -2556,6 +2555,7 @@ var yadcf = (function ($) {
 					tmpStr = yadcfMatchFilterString(table_arg, column_number, filter_value, optionsObj.filter_match_mode, false);
 					table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = tmpStr;
 					break;
+				case 'select':
 				case 'multi_select':
 					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(filter_value);
 					tmpStr = yadcfMatchFilterString(table_arg, column_number, filter_value, optionsObj.filter_match_mode, true);
@@ -2620,8 +2620,21 @@ var yadcf = (function ($) {
 						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = filter_value.from + '-yadcf_delim-' + filter_value.to;
 					}
 					break;
+				case 'custom_func':
+				case 'multi_select_custom_func':
+					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(filter_value).addClass('inuse');
+					if (table_arg.fnSettings().oFeatures.bServerSide === true) {
+						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = filter_value;
+					}
+					if (optionsObj.select_type !== undefined) {
+						if (optionsObj.select_type === 'chosen') {
+							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
+						} else if (optionsObj.select_type === 'select2') {
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(optionsObj.select_type_options);
+						}
+					}
+					break;
 				}
-
 			}
 			if (table_arg.fnSettings().oFeatures.bServerSide !== true) {
 				table_arg.fnDraw();
@@ -2726,6 +2739,13 @@ var yadcf = (function ($) {
 				case 'custom_func':
 					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val('-1').removeClass('inuse');
 					table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
+					if (optionsObj.select_type !== undefined) {
+						if (optionsObj.select_type === 'chosen') {
+							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
+						} else if (optionsObj.select_type === 'select2') {
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(optionsObj.select_type_options);
+						}
+					}
 					break;
 				case 'auto_complete':
 				case 'text':
