@@ -1849,7 +1849,7 @@ var yadcf = (function ($) {
 							+ "' placeholder='" + filter_default_label + "'" + " filter_match_mode='" + filter_match_mode + "'" + " onkeyup=\"yadcf.textKeyUP('" + table_selector_jq_friendly + "', '" + column_number + "');\"></input>");
 
 						if (filter_reset_button_text !== false) {
-							$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset\"" +
+							$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filter_reset_button_text + "\" type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset\" " +
 								"onclick=\"yadcf.stopPropagation(event);yadcf.textKeyUP('" + table_selector_jq_friendly + "', '" + column_number + "', 'clear'); return false;\" class=\"yadcf-filter-reset-button\">");
 						}
 
@@ -2539,7 +2539,7 @@ var yadcf = (function ($) {
 			$(filter_selector_string).append("<input type=\"text\" id=\"yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str + "\" class=\"yadcf-filter\" onclick='yadcf.stopPropagation(event);"
 				+ "' placeholder='" + filterOptions.filter_default_label + "'" + " onkeyup=\"yadcf.textKeyUpMultiTables('" + tablesSelectors + "',event,'" + column_number_str + "');\"></input>");
 			if (filterOptions.filter_reset_button_text !== false) {
-				$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filterOptions.filter_reset_button_text + "\" type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str + "-reset\"" +
+				$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filterOptions.filter_reset_button_text + "\" type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str + "-reset\" " +
 					"onclick=\"yadcf.stopPropagation(event);yadcf.textKeyUpMultiTables('" + tablesSelectors + "', event,'" + column_number_str + "','clear'); return false;\" class=\"yadcf-filter-reset-button\">");
 			}
 			break;
@@ -2609,7 +2609,7 @@ var yadcf = (function ($) {
 				$("#yadcf-filter-" + table_selector_jq_friendly).select2(filterOptions.select_type_options);
 			}
 			if (filterOptions.filter_reset_button_text !== false) {
-				$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filterOptions.filter_reset_button_text + "\" type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-reset\"" +
+				$(filter_selector_string).find(".yadcf-filter").after("<input value=\"" + filterOptions.filter_reset_button_text + "\" type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-reset\" " +
 					"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterMultiTables('" + tablesSelectors + "', event,'" + column_number_str + "','clear'); return false;\" class=\"yadcf-filter-reset-button\">");
 			}
 			break;
