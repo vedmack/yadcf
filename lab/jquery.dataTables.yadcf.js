@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.7.beta.7
+* Version:     0.8.7.beta.8
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1830,7 +1830,7 @@ var yadcf = (function ($) {
 						$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter-wrapper\"></div>");
 						filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
 
-						$(filter_selector_string).append("<input id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" onclick='yadcf.stopPropagation(event);"
+						$(filter_selector_string).append("<input id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);"
 							+ "' placeholder='" + filter_default_label + "'" + " filter_match_mode='" + filter_match_mode + "'" + " onkeyup=\"yadcf.autocompleteKeyUP('" + table_selector_jq_friendly + "',event);\"></input>");
 						$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_data);
 
@@ -2193,17 +2193,20 @@ var yadcf = (function ($) {
 			regex = false,
 			smart = true,
 			caseInsen = true,
-			serachVal;
+			serachVal,
+			tablesAsOne,
+			tablesArray = oTables[tablesSelectors];
 
 		event = eventTargetFixUp(event);
+		tablesAsOne = new $.fn.dataTable.Api(tablesArray);
 
 		if (clear !== undefined || event.target.value === '-1') {
 			$(event.target).prev().val("").focus();
 			$(event.target).prev().removeClass("inuse");
 			if (columnsObj.column_number instanceof Array) {
-				$(tablesSelectors).DataTable().columns(columnsObj.column_number).search('').draw();
+				tablesAsOne.columns(columnsObj.column_number).search('').draw();
 			} else {
-				$(tablesSelectors).DataTable().search('').draw();
+				tablesAsOne.search('').draw();
 			}
 			return;
 		}
@@ -2224,9 +2227,9 @@ var yadcf = (function ($) {
 			serachVal = "^" + serachVal;
 		}*/
 		if (columnsObj.column_number instanceof Array) {
-			$(tablesSelectors).DataTable().columns(columnsObj.column_number).search(serachVal, regex, smart, caseInsen).draw();
+			tablesAsOne.columns(columnsObj.column_number).search(serachVal, regex, smart, caseInsen).draw();
 		} else {
-			$(tablesSelectors).DataTable().search(serachVal, regex, smart, caseInsen).draw();
+			tablesAsOne.search(serachVal, regex, smart, caseInsen).draw();
 		}
 	}
 
@@ -2237,11 +2240,14 @@ var yadcf = (function ($) {
 			regex = false,
 			smart = true,
 			caseInsen = true,
-			serachVal;
+			serachVal,
+			tablesAsOne,
+			tablesArray = oTables[tablesSelectors];
 
 		event = eventTargetFixUp(event);
+		tablesAsOne = new $.fn.dataTable.Api(tablesArray);
 
-		keyUp = function (tablesSelectors, event, clear) {
+		keyUp = function (tablesAsOne, event, clear) {
 
 			if (clear !== undefined || event.target.value === '') {
 				if (clear !== undefined) {
@@ -2252,9 +2258,9 @@ var yadcf = (function ($) {
 					$(event.target).removeClass("inuse");
 				}
 				if (columnsObj.column_number instanceof Array) {
-					$(tablesSelectors).DataTable().columns(columnsObj.column_number).search('').draw();
+					tablesAsOne.columns(columnsObj.column_number).search('').draw();
 				} else {
-					$(tablesSelectors).DataTable().search('').draw();
+					tablesAsOne.search('').draw();
 				}
 				return;
 			}
@@ -2276,18 +2282,18 @@ var yadcf = (function ($) {
 			}
 */
 			if (columnsObj.column_number instanceof Array) {
-				$(tablesSelectors).DataTable().columns(columnsObj.column_number).search(serachVal, regex, smart, caseInsen).draw();
+				tablesAsOne.columns(columnsObj.column_number).search(serachVal, regex, smart, caseInsen).draw();
 			} else {
-				$(tablesSelectors).DataTable().search(serachVal, regex, smart, caseInsen).draw();
+				tablesAsOne.search(serachVal, regex, smart, caseInsen).draw();
 			}
 
 		};
 
 		if (columnsObj.filter_delay === undefined) {
-			keyUp(tablesSelectors, event, clear);
+			keyUp(tablesAsOne, event, clear);
 		} else {
 			yadcfDelay(function () {
-				keyUp(tablesSelectors, event, clear);
+				keyUp(tablesAsOne, event, clear);
 			}, columnsObj.filter_delay);
 		}
 	}
@@ -2516,7 +2522,7 @@ var yadcf = (function ($) {
 		}
 	}
 
-	function appendFiltersMultipleTables(tablesSelectors, colObjDummy) {
+	function appendFiltersMultipleTables(tablesArray, tablesSelectors, colObjDummy) {
 		var filter_selector_string = "#" + colObjDummy.filter_container_id,
 			$filter_selector = $(filter_selector_string).find(".yadcf-filter"),
 			table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendlyNew(tablesSelectors),
@@ -2553,7 +2559,7 @@ var yadcf = (function ($) {
 				filterOptions.data = [];
 				tableTmpArr = tablesSelectors.split(',');
 				for (tableTmpArrIndex = 0; tableTmpArrIndex < tableTmpArr.length; tableTmpArrIndex++) {
-					tableTmp = $(tableTmpArr[tableTmpArrIndex]).dataTable();
+					tableTmp = $('#' + tablesArray[tableTmpArrIndex].table().node().id).dataTable();
 					if (isDOMSource(tableTmp)) {
 						//check if ajax source, if so, listen for dt.draw
 						columnsTmpArr = filterOptions.column_number;
@@ -2563,7 +2569,7 @@ var yadcf = (function ($) {
 						}
 						filterOptions.column_number = columnsTmpArr;
 					} else {
-						$(document).off('draw.dt', tableTmp.selector).on('draw.dt', tableTmp.selector, function (event, ui) {
+						$(document).off('draw.dt', '#' + tablesArray[tableTmpArrIndex].table().node().id).on('draw.dt', '#' + tablesArray[tableTmpArrIndex].table().node().id, function (event, ui) {
 							var options_tmp = '',
 								ii;
 							columnsTmpArr = filterOptions.column_number;
@@ -2657,13 +2663,13 @@ var yadcf = (function ($) {
 			dummyArr.push(columnsObj);
 
 			for (i = 0; i < tablesArray.length; i++) {
-				tablesSelectors += tablesArray[i].settings()[0].oInstance.selector + ',';
+				tablesSelectors += tablesArray[i].table().node().id + ',';
 			}
 			tablesSelectors = tablesSelectors.substring(0, tablesSelectors.length - 1);
 
 			setOptions(tablesSelectors + '_' + column_number_str, dummyArr);
-
-			appendFiltersMultipleTables(tablesSelectors, columnsObj);
+			oTables[tablesSelectors] = tablesArray;
+			appendFiltersMultipleTables(tablesArray, tablesSelectors, columnsObj);
 		}
 	}
 
