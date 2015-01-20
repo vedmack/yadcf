@@ -8,7 +8,7 @@
 * Support complex headers (rowspan / colspan) https://github.com/vedmack/yadcf/issues/119
 * Support custom_func / multi_select_custom_func in exResetAllFilters and exFilterColumn functions https://github.com/vedmack/yadcf/issues/126
 * Added initMultipleColumns function to allows to add filter for multiple columns on a table https://github.com/vedmack/yadcf/issues/79
-* Bugs / Issues fix https://github.com/vedmack/yadcf/issues/136 / https://github.com/vedmack/yadcf/issues/131
+* Bugs / Issues fix https://github.com/vedmack/yadcf/issues/136 / https://github.com/vedmack/yadcf/issues/131 / https://github.com/vedmack/yadcf/issues/142
 
 ## 0.8.6
 

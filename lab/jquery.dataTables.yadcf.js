@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.7.beta.8
+* Version:     0.8.7.beta.9
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -600,8 +600,9 @@ var yadcf = (function ($) {
 				}
 			}
 			if (selected_values.length !== 0) {
-				stringForSearch = selected_values.join("|");
-				stringForSearch = stringForSearch.replace(/([.*+?^=!:${}()\[\]\/\\])/g, "\\$1");
+				stringForSearch = selected_values.join('narutouzomaki');
+				stringForSearch = stringForSearch.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+				stringForSearch = stringForSearch.split('narutouzomaki').join('|');
 				if (filter_match_mode === "contains") {
 					oTable.fnFilter(stringForSearch, column_number, true, false, true);
 				} else if (filter_match_mode === "exact") {
@@ -2415,9 +2416,11 @@ var yadcf = (function ($) {
 					var obj = {};
 					if (state === true) {
 						obj[col_num] = yadcf.getOptions(settings.oInstance.selector)[col_num];
-						appendFilters(oTables[yadcf.generateTableSelectorJQFriendly(settings.oInstance.selector)],
-							obj,
-							settings.oInstance.selector);
+						if (obj[col_num] !== undefined) {
+							appendFilters(oTables[yadcf.generateTableSelectorJQFriendly(settings.oInstance.selector)],
+								obj,
+								settings.oInstance.selector);
+						}
 					}
 				});
 				$(document).off('destroy.dt', oTable.selector).on('destroy.dt', oTable.selector, function (event, ui) {
