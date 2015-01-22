@@ -72,6 +72,8 @@ Examples:
 
 [DOM source with select2 example](http://yadcf-showcase.appspot.com/DOM_source_select2.html)
 
+[DOM / Multiple Columns and Tables 1.10.0 example] (http://yadcf-showcase.appspot.com/dom_multi_columns_tables_1.10.html)
+
 [AJAX source example](http://yadcf-showcase.appspot.com/ajax_source.html)
 
 [AJAX mData (deep) example](http://yadcf-showcase.appspot.com/ajax_mData_source.html)
