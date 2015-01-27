@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.7.beta.10
+* Version:     0.8.7.beta.11
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -273,11 +273,62 @@ var yadcf = (function ($) {
 	'use strict';
 
 	var oTables = {},
-		oTablesD = {},
 		oTablesIndex = {},
 		options = {},
+		plugins = {},
 		exFilterColumnQueue = [],
 		yadcfDelay;
+
+	//From ColReorder (SpryMedia Ltd (www.sprymedia.co.uk))
+	function getSettingsObjFromTable(dt) {
+		var oDTSettings;
+		if ($.fn.dataTable.Api) {
+			oDTSettings = new $.fn.dataTable.Api(dt).settings()[0];
+		} else if (dt.fnSettings) {// 1.9 compatibility
+			// DataTables object, convert to the settings object
+			oDTSettings = dt.fnSettings();
+		} else if (typeof dt === 'string') {// jQuery selector
+			if ($.fn.dataTable.fnIsDataTable($(dt)[0])) {
+				oDTSettings = $(dt).eq(0).dataTable().fnSettings();
+			}
+		} else if (dt.nodeName && dt.nodeName.toLowerCase() === 'table') {
+			// Table node
+			if ($.fn.dataTable.fnIsDataTable(dt.nodeName)) {
+				oDTSettings = $(dt.nodeName).dataTable().fnSettings();
+			}
+		} else if (dt instanceof jQuery) {
+			// jQuery object
+			if ($.fn.dataTable.fnIsDataTable(dt[0])) {
+				oDTSettings = dt.eq(0).dataTable().fnSettings();
+			}
+		} else {
+			// DataTables settings object
+			oDTSettings = dt;
+		}
+		return oDTSettings;
+	}
+
+	function arraySwapValueWithIndex(pArray) {
+		var tmp = [],
+			i;
+		for (i = 0; i < pArray.length; i++) {
+			tmp[pArray[i]] = i;
+		}
+		return tmp;
+	}
+
+	function initColReorder(settingsDt, table_selector_jq_friendly, clear) {
+		if (clear === true) {
+			plugins[table_selector_jq_friendly] = undefined;
+			return;
+		}
+		if (settingsDt.oSavedState != null && settingsDt.oSavedState.ColReorder !== undefined) {
+			if (plugins[table_selector_jq_friendly] === undefined) {
+				plugins[table_selector_jq_friendly] = {};
+				plugins[table_selector_jq_friendly].ColReorder = arraySwapValueWithIndex(settingsDt.oSavedState.ColReorder);
+			}
+		}
+	}
 
 	function columnsArrayToString(column_number) {
 		var column_number_obj = {};
@@ -404,15 +455,6 @@ var yadcf = (function ($) {
 
 	function escapeRegExp(string) {
 		return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-	}
-
-	function arraySwapValueWithIndex(pArray) {
-		var tmp = [],
-			i;
-		for (i = 0; i < pArray.length; i++) {
-			tmp[pArray[i]] = i;
-		}
-		return tmp;
 	}
 
 	function replaceAll(string, find, replace) {
@@ -542,13 +584,14 @@ var yadcf = (function ($) {
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 
 		var oTable = oTables[table_selector_jq_friendly],
-			oTableD = oTablesD[table_selector_jq_friendly],
 			selected_value,
 			column_number_filter,
-			columnObj;
+			columnObj,
+			settingsDt = getSettingsObjFromTable(oTable);
 
-		if (oTableD !== undefined && oTableD.colReorder !== undefined) {
-			column_number_filter = arraySwapValueWithIndex(oTableD.colReorder.order())[column_number];
+		if (settingsDt.oSavedState != null && settingsDt.oSavedState.ColReorder !== undefined) {
+			initColReorder(settingsDt, table_selector_jq_friendly);
+			column_number_filter = plugins[table_selector_jq_friendly].ColReorder[column_number];
 		} else {
 			column_number_filter = column_number;
 		}
@@ -1494,6 +1537,7 @@ var yadcf = (function ($) {
 			filter_container_id,
 			column_number_data,
 			column_number,
+			column_position,
 			column_data_type,
 			html_data_type,
 			text_data_delimiter,
@@ -1523,13 +1567,16 @@ var yadcf = (function ($) {
 			columnObjKey,
 			columnObj,
 			filters_position,
-			unique_th;
+			unique_th,
+			settingsDt;
 
-
+		settingsDt = getSettingsObjFromTable(oTable);
 		table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector);
 
+		initColReorder(settingsDt, table_selector_jq_friendly);
+
 		filters_position = $(document).data(table_selector + "_filters_position");
-		if (oTable.fnSettings().oScroll.sX !== '' || oTable.fnSettings().oScroll.sY !== '') {
+		if (settingsDt.oScroll.sX !== '' || settingsDt.oScroll.sY !== '') {
 			table_selector = '.yadcf-datatables-table-' + table_selector_jq_friendly;
 		}
 		if (filters_position === 'thead' && oTable._fnGetUniqueThs() !== undefined) {
@@ -1544,10 +1591,16 @@ var yadcf = (function ($) {
 				filter_container_id = columnObj.filter_container_id;
 				column_number = columnObj.column_number;
 				column_number = +column_number;
+				column_position = column_number;
+
+				if (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined) {
+					column_position = plugins[table_selector_jq_friendly].ColReorder[column_number];
+				}
+
 				columnObj.column_number = column_number;
 				column_number_data = undefined;
-				if (isNaN(oTable.fnSettings().aoColumns[column_number].mData) && typeof oTable.fnSettings().aoColumns[column_number].mData !== 'object') {
-					column_number_data = oTable.fnSettings().aoColumns[column_number].mData;
+				if (isNaN(settingsDt.aoColumns[column_number].mData) && typeof settingsDt.aoColumns[column_number].mData !== 'object') {
+					column_number_data = settingsDt.aoColumns[column_number].mData;
 					columnObj.column_number_data = column_number_data;
 				}
 				column_data_type = columnObj.column_data_type;
@@ -1618,21 +1671,21 @@ var yadcf = (function ($) {
 
 				if (filter_container_id === undefined) {
 					//Can't show filter inside a column for a hidden one (place it outside using filter_container_id) 
-					if (oTable.fnSettings().aoColumns[column_number].bVisible === false) {
+					if (settingsDt.aoColumns[column_number].bVisible === false) {
 						//console.log('Yadcf warning: Can\'t show filter inside a column N#' + column_number + ' for a hidden one (place it outside using filter_container_id)');
 						continue;
 					}
 					col_num_visible = column_number;
 
-					for (col_num_visible_iter = 0; col_num_visible_iter < oTable.fnSettings().aoColumns.length && col_num_visible_iter < column_number; col_num_visible_iter++) {
-						if (oTable.fnSettings().aoColumns[col_num_visible_iter].bVisible === false) {
+					for (col_num_visible_iter = 0; col_num_visible_iter < settingsDt.aoColumns.length && col_num_visible_iter < column_number; col_num_visible_iter++) {
+						if (settingsDt.aoColumns[col_num_visible_iter].bVisible === false) {
 							col_num_visible--;
 						}
 					}
 					if (unique_th === undefined) {
 						filter_selector_string = table_selector + ' ' + filters_position + ' th:eq(' + col_num_visible + ')';
 					} else {
-						filter_selector_string = table_selector + ' ' + filters_position + ' tr:eq(' + $(unique_th[col_num_visible]).parent().index() + ') th:eq(' + $(unique_th[col_num_visible]).index() + ')';
+						filter_selector_string = table_selector + ' ' + filters_position + ' tr:eq(' + $(unique_th[column_position]).parent().index() + ') th:eq(' + $(unique_th[column_position]).index() + ')';
 					}
 					$filter_selector = $(filter_selector_string).find(".yadcf-filter");
 				} else {
@@ -1688,8 +1741,8 @@ var yadcf = (function ($) {
 
 						$filter_selector.empty();
 						$filter_selector.append(column_data);
-						if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
-							tmpStr = oTable.fnSettings().aoPreSearchCols[column_number].sSearch;
+						if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
+							tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 							if (columnObj.filter_type === "select") {
 								tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
 								$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
@@ -1741,9 +1794,9 @@ var yadcf = (function ($) {
 									"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterCustomDateFunc('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">" + filter_reset_button_text + "</button>");
 							}
 
-							if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
-								if (oTable.fnSettings().oLoadedState.yadcfState && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
-									tmpStr = oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from;
+							if (settingsDt.oFeatures.bStateSave === true && settingsDt.oLoadedState) {
+								if (settingsDt.oLoadedState.yadcfState && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly] && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
+									tmpStr = settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from;
 									if (tmpStr === '-1' || tmpStr === undefined) {
 										$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr);
 									} else {
@@ -1751,13 +1804,13 @@ var yadcf = (function ($) {
 									}
 								}
 							}
-							if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+							if (settingsDt.oFeatures.bServerSide !== true) {
 								addCustomFunctionFilterCapability(table_selector_jq_friendly, "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_number);
 							}
 						}
 
-						if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
-							tmpStr = oTable.fnSettings().aoPreSearchCols[column_number].sSearch;
+						if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
+							tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 							tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
 						}
@@ -1784,8 +1837,8 @@ var yadcf = (function ($) {
 									"onclick=\"yadcf.stopPropagation(event);yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">" + filter_reset_button_text + "</button>");
 							}
 
-							if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
-								tmpStr = oTable.fnSettings().aoPreSearchCols[column_number].sSearch;
+							if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
+								tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 								tmpStr = yadcfParseMatchFilterMultiSelect(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
 								tmpStr = tmpStr.replace(/\\/g, "");
 								tmpStr = tmpStr.split("|");
@@ -1800,9 +1853,9 @@ var yadcf = (function ($) {
 									"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterCustomDateFunc('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">" + filter_reset_button_text + "</button>");
 							}
 
-							if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
-								if (oTable.fnSettings().oLoadedState.yadcfState && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
-									tmpStr = oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from;
+							if (settingsDt.oFeatures.bStateSave === true && settingsDt.oLoadedState) {
+								if (settingsDt.oLoadedState.yadcfState && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly] && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
+									tmpStr = settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from;
 									if (tmpStr === '-1' || tmpStr === undefined) {
 										$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr);
 									} else {
@@ -1810,7 +1863,7 @@ var yadcf = (function ($) {
 									}
 								}
 							}
-							if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+							if (settingsDt.oFeatures.bServerSide !== true) {
 								addCustomFunctionFilterCapability(table_selector_jq_friendly, "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_number);
 							}
 						}
@@ -1854,8 +1907,8 @@ var yadcf = (function ($) {
 								"onclick=\"yadcf.stopPropagation(event);yadcf.textKeyUP('" + table_selector_jq_friendly + "', '" + column_number + "', 'clear'); return false;\" class=\"yadcf-filter-reset-button\">" + filter_reset_button_text + "</button>");
 						}
 
-						if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
-							tmpStr = oTable.fnSettings().aoPreSearchCols[column_number].sSearch;
+						if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
+							tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 							tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
 						}
@@ -1887,8 +1940,8 @@ var yadcf = (function ($) {
 						source: $(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number),
 						select: autocompleteSelect
 					});
-					if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
-						tmpStr = oTable.fnSettings().aoPreSearchCols[column_number].sSearch;
+					if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
+						tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 						tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
 						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
 					}
@@ -2302,12 +2355,13 @@ var yadcf = (function ($) {
 	function textKeyUP(table_selector_jq_friendly, column_number, clear) {
 		var column_number_filter,
 			oTable = oTables[table_selector_jq_friendly],
-			oTableD = oTablesD[table_selector_jq_friendly],
 			keyUp,
-			options;
+			options,
+			settingsDt = getSettingsObjFromTable(oTable);
 
-		if (oTableD !== undefined && oTableD.colReorder !== undefined) {
-			column_number_filter = arraySwapValueWithIndex(oTableD.colReorder.order())[column_number];
+		if (settingsDt.oSavedState != null && settingsDt.oSavedState.ColReorder !== undefined) {
+			initColReorder(settingsDt, table_selector_jq_friendly);
+			column_number_filter = plugins[table_selector_jq_friendly].ColReorder[column_number];
 		} else {
 			column_number_filter = column_number;
 		}
@@ -2378,14 +2432,11 @@ var yadcf = (function ($) {
 		}
 	}
 
-	function initAndBindTable(oTable, table_selector, index, oTableD) {
+	function initAndBindTable(oTable, table_selector, index) {
 
 		var table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector),
 			table_selector_tmp;
         oTables[table_selector_jq_friendly] = oTable;
-		if (oTableD !== undefined) {
-			oTablesD[table_selector_jq_friendly] = oTableD;
-		}
 		oTablesIndex[table_selector_jq_friendly] = index;
 
 		scrollXYHandler(oTable, table_selector);
@@ -2412,10 +2463,18 @@ var yadcf = (function ($) {
 						}
 					}
 				});
+				$(document).off('column-reorder.dt', oTable.selector).on('column-reorder.dt', oTable.selector, function (e, settings, json) {
+					var table_selector_jq_friendly = generateTableSelectorJQFriendly(oTable.selector);
+					initColReorder('', table_selector_jq_friendly, true);
+				});
 				$(document).off('column-visibility.dt', oTable.selector).on('column-visibility.dt', oTable.selector, function (e, settings, col_num, state) {
 					var obj = {};
 					if (state === true) {
+						if (settings.oSavedState != null && settings.oSavedState.ColReorder !== undefined) {
+							col_num = settings.oSavedState.ColReorder[col_num];
+						}
 						obj[col_num] = yadcf.getOptions(settings.oInstance.selector)[col_num];
+						obj[col_num].column_number = col_num;
 						if (obj[col_num] !== undefined) {
 							appendFilters(oTables[yadcf.generateTableSelectorJQFriendly(settings.oInstance.selector)],
 								obj,
