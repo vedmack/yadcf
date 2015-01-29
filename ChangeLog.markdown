@@ -10,6 +10,7 @@
 * Added initMultipleColumns function to allows to add filter for multiple columns on a table https://github.com/vedmack/yadcf/issues/79
 * Bugs / Issues fix https://github.com/vedmack/yadcf/issues/136 / https://github.com/vedmack/yadcf/issues/131 / https://github.com/vedmack/yadcf/issues/142 /
 					https://github.com/vedmack/yadcf/issues/123 / https://github.com/vedmack/yadcf/issues/139 
+					https://github.com/vedmack/yadcf/issues/148 / https://github.com/vedmack/yadcf/issues/144
 
 ## 0.8.6
 

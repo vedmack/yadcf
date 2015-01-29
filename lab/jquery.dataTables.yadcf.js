@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.7.beta.11
+* Version:     0.8.7.beta.12
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -160,6 +160,12 @@
 				Default value:		{}
 				Description:		This parameter will be passed "as is" to the Chosen/Select2 plugin constructor
 				
+				
+* filter_plugin_options
+				Required:			false
+				Type:				Object
+				Default value:		undefined
+				Description:		This parameter will be passed to the jQuery Autocomplete plugin constructor
 				
 * case_insensitive
 				Required:			false
@@ -1599,8 +1605,8 @@ var yadcf = (function ($) {
 
 				columnObj.column_number = column_number;
 				column_number_data = undefined;
-				if (isNaN(settingsDt.aoColumns[column_number].mData) && typeof settingsDt.aoColumns[column_number].mData !== 'object') {
-					column_number_data = settingsDt.aoColumns[column_number].mData;
+				if (isNaN(settingsDt.aoColumns[column_position].mData) && typeof settingsDt.aoColumns[column_position].mData !== 'object') {
+					column_number_data = settingsDt.aoColumns[column_position].mData;
 					columnObj.column_number_data = column_number_data;
 				}
 				column_data_type = columnObj.column_data_type;
@@ -1671,7 +1677,7 @@ var yadcf = (function ($) {
 
 				if (filter_container_id === undefined) {
 					//Can't show filter inside a column for a hidden one (place it outside using filter_container_id) 
-					if (settingsDt.aoColumns[column_number].bVisible === false) {
+					if (settingsDt.aoColumns[column_position].bVisible === false) {
 						//console.log('Yadcf warning: Can\'t show filter inside a column N#' + column_number + ' for a hidden one (place it outside using filter_container_id)');
 						continue;
 					}
@@ -1936,10 +1942,20 @@ var yadcf = (function ($) {
 					$(filter_selector_string).find(".yadcf-filter").val($(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val"));
 				}
 				if (columnObj.filter_type === "auto_complete") {
-					$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).autocomplete({
-						source: $(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number),
-						select: autocompleteSelect
-					});
+					if (columnObj.filter_plugin_options !== undefined) {
+						if (columnObj.filter_plugin_options.source !== undefined) {
+							columnObj.filter_plugin_options.select = autocompleteSelect;
+						} else {
+							columnObj.filter_plugin_options.source = $(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number);
+							columnObj.filter_plugin_options.select = autocompleteSelect;
+						}
+					} else {
+						columnObj.filter_plugin_options = {
+							source: $(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number),
+							select: autocompleteSelect
+						};
+					}
+					$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).autocomplete(columnObj.filter_plugin_options);
 					if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
 						tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 						tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
