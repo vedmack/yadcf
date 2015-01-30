@@ -498,6 +498,7 @@ var yadcf = (function ($) {
 
 		if (multiple === undefined || multiple === false) {
 			if (filter_match_mode === "contains") {
+				table_arg.fnSettings().aoPreSearchCols[column_number].bSmart = true;
 				table_arg.fnSettings().aoPreSearchCols[column_number].bRegex = false;
 				ret_val = selected_value;
 			} else if (filter_match_mode === "exact") {
@@ -509,6 +510,7 @@ var yadcf = (function ($) {
 			}
 		} else {
 			if (filter_match_mode === "contains") {
+				table_arg.fnSettings().aoPreSearchCols[column_number].bSmart = true;
 				table_arg.fnSettings().aoPreSearchCols[column_number].bRegex = true;
 				ret_val = selected_value.join("|");
 			} else if (filter_match_mode === "exact") {
@@ -525,7 +527,7 @@ var yadcf = (function ($) {
 	function yadcfMatchFilter(oTable, selected_value, filter_match_mode, column_number) {
 		var case_insensitive = yadcf.getOptions(oTable.selector)[column_number].case_insensitive;
 		if (filter_match_mode === "contains") {
-			oTable.fnFilter(selected_value, column_number, false, false, true, case_insensitive);
+			oTable.fnFilter(selected_value, column_number, false, true, true, case_insensitive);
 		} else if (filter_match_mode === "exact") {
 			oTable.fnFilter("^" + selected_value + "$", column_number, true, false, true, case_insensitive);
 		} else if (filter_match_mode === "startsWith") {
@@ -653,7 +655,7 @@ var yadcf = (function ($) {
 				stringForSearch = stringForSearch.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 				stringForSearch = stringForSearch.split('narutouzomaki').join('|');
 				if (filter_match_mode === "contains") {
-					oTable.fnFilter(stringForSearch, column_number, true, false, true);
+					oTable.fnFilter(stringForSearch, column_number, true, true, true);
 				} else if (filter_match_mode === "exact") {
 					oTable.fnFilter("^(" + stringForSearch + ")$", column_number, true, false, true);
 				} else if (filter_match_mode === "startsWith") {
