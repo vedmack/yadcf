@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.7.beta.12
+* Version:     0.8.7.beta.13
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -323,15 +323,15 @@ var yadcf = (function ($) {
 		return tmp;
 	}
 
-	function initColReorder(settingsDt, table_selector_jq_friendly, clear) {
+	function initColReorder(state, table_selector_jq_friendly, clear) {
 		if (clear === true) {
 			plugins[table_selector_jq_friendly] = undefined;
 			return;
 		}
-		if (settingsDt.oSavedState != null && settingsDt.oSavedState.ColReorder !== undefined) {
+		if (state != null && state.ColReorder !== undefined) {
 			if (plugins[table_selector_jq_friendly] === undefined) {
 				plugins[table_selector_jq_friendly] = {};
-				plugins[table_selector_jq_friendly].ColReorder = arraySwapValueWithIndex(settingsDt.oSavedState.ColReorder);
+				plugins[table_selector_jq_friendly].ColReorder = arraySwapValueWithIndex(state.ColReorder);
 			}
 		}
 	}
@@ -598,7 +598,7 @@ var yadcf = (function ($) {
 			settingsDt = getSettingsObjFromTable(oTable);
 
 		if (settingsDt.oSavedState != null && settingsDt.oSavedState.ColReorder !== undefined) {
-			initColReorder(settingsDt, table_selector_jq_friendly);
+			initColReorder(settingsDt.oSavedState, table_selector_jq_friendly);
 			column_number_filter = plugins[table_selector_jq_friendly].ColReorder[column_number];
 		} else {
 			column_number_filter = column_number;
@@ -1581,7 +1581,7 @@ var yadcf = (function ($) {
 		settingsDt = getSettingsObjFromTable(oTable);
 		table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector);
 
-		initColReorder(settingsDt, table_selector_jq_friendly);
+		initColReorder(settingsDt.oSavedState, table_selector_jq_friendly);
 
 		filters_position = $(document).data(table_selector + "_filters_position");
 		if (settingsDt.oScroll.sX !== '' || settingsDt.oScroll.sY !== '') {
@@ -2378,7 +2378,7 @@ var yadcf = (function ($) {
 			settingsDt = getSettingsObjFromTable(oTable);
 
 		if (settingsDt.oSavedState != null && settingsDt.oSavedState.ColReorder !== undefined) {
-			initColReorder(settingsDt, table_selector_jq_friendly);
+			initColReorder(settingsDt.oSavedState, table_selector_jq_friendly);
 			column_number_filter = plugins[table_selector_jq_friendly].ColReorder[column_number];
 		} else {
 			column_number_filter = column_number;
