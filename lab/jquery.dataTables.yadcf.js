@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.7.beta.13
+* Version:     0.8.7.beta.16
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1683,15 +1683,17 @@ var yadcf = (function ($) {
 						//console.log('Yadcf warning: Can\'t show filter inside a column N#' + column_number + ' for a hidden one (place it outside using filter_container_id)');
 						continue;
 					}
-					col_num_visible = column_number;
 
-					for (col_num_visible_iter = 0; col_num_visible_iter < settingsDt.aoColumns.length && col_num_visible_iter < column_number; col_num_visible_iter++) {
-						if (settingsDt.aoColumns[col_num_visible_iter].bVisible === false) {
-							col_num_visible--;
-						}
-					}
 					if (unique_th === undefined) {
-						filter_selector_string = table_selector + ' ' + filters_position + ' th:eq(' + col_num_visible + ')';
+						//handle hidden columns
+						col_num_visible = column_position;
+						for (col_num_visible_iter = 0; col_num_visible_iter < settingsDt.aoColumns.length && col_num_visible_iter < column_position; col_num_visible_iter++) {
+							if (settingsDt.aoColumns[col_num_visible_iter].bVisible === false) {
+								col_num_visible--;
+							}
+						}
+						column_position = col_num_visible;
+						filter_selector_string = table_selector + ' ' + filters_position + ' th:eq(' + column_position + ')';
 					} else {
 						filter_selector_string = table_selector + ' ' + filters_position + ' tr:eq(' + $(unique_th[column_position]).parent().index() + ') th:eq(' + $(unique_th[column_position]).index() + ')';
 					}
@@ -2472,11 +2474,20 @@ var yadcf = (function ($) {
 					appendFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
 				});
 				$(document).off('xhr.dt', oTable.selector).on('xhr.dt', oTable.selector, function (e, settings, json) {
-					var col_num;
+					var col_num,
+						column_number_filter,
+						table_selector_jq_friendly = generateTableSelectorJQFriendly(oTable.selector);
+					if (settings.oSavedState !== null) {
+						initColReorder(settings.oSavedState, table_selector_jq_friendly);
+					}
 					for (col_num in yadcf.getOptions(settings.oInstance.selector)) {
 						if (yadcf.getOptions(settings.oInstance.selector).hasOwnProperty(col_num)) {
 							if (json['yadcf_data_' + col_num] !== undefined) {
-								yadcf.getOptions(settings.oInstance.selector)[col_num].data = json['yadcf_data_' + col_num];
+								column_number_filter = col_num;
+								if (settings.oSavedState !== null) {
+									column_number_filter = plugins[table_selector_jq_friendly].ColReorder[col_num];
+								}
+								yadcf.getOptions(settings.oInstance.selector)[col_num].data = json['yadcf_data_' + column_number_filter];
 							}
 						}
 					}
