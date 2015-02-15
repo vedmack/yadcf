@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.7.beta.16
+* Version:     0.8.7.beta.17
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1587,7 +1587,7 @@ var yadcf = (function ($) {
 		if (settingsDt.oScroll.sX !== '' || settingsDt.oScroll.sY !== '') {
 			table_selector = '.yadcf-datatables-table-' + table_selector_jq_friendly;
 		}
-		if (filters_position === 'thead' && oTable._fnGetUniqueThs() !== undefined) {
+		if (oTable._fnGetUniqueThs() !== undefined) {
 			unique_th = oTable._fnGetUniqueThs();
 		}
 		for (columnObjKey in args) {
@@ -1684,16 +1684,20 @@ var yadcf = (function ($) {
 						continue;
 					}
 
-					if (unique_th === undefined) {
-						//handle hidden columns
-						col_num_visible = column_position;
-						for (col_num_visible_iter = 0; col_num_visible_iter < settingsDt.aoColumns.length && col_num_visible_iter < column_position; col_num_visible_iter++) {
-							if (settingsDt.aoColumns[col_num_visible_iter].bVisible === false) {
-								col_num_visible--;
+					if (filters_position !== 'thead') {
+						if (unique_th === undefined) {
+							//handle hidden columns
+							col_num_visible = column_position;
+							for (col_num_visible_iter = 0; col_num_visible_iter < settingsDt.aoColumns.length && col_num_visible_iter < column_position; col_num_visible_iter++) {
+								if (settingsDt.aoColumns[col_num_visible_iter].bVisible === false) {
+									col_num_visible--;
+								}
 							}
+							column_position = col_num_visible;
+							filter_selector_string = table_selector + ' ' + filters_position + ' th:eq(' + column_position + ')';
+						} else {
+							filter_selector_string = table_selector + ' ' + filters_position + ' th:eq(' + $(unique_th[column_position]).index() + ')';
 						}
-						column_position = col_num_visible;
-						filter_selector_string = table_selector + ' ' + filters_position + ' th:eq(' + column_position + ')';
 					} else {
 						filter_selector_string = table_selector + ' ' + filters_position + ' tr:eq(' + $(unique_th[column_position]).parent().index() + ') th:eq(' + $(unique_th[column_position]).index() + ')';
 					}
