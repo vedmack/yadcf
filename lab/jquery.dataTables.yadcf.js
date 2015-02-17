@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.7.beta.17
+* Version:     0.8.7.beta.18
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2560,7 +2560,7 @@ var yadcf = (function ($) {
 				//we need to make sure that the yadcf state will be saved after page reload
 				oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 				//redraw the table in order to apply the filters
-				oTable.fnDraw();
+				oTable.fnDraw(false);
 			}
 		}
 	}
