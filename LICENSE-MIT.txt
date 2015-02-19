@@ -1,4 +1,4 @@
-Copyright (c) 2014, Daniel Reznick, vedmack@gmail.com
+Copyright (c) 2015, Daniel Reznick, vedmack@gmail.com
 All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining
