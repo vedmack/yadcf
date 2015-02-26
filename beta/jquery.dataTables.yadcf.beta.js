@@ -1,10 +1,10 @@
 /*global $, jQuery, exFilterColumn*/
-/*jslint plusplus: true, nomen: true */
+/*jslint plusplus: true, nomen: true, eqeq: true */
 /*!
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.3 
+* Version:     0.8.8.beta.4
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -328,7 +328,7 @@ var yadcf = (function ($) {
 			plugins[table_selector_jq_friendly] = undefined;
 			return;
 		}
-		if (state != null && state.ColReorder !== undefined) {
+		if (state != undefined && state.ColReorder !== undefined) {
 			if (plugins[table_selector_jq_friendly] === undefined) {
 				plugins[table_selector_jq_friendly] = {};
 				plugins[table_selector_jq_friendly].ColReorder = arraySwapValueWithIndex(state.ColReorder);
@@ -601,7 +601,7 @@ var yadcf = (function ($) {
 			columnObj,
 			settingsDt = getSettingsObjFromTable(oTable);
 
-		if (settingsDt.oSavedState != null && settingsDt.oSavedState.ColReorder !== undefined) {
+		if (settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) {
 			initColReorder(settingsDt.oSavedState, table_selector_jq_friendly);
 			column_number_filter = plugins[table_selector_jq_friendly].ColReorder[column_number];
 		} else {
@@ -757,17 +757,61 @@ var yadcf = (function ($) {
 	function addRangeNumberFilterCapability(table_selector_jq_friendly, fromId, toId, col_num, ignore_char) {
 
 		$.fn.dataTableExt.afnFiltering.push(
-			function (oSettings, aData, iDataIndex) {
+			function (oSettings, aData, iDataIndex, rowData) {
 				var min = document.getElementById(fromId).value,
 					max = document.getElementById(toId).value,
 					val = aData[col_num] === "-" ? 0 : aData[col_num],
 					retVal = false,
 					table_selector_jq_friendly_local = table_selector_jq_friendly,
 					current_table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(oSettings.oInstance.selector),
-					ignore_char_local = ignore_char;
+					ignore_char_local = ignore_char,
+					column_data_type,
+					html_data_type,
+					i,
+					columnObjKey,
+					columnObj;
 
+				if (rowData !== undefined) {
+					aData = rowData;
+				}
+				val = aData[col_num] === "-" ? 0 : aData[col_num];
 				if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
 					return true;
+				}
+
+				if (!isFinite(min) || !isFinite(max)) {
+					return true;
+				}
+				columnObj = yadcf.getOptions(oSettings.oInstance.selector)[col_num];
+				column_data_type = columnObj.column_data_type;
+				html_data_type = columnObj.html_data_type;
+
+				if (column_data_type === "html" || column_data_type === "rendered_html") {
+					if (html_data_type === undefined) {
+						html_data_type = "text";
+					}
+					if ($(val).length !== 0) {
+						switch (html_data_type) {
+						case "text":
+							val = $(val).text();
+							break;
+						case "value":
+							val = $(val).val();
+							break;
+						case "id":
+							val = val.id;
+							break;
+						case "selector":
+							val = $(val).find(columnObj.html_data_selector).text();
+							break;
+						}
+					}
+				} else {
+					if (typeof val === 'object') {
+						if (columnObj.html5_data !== undefined) {
+							val = val['@' + columnObj.html5_data];
+						}
+					}
 				}
 
 				if (ignore_char_local !== undefined) {
@@ -913,6 +957,12 @@ var yadcf = (function ($) {
 						case "selector":
 							val = $(val).find(columnObj.html_data_selector).text();
 							break;
+						}
+					}
+				} else {
+					if (typeof val === 'object') {
+						if (columnObj.html5_data !== undefined) {
+							val = val['@' + columnObj.html5_data];
 						}
 					}
 				}
@@ -2416,7 +2466,7 @@ var yadcf = (function ($) {
 			options,
 			settingsDt = getSettingsObjFromTable(oTable);
 
-		if (settingsDt.oSavedState != null && settingsDt.oSavedState.ColReorder !== undefined) {
+		if (settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) {
 			initColReorder(settingsDt.oSavedState, table_selector_jq_friendly);
 			column_number_filter = plugins[table_selector_jq_friendly].ColReorder[column_number];
 		} else {
@@ -2467,7 +2517,7 @@ var yadcf = (function ($) {
 	}
 
 	function isDOMSource(tableVar) {
-		if (tableVar.fnSettings().sAjaxSource == null && tableVar.fnSettings().ajax == null) {
+		if (tableVar.fnSettings().sAjaxSource == undefined && tableVar.fnSettings().ajax == undefined) {
 			return true;
 		}
 		return false;
@@ -2536,7 +2586,7 @@ var yadcf = (function ($) {
 				$(document).off('column-visibility.dt', oTable.selector).on('column-visibility.dt', oTable.selector, function (e, settings, col_num, state) {
 					var obj = {};
 					if (state === true) {
-						if (settings.oSavedState != null && settings.oSavedState.ColReorder !== undefined) {
+						if (settings.oSavedState != undefined && settings.oSavedState.ColReorder !== undefined) {
 							col_num = settings.oSavedState.ColReorder[col_num];
 						}
 						obj[col_num] = yadcf.getOptions(settings.oInstance.selector)[col_num];
@@ -3120,12 +3170,19 @@ var yadcf = (function ($) {
 	}
 
 	function exFilterExternallyTriggered(table_arg) {
-		var columnsObj = getOptions(table_arg.selector),
+		var columnsObj,
 			columnObjKey,
 			columnObj,
 			filterValue,
 			filtersValuesSingleElem,
 			filtersValuesArr = [];
+
+		//check if the table arg is from new datatables API (capital "D")
+		if (table_arg.settings !== undefined) {
+			table_arg = table_arg.settings()[0].oInstance;
+		}
+		columnsObj = getOptions(table_arg.selector);
+
 		for (columnObjKey in columnsObj) {
 			if (columnsObj.hasOwnProperty(columnObjKey)) {
 				columnObj = columnsObj[columnObjKey];
