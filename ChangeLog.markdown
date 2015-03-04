@@ -1,4 +1,9 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
+
+## 0.8.8.beta (still in development
+
+* Added html5_data support for range_number and range_number_slider https://github.com/vedmack/yadcf/issues/158
+
   
 ## 0.8.7
 
