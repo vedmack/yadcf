@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.6
+* Version:     0.8.8.beta.7
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -3116,6 +3116,25 @@ var yadcf = (function ($) {
 		return retVal;
 	}
 
+	function clearStateSave(oTable, column_number, table_selector_jq_friendly) {
+		var yadcfState;
+		if (oTable.fnSettings().oFeatures.bStateSave === true) {
+			if (!oTable.fnSettings().oLoadedState) {
+				oTable.fnSettings().oLoadedState = {};
+				oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
+			}
+			if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
+				oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] = undefined;
+			} else {
+				yadcfState = {};
+				yadcfState[table_selector_jq_friendly] = [];
+				yadcfState[table_selector_jq_friendly][column_number] = undefined;
+				oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+			}
+			oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
+		}
+	}
+
 	function exResetAllFilters(table_arg) {
 		var table_selector_jq_friendly,
 			column_number,
@@ -3180,6 +3199,7 @@ var yadcf = (function ($) {
 					if (table_arg.fnSettings().oFeatures.bServerSide === true) {
 						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
 					}
+					clearStateSave(table_arg, column_number, table_selector_jq_friendly);
 					break;
 				case 'range_number':
 					fromId = 'yadcf-filter-' + table_selector_jq_friendly + '-from-' + column_number;
@@ -3191,6 +3211,7 @@ var yadcf = (function ($) {
 					if (table_arg.fnSettings().oFeatures.bServerSide === true) {
 						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
 					}
+					clearStateSave(table_arg, column_number, table_selector_jq_friendly);
 					break;
 				case 'range_number_slider':
 					sliderId = 'yadcf-filter-' + table_selector_jq_friendly + '-slider-' + column_number;
@@ -3206,6 +3227,7 @@ var yadcf = (function ($) {
 					if (table_arg.fnSettings().oFeatures.bServerSide === true) {
 						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
 					}
+					clearStateSave(table_arg, column_number, table_selector_jq_friendly);
 					break;
 				}
 
