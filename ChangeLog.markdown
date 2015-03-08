@@ -4,6 +4,7 @@
 
 * Added html5_data support for range_number and range_number_slider https://github.com/vedmack/yadcf/issues/158
 * Added externally_triggered and exFilterExternallyTriggered function to allow creating "search forms" , fill the filters and hit the "filter" button to filter them all https://github.com/vedmack/yadcf/issues/141
+* ColReorder support for all filter types! https://github.com/vedmack/yadcf/issues/138
 * Bugs / Issues fix https://github.com/vedmack/yadcf/issues/159 / 
   
 ## 0.8.7
