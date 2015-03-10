@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.8
+* Version:     0.8.8.beta.9
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -210,7 +210,12 @@
 				Arguments:			table_arg: (variable of the datatable)									
 				Usage example:		yadcf.exResetAllFilters(oTable);
 									
-
+* exResetFilters
+				Description:		Allows to reset specific filters externally/programmatically (support ALL filter types!!!) , can be used for resetting one or more filters
+				Arguments:			table_arg: (variable of the datatable)	
+									array with columns numbers 
+				Usage example:		yadcf.exResetAllFilters(oTable, [1,2]);
+									
 *
 *				
 *				
@@ -3197,7 +3202,7 @@ var yadcf = (function ($) {
 		}
 	}
 
-	function exResetAllFilters(table_arg) {
+	function exResetAllFilters(table_arg, columns) {
 		var table_selector_jq_friendly,
 			column_number,
 			fromId,
@@ -3217,6 +3222,10 @@ var yadcf = (function ($) {
 			if (tableOptions.hasOwnProperty(columnObjKey)) {
 				optionsObj = tableOptions[columnObjKey];
 				column_number = optionsObj.column_number;
+
+				if (columns !== undefined && $.inArray(column_number, columns) === -1) {
+					continue;
+				}
 				$(document).removeData("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val");
 
 				switch (optionsObj.filter_type) {
@@ -3298,6 +3307,10 @@ var yadcf = (function ($) {
 		table_arg.fnDraw();
 	}
 
+	function exResetFilters(table_arg, columns) {
+		exResetAllFilters(table_arg, columns);
+	}
+
 	function exFilterExternallyTriggered(table_arg) {
 		var columnsObj,
 			columnObjKey,
@@ -3353,7 +3366,8 @@ var yadcf = (function ($) {
 		textKeyUpMultiTables: textKeyUpMultiTables,
 		doFilterMultiTables: doFilterMultiTables,
 		generateTableSelectorJQFriendlyNew: generateTableSelectorJQFriendlyNew,
-		exFilterExternallyTriggered: exFilterExternallyTriggered
+		exFilterExternallyTriggered: exFilterExternallyTriggered,
+		exResetFilters: exResetFilters
     };
 
 }(jQuery));

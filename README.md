@@ -9,7 +9,7 @@ This jQuery plug-in allows the user to easily add filter components to table col
 
 Contact/Social:
 =====
-If you want to ask a question you can post a question on [stackoverflow](www.stackoverflow.com) with 'yadcf' tag or use my [google group](https://groups.google.com/forum/#!forum/daniels_code)
+If you want to ask a question you can post a question on [stackoverflow](www.stackoverflow.com) with [yadcf](http://stackoverflow.com/questions/tagged/yadcf) tag or use my [google group](https://groups.google.com/forum/#!forum/daniels_code)
 
 If you like my plugin, you can show your appreciation by following me on [Twitter](https://twitter.com/danielreznick) / [GitHub](https://github.com/vedmack)
 
