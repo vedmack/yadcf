@@ -1,11 +1,12 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
-## 0.8.8.beta (still in development
+## 0.8.8.beta (still in development)
 
 * Added exResetFilters function to reset specific filters (one or more) https://github.com/vedmack/yadcf/issues/162
 * Added html5_data support for range_number and range_number_slider https://github.com/vedmack/yadcf/issues/158
 * Added externally_triggered and exFilterExternallyTriggered function to allow creating "search forms" , fill the filters and hit the "filter" button to filter them all https://github.com/vedmack/yadcf/issues/141
 * ColReorder support for all filter types! https://github.com/vedmack/yadcf/issues/138
+* Added multi_select with selects & chosen for initMultipleTables and initMultipleColumns https://github.com/vedmack/yadcf/issues/132
 * Bugs / Issues fix https://github.com/vedmack/yadcf/issues/159 / 
   
 ## 0.8.7

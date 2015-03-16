@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.9
+* Version:     0.8.8.beta.10
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -27,7 +27,7 @@
 
 * column_number
 				Required:			true
-				Type:				String
+				Type:				int
 				Description:		The number of the column to which the filter will be applied
 
 * filter_type				
@@ -369,7 +369,7 @@ var yadcf = (function ($) {
 		return pEvent;
 	}
 
-	function setOptions(selector_arg, options_arg) {
+	function setOptions(selector_arg, options_arg, params) {
 		var tmpOptions = {},
 			i,
 			j,
@@ -390,6 +390,8 @@ var yadcf = (function ($) {
 			},
 			adaptContainerCssClassImpl = function (dummy) { return ''; };
 
+		$.extend(true, default_options, params);
+
 		if (options_arg.length === undefined) {
 			options[selector_arg] = options_arg;
 			return;
@@ -399,7 +401,7 @@ var yadcf = (function ($) {
 				default_options.select_type_options = {adaptContainerCssClass: adaptContainerCssClassImpl};
 			}
 			//no individual reset button for externally_triggered mode
-			if (options_arg[i].externally_triggered === true) {
+			if (default_options.externally_triggered === true) {
 				options_arg[i].filter_reset_button_text = false;
 			}
 			//validate custom function required attributes
@@ -2454,6 +2456,69 @@ var yadcf = (function ($) {
 		}
 	}
 
+	function doFilterMultiTablesMultiSelect(tablesSelectors, event, column_number_str, clear) {
+
+		var columnsObj = getOptions(tablesSelectors + '_' + column_number_str)[column_number_str],
+			regex = false,
+			smart = true,
+			caseInsen = true,
+			tablesAsOne,
+			tablesArray = oTables[tablesSelectors],
+			selected_values = $(event.target).val(),
+			i;
+
+		event = eventTargetFixUp(event);
+		tablesAsOne = new $.fn.dataTable.Api(tablesArray);
+
+		if (clear !== undefined || selected_values == undefined || selected_values.length === 0) {
+			if (clear !== undefined) {
+				$(event.target).parent().find('select').val('-1').focus();
+				$(event.target).parent().find('select').removeClass("inuse");
+			}
+			if (columnsObj.column_number instanceof Array) {
+				tablesAsOne.columns(columnsObj.column_number).search('').draw();
+			} else {
+				tablesAsOne.search('').draw();
+			}
+			if (columnsObj.select_type === 'chosen') {
+				$('#' + columnsObj.filter_container_id + ' select').trigger("chosen:updated");
+			} else if (columnsObj.select_type === 'select2') {
+				$('#' + columnsObj.filter_container_id + ' select').select2("destroy").select2(columnsObj.select_type_options);
+			}
+			return;
+		}
+
+		$(event.target).addClass("inuse");
+
+		regex = true;
+		smart = false;
+		caseInsen = columnsObj.case_insensitive;
+
+		if (selected_values !== null) {
+			for (i = selected_values.length - 1; i >= 0; i--) {
+				if (selected_values[i] === "-1") {
+					selected_values.splice(i, 1);
+					break;
+				}
+			}
+			if (selected_values.length !== 0) {
+				selected_values = selected_values.join('narutouzomaki');
+				selected_values = selected_values.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+				selected_values = selected_values.split('narutouzomaki').join('|');
+			}
+		}
+		if (columnsObj.filter_match_mode === "exact") {
+			selected_values = "^" + selected_values + "$";
+		} else if (columnsObj.filter_match_mode === "startsWith") {
+			selected_values = "^" + selected_values;
+		}
+		if (columnsObj.column_number instanceof Array) {
+			tablesAsOne.columns(columnsObj.column_number).search(selected_values, regex, smart, caseInsen).draw();
+		} else {
+			tablesAsOne.search(selected_values, regex, smart, caseInsen).draw();
+		}
+	}
+
 	function doFilterMultiTables(tablesSelectors, event, column_number_str, clear) {
 
 		var columnsObj = getOptions(tablesSelectors + '_' + column_number_str)[column_number_str],
@@ -2468,12 +2533,19 @@ var yadcf = (function ($) {
 		tablesAsOne = new $.fn.dataTable.Api(tablesArray);
 
 		if (clear !== undefined || event.target.value === '-1') {
-			$(event.target).prev().val("").focus();
-			$(event.target).prev().removeClass("inuse");
+			if (clear !== undefined) {
+				$(event.target).parent().find('select').val('-1').focus();
+				$(event.target).parent().find('select').removeClass("inuse");
+			}
 			if (columnsObj.column_number instanceof Array) {
 				tablesAsOne.columns(columnsObj.column_number).search('').draw();
 			} else {
 				tablesAsOne.search('').draw();
+			}
+			if (columnsObj.select_type === 'chosen') {
+				$('#' + columnsObj.filter_container_id + ' select').trigger("chosen:updated");
+			} else if (columnsObj.select_type === 'select2') {
+				$('#' + columnsObj.filter_container_id + ' select').select2("destroy").select2(columnsObj.select_type_options);
 			}
 			return;
 		}
@@ -2754,25 +2826,36 @@ var yadcf = (function ($) {
 		}
 	}
 
-    $.fn.yadcf = function (options_arg, filters_position) {
+    $.fn.yadcf = function (options_arg, params) {
 
-		if (filters_position === undefined || filters_position === 'header') {
-			filters_position = 'thead';
-		} else {
-			filters_position = 'tfoot';
+		var tmpParams,
+			i = 0,
+			selector;
+
+		if (params === undefined) {
+			params = {};
 		}
-		$(document).data(this.selector + "_filters_position", filters_position);
+
+		if (typeof params === 'string') {
+			tmpParams = params;
+			params = {};
+			params.filters_position = tmpParams;
+		}
+		if (params.filters_position === undefined || params.filters_position === 'header') {
+			params.filters_position = 'thead';
+		} else {
+			params.filters_position = 'tfoot';
+		}
+		$(document).data(this.selector + "_filters_position", params.filters_position);
 
 		if ($(this.selector).length === 1) {
-			setOptions(this.selector, options_arg);
+			setOptions(this.selector, options_arg, params);
 			initAndBindTable(this, this.selector, 0);
 		} else {
-			var i = 0,
-				selector;
 			for (i; i < $(this.selector).length; i++) {
 				$.fn.dataTableExt.iApiIndex = i;
 				selector = this.selector + ":eq(" + i + ")";
-				setOptions(this.selector, options_arg);
+				setOptions(this.selector, options_arg, params);
 				initAndBindTable(this, selector, i);
 			}
 			$.fn.dataTableExt.iApiIndex = 0;
@@ -2780,26 +2863,36 @@ var yadcf = (function ($) {
         return this;
     };
 
-	function init(oTable, options_arg, filters_position) {
+	function init(oTable, options_arg, params) {
 		var instance = oTable.settings()[0].oInstance,
 			i = 0,
-			selector;
+			selector,
+			tmpParams;
 
-		if (filters_position === undefined || filters_position === 'header') {
-			filters_position = 'thead';
-		} else {
-			filters_position = 'tfoot';
+		if (params === undefined) {
+			params = {};
 		}
-		$(document).data(instance.selector + "_filters_position", filters_position);
+
+		if (typeof params === 'string') {
+			tmpParams = params;
+			params = {};
+			params.filters_position = tmpParams;
+		}
+		if (params.filters_position === undefined || params.filters_position === 'header') {
+			params.filters_position = 'thead';
+		} else {
+			params.filters_position = 'tfoot';
+		}
+		$(document).data(instance.selector + "_filters_position", params.filters_position);
 
 		if ($(instance.selector).length === 1) {
-			setOptions(instance.selector, options_arg);
+			setOptions(instance.selector, options_arg, params);
 			initAndBindTable(instance, instance.selector, 0, oTable);
 		} else {
 			for (i; i < $(instance.selector).length; i++) {
 				$.fn.dataTableExt.iApiIndex = i;
 				selector = instance.selector + ":eq(" + i + ")";
-				setOptions(instance.selector, options_arg);
+				setOptions(instance.selector, options_arg, params);
 				initAndBindTable(instance, selector, i, oTable);
 			}
 			$.fn.dataTableExt.iApiIndex = 0;
@@ -2821,7 +2914,7 @@ var yadcf = (function ($) {
 			columnsTmpArr;
 
 		//add a wrapper to hold both filter and reset button
-		$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-" + table_selector_jq_friendly + "\" class=\"yadcf-filter-wrapper\"></div>");
+		$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-" + table_selector_jq_friendly + '-' + column_number_str + "\" class=\"yadcf-filter-wrapper\"></div>");
 		filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
 
 		switch (filterOptions.filter_type) {
@@ -2834,11 +2927,15 @@ var yadcf = (function ($) {
 			}
 			break;
 		case 'select':
-			options_tmp = "<option value=\"" + "-1" + "\">" + filterOptions.filter_default_label + "</option>";
+		case 'multi_select':
+			if (filterOptions.select_type === undefined) {
+				options_tmp = "<option data-placeholder=\"true\" value=\"" + "-1" + "\">" + filterOptions.filter_default_label + "</option>";
+			} else {
+				options_tmp = "";
+			}
 			if (filterOptions.select_type === 'select2' && filterOptions.select_type_options.placeholder !== undefined && filterOptions.select_type_options.allowClear === true) {
 				options_tmp = "<option value=\"\"></option>";
 			}
-
 			if (filterOptions.data === undefined) {
 				filterOptions.data = [];
 				tableTmpArr = tablesSelectors.split(',');
@@ -2889,18 +2986,29 @@ var yadcf = (function ($) {
 					options_tmp += "<option value=\"" + filterOptions.data[ii] + "\">" + filterOptions.data[ii] + "</option>";
 				}
 			}
-			$(filter_selector_string).append("<select id=\"yadcf-filter-" + table_selector_jq_friendly + "\" class=\"yadcf-filter\" " +
-				"onchange=\"yadcf.doFilterMultiTables('" + tablesSelectors + "',event,'" + column_number_str + "')\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);'>" + options_tmp + "</select>");
-
-			if (filterOptions.select_type !== undefined && filterOptions.select_type === 'chosen') {
-				$("#yadcf-filter-" + table_selector_jq_friendly).chosen(filterOptions.select_type_options);
-				$("#yadcf-filter-" + table_selector_jq_friendly).next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
-			} else if (filterOptions.select_type !== undefined && filterOptions.select_type === 'select2') {
-				$("#yadcf-filter-" + table_selector_jq_friendly).select2(filterOptions.select_type_options);
+			if (filterOptions.filter_type === 'select') {
+				$(filter_selector_string).append("<select id=\"yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str + "\" class=\"yadcf-filter\" " +
+					"onchange=\"yadcf.doFilterMultiTables('" + tablesSelectors + "',event,'" + column_number_str + "')\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);'>" + options_tmp + "</select>");
+			} else if (filterOptions.filter_type === 'multi_select') {
+				$(filter_selector_string).append("<select multiple data-placeholder=\"" + filterOptions.filter_default_label + "\" id=\"yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str + "\" class=\"yadcf-filter\" " +
+					"onchange=\"yadcf.doFilterMultiTablesMultiSelect('" + tablesSelectors + "',event,'" + column_number_str + "')\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);'>" + options_tmp + "</select>");
 			}
-			if (filterOptions.filter_reset_button_text !== false) {
-				$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" " +
-					"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterMultiTables('" + tablesSelectors + "', event,'" + column_number_str + "','clear'); return false;\" class=\"yadcf-filter-reset-button\">" + filterOptions.filter_reset_button_text + "</button>");
+			if (filterOptions.filter_type === 'select') {
+				if (filterOptions.filter_reset_button_text !== false) {
+					$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly  + '-' + column_number_str + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" " +
+						"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterMultiTables('" + tablesSelectors + "', event,'" + column_number_str + "','clear'); return false;\" class=\"yadcf-filter-reset-button\">" + filterOptions.filter_reset_button_text + "</button>");
+				}
+			} else if (filterOptions.filter_type === 'multi_select') {
+				if (filterOptions.filter_reset_button_text !== false) {
+					$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" " +
+						"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterMultiTablesMultiSelect('" + tablesSelectors + "', event,'" + column_number_str + "','clear'); return false;\" class=\"yadcf-filter-reset-button\">" + filterOptions.filter_reset_button_text + "</button>");
+				}
+			}
+			if (filterOptions.select_type !== undefined && filterOptions.select_type === 'chosen') {
+				$("#yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str).chosen(filterOptions.select_type_options);
+				$("#yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str).next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
+			} else if (filterOptions.select_type !== undefined && filterOptions.select_type === 'select2') {
+				$("#yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str).select2(filterOptions.select_type_options);
 			}
 			break;
 		default:
@@ -2945,7 +3053,7 @@ var yadcf = (function ($) {
 			columnsObj.column_number_str = column_number_str;
 
 			dummyArr.push(columnsObj);
-
+			tablesSelectors = '';
 			for (i = 0; i < tablesArray.length; i++) {
 				tablesSelectors += tablesArray[i].table().node().id + ',';
 			}
@@ -3365,6 +3473,7 @@ var yadcf = (function ($) {
 		initMultipleColumns: initMultipleColumns,
 		textKeyUpMultiTables: textKeyUpMultiTables,
 		doFilterMultiTables: doFilterMultiTables,
+		doFilterMultiTablesMultiSelect: doFilterMultiTablesMultiSelect,
 		generateTableSelectorJQFriendlyNew: generateTableSelectorJQFriendlyNew,
 		exFilterExternallyTriggered: exFilterExternallyTriggered,
 		exResetFilters: exResetFilters
