@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.10
+* Version:     0.8.8.beta.11
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -569,7 +569,7 @@ var yadcf = (function ($) {
 			if (columnObj.select_type === 'chosen') {
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("chosen:updated");
 			} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
-				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(columnObj.select_type_options);
+				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
 			}
 		} else {
 			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
@@ -624,7 +624,7 @@ var yadcf = (function ($) {
 			if (getOptions(oTable.selector)[column_number].select_type === 'chosen') {
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("chosen:updated");
 			} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
-				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(columnObj.select_type_options);
+				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
 			}
 			return;
 		}
@@ -647,8 +647,8 @@ var yadcf = (function ($) {
 	function doFilterMultiSelect(arg, table_selector_jq_friendly, column_number, filter_match_mode) {
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 		var oTable = oTables[table_selector_jq_friendly],
-			aEscapedTerms = [],
 			selected_values = $(arg).val(),
+			selected_values_trimmed = [],
 			i,
 			stringForSearch,
 			column_number_filter,
@@ -669,12 +669,15 @@ var yadcf = (function ($) {
 					break;
 				}
 			}
-			if (selected_values.length !== 0) {
-				stringForSearch = selected_values.join('narutouzomaki');
+			for (i = 0; i < selected_values.length; i++) {
+				selected_values_trimmed.push($.trim(selected_values[i]));
+			}
+			if (selected_values_trimmed.length !== 0) {
+				stringForSearch = selected_values_trimmed.join('narutouzomaki');
 				stringForSearch = stringForSearch.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 				stringForSearch = stringForSearch.split('narutouzomaki').join('|');
 				if (filter_match_mode === "contains") {
-					oTable.fnFilter(stringForSearch, column_number_filter, true, true, true);
+					oTable.fnFilter(stringForSearch, column_number_filter, true, false, true);
 				} else if (filter_match_mode === "exact") {
 					oTable.fnFilter("^(" + stringForSearch + ")$", column_number_filter, true, false, true);
 				} else if (filter_match_mode === "startsWith") {
@@ -1933,7 +1936,7 @@ var yadcf = (function ($) {
 						if (columnObj.select_type !== undefined && columnObj.select_type === 'chosen') {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("chosen:updated");
 						} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
-							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(columnObj.select_type_options);
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
 						}
 					} else if (columnObj.filter_type === "auto_complete") {
 						$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_data);
@@ -2483,7 +2486,7 @@ var yadcf = (function ($) {
 			if (columnsObj.select_type === 'chosen') {
 				$('#' + columnsObj.filter_container_id + ' select').trigger("chosen:updated");
 			} else if (columnsObj.select_type === 'select2') {
-				$('#' + columnsObj.filter_container_id + ' select').select2("destroy").select2(columnsObj.select_type_options);
+				$('#' + columnsObj.filter_container_id + ' select').trigger("change");
 			}
 			return;
 		}
@@ -2545,7 +2548,7 @@ var yadcf = (function ($) {
 			if (columnsObj.select_type === 'chosen') {
 				$('#' + columnsObj.filter_container_id + ' select').trigger("chosen:updated");
 			} else if (columnsObj.select_type === 'select2') {
-				$('#' + columnsObj.filter_container_id + ' select').select2("destroy").select2(columnsObj.select_type_options);
+				$('#' + columnsObj.filter_container_id + ' select').trigger("change");
 			}
 			return;
 		}
@@ -3125,7 +3128,7 @@ var yadcf = (function ($) {
 						if (optionsObj.select_type === 'chosen') {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
 						} else if (optionsObj.select_type === 'select2') {
-							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(optionsObj.select_type_options);
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
 						}
 					}
 					break;
@@ -3137,7 +3140,7 @@ var yadcf = (function ($) {
 						if (optionsObj.select_type === 'chosen') {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
 						} else if (optionsObj.select_type === 'select2') {
-							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(optionsObj.select_type_options);
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
 						}
 					}
 					break;
@@ -3209,7 +3212,7 @@ var yadcf = (function ($) {
 						if (optionsObj.select_type === 'chosen') {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
 						} else if (optionsObj.select_type === 'select2') {
-							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(optionsObj.select_type_options);
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
 						}
 					}
 					break;
@@ -3345,7 +3348,7 @@ var yadcf = (function ($) {
 						if (optionsObj.select_type === 'chosen') {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
 						} else if (optionsObj.select_type === 'select2') {
-							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(optionsObj.select_type_options);
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
 						}
 					}
 					break;
@@ -3364,7 +3367,7 @@ var yadcf = (function ($) {
 						if (optionsObj.select_type === 'chosen') {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
 						} else if (optionsObj.select_type === 'select2') {
-							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(optionsObj.select_type_options);
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
 						}
 					}
 					break;
