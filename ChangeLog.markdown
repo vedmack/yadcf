@@ -7,7 +7,7 @@
 * Added externally_triggered and exFilterExternallyTriggered function to allow creating "search forms" , fill the filters and hit the "filter" button to filter them all https://github.com/vedmack/yadcf/issues/141
 * ColReorder support for all filter types! https://github.com/vedmack/yadcf/issues/138
 * Added multi_select with selects & chosen for initMultipleTables and initMultipleColumns https://github.com/vedmack/yadcf/issues/132
-* Bugs / Issues fix https://github.com/vedmack/yadcf/issues/159 / 
+* Bugs / Features fix https://github.com/vedmack/yadcf/issues/159 / https://github.com/vedmack/yadcf/issues/122
   
 ## 0.8.7
 

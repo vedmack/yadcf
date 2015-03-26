@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.11
+* Version:     0.8.8.beta.12
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -207,7 +207,9 @@
 				
 * exResetAllFilters
 				Description:		Allows to reset all filters externally/programmatically (support ALL filter types!!!) , perfect for adding a "reset all" button to your page!
-				Arguments:			table_arg: (variable of the datatable)									
+				Arguments:			table_arg: (variable of the datatable)
+									noRedraw:	(boolean) , use it if you don't want your table to be reloaded after the filter reset, 
+												for example if you planning to call exFilterColumn function right after the exResetAllFilters (to avoid two AJAX requests)
 				Usage example:		yadcf.exResetAllFilters(oTable);
 									
 * exResetFilters
@@ -505,6 +507,7 @@ var yadcf = (function ($) {
 			ret_val;
 
 		table_arg.fnSettings().aoPreSearchCols[column_number].bSmart = false;
+		table_arg.fnSettings().aoPreSearchCols[column_number].bRegex = true;
 		table_arg.fnSettings().aoPreSearchCols[column_number].bCaseInsensitive = case_insensitive;
 
 		if (multiple === undefined || multiple === false) {
@@ -513,22 +516,16 @@ var yadcf = (function ($) {
 				table_arg.fnSettings().aoPreSearchCols[column_number].bRegex = false;
 				ret_val = selected_value;
 			} else if (filter_match_mode === "exact") {
-				table_arg.fnSettings().aoPreSearchCols[column_number].bRegex = true;
 				ret_val = "^" + selected_value + "$";
 			} else if (filter_match_mode === "startsWith") {
-				table_arg.fnSettings().aoPreSearchCols[column_number].bRegex = true;
 				ret_val = "^" + selected_value;
 			}
 		} else {
 			if (filter_match_mode === "contains") {
-				table_arg.fnSettings().aoPreSearchCols[column_number].bSmart = true;
-				table_arg.fnSettings().aoPreSearchCols[column_number].bRegex = true;
 				ret_val = selected_value.join("|");
 			} else if (filter_match_mode === "exact") {
-				table_arg.fnSettings().aoPreSearchCols[column_number].bRegex = true;
 				ret_val = "^(" + selected_value.join("|") + ")$";
 			} else if (filter_match_mode === "startsWith") {
-				table_arg.fnSettings().aoPreSearchCols[column_number].bRegex = true;
 				ret_val = "^(" + selected_value.join("|") + ")";
 			}
 		}
@@ -3313,7 +3310,7 @@ var yadcf = (function ($) {
 		}
 	}
 
-	function exResetAllFilters(table_arg, columns) {
+	function exResetAllFilters(table_arg, noRedraw, columns) {
 		var table_selector_jq_friendly,
 			column_number,
 			fromId,
@@ -3415,11 +3412,13 @@ var yadcf = (function ($) {
 
 			}
 		}
-		table_arg.fnDraw();
+		if (noRedraw !== true) {
+			table_arg.fnDraw();
+		}
 	}
 
 	function exResetFilters(table_arg, columns) {
-		exResetAllFilters(table_arg, columns);
+		exResetAllFilters(table_arg, false, columns);
 	}
 
 	function exFilterExternallyTriggered(table_arg) {
