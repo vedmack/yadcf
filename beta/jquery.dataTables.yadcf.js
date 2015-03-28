@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.12
+* Version:     0.8.8.beta.13
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -41,17 +41,23 @@
 				Required:			true (when filter_type is custom_func / multi_select_custom_func)
 				Type:				function
 				Default value:		undefined
-				Description:		should be pointing to a function with the following signature myCustomFilterFunction(filterVal, columnVal) , where filterVal is the value from the select box and
-									columnVal is the value from the relevant row column, this function should return true if the row matches your condition and the row should be displayed) and false otherwise
+				Description:		should be pointing to a function with the following signature myCustomFilterFunction(filterVal, columnVal, rowValues) , where filterVal is the value from the select box and
+									columnVal is the value from the relevant row column, rowValues is an array that holds the values of the entire row, this function should return true if the row matches your condition and the row should be displayed) and false otherwise
 				Note:				When using multi_select_custom_func as filter_type filterVal will hold an array of selected values from the multi select element
 	
 * data
-				Required:			false / true (when filter_type is custom_func / multi_select_custom_func)
+				Required:			false
 				Type:				Array (of string or objects)
 				Description:		When the need of predefined data for filter is needed just use an array of strings ["value1","value2"....] (supported in select / multi_select / auto_complete filters) or
 									array of objects [{value: 'Some Data 1', label: 'One'}, {value: 'Some Data 3', label: 'Three'}] (supported in select / multi_select filters)
 				Note:				that when filter_type is custom_func / multi_select_custom_func this array will populate the custom filter select element
-					
+	
+* append_data_to_table_data	
+				Required:			false
+				Type:				boolean
+				Default value:		undefined
+				Description:		Set it to true when you want to use the array you set in data attribute in addition to values that yadcf will grab from the table for you
+				
 * column_data_type
 				Required:			false
 				Type:				String
@@ -410,10 +416,6 @@ var yadcf = (function ($) {
 			if (options_arg[i].filter_type !== undefined && options_arg[i].filter_type.indexOf('custom_func') !== -1) {
 				if (options_arg[i].custom_func === undefined) {
 					alert('You are trying to use filter_type: "custom_func / multi_select_custom_func" for column ' + options_arg[i].column_number + ' but there is no such custom_func attribute provided (custom_func: \"function reference goes here...\")');
-					return;
-				}
-				if (options_arg[i].data === undefined) {
-					alert('You are trying to use filter_type: "custom_func / multi_select_custom_func" for column ' + options_arg[i].column_number + ' but there is no such data attribute provided (data: \"array of options goes here...\")');
 					return;
 				}
 			}
@@ -900,7 +902,7 @@ var yadcf = (function ($) {
 
 				custom_func = getOptions(settingsDt.oInstance.selector)[col_num].custom_func;
 
-				retVal = custom_func(filterVal, columnVal);
+				retVal = custom_func(filterVal, columnVal, aData);
 
 				return retVal;
 			}
@@ -1823,10 +1825,11 @@ var yadcf = (function ($) {
 					filter_reset_button_text = "x";
 				}
 
-				if (data === undefined) {
+				if (data === undefined || columnObj.append_data_to_table_data === true) {
 					columnObj.col_filter_array = undefined;
 					column_data = parseTableColumn(oTable, columnObj);
-				} else {
+				}
+				if (data !== undefined) {
 					for (ii = 0; ii < data.length; ii++) {
 						column_data.push(data[ii]);
 					}
@@ -1883,14 +1886,23 @@ var yadcf = (function ($) {
 					if (columnObj.select_type === 'select2' && columnObj.select_type_options.placeholder !== undefined && columnObj.select_type_options.allowClear === true) {
 						options_tmp = "<option value=\"\"></option>";
 					}
-
-					if (typeof column_data[0] === 'object') {
-						for (ii = 0; ii < column_data.length; ii++) {
-							options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
+					if (columnObj.append_data_to_table_data !== true) {
+						if (typeof column_data[0] === 'object') {
+							for (ii = 0; ii < column_data.length; ii++) {
+								options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
+							}
+						} else {
+							for (ii = 0; ii < column_data.length; ii++) {
+								options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
+							}
 						}
 					} else {
 						for (ii = 0; ii < column_data.length; ii++) {
-							options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
+							if (typeof column_data[ii] === 'object') {
+								options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
+							} else {
+								options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
+							}
 						}
 					}
 					column_data = options_tmp;
