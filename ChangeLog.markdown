@@ -7,7 +7,9 @@
 * Added externally_triggered and exFilterExternallyTriggered function to allow creating "search forms" , fill the filters and hit the "filter" button to filter them all https://github.com/vedmack/yadcf/issues/141
 * ColReorder support for all filter types! https://github.com/vedmack/yadcf/issues/138
 * Added multi_select with selects & chosen for initMultipleTables and initMultipleColumns https://github.com/vedmack/yadcf/issues/132
-* Bugs / Features fix https://github.com/vedmack/yadcf/issues/159 / https://github.com/vedmack/yadcf/issues/122
+* Predefined data can be added in addition to values that yadcf grabs from the table column, usage - append_data_to_table_data: true , https://github.com/vedmack/yadcf/issues/178
+* custom_func and multi_select_custom_func passing third argument (array that holds the values of the entire row) to the custom function, https://github.com/vedmack/yadcf/issues/179
+* Bugs / Features 	https://github.com/vedmack/yadcf/issues/159 / https://github.com/vedmack/yadcf/issues/122
   
 ## 0.8.7
 
@@ -18,7 +20,7 @@
 * Allow advanced selection of value from html code inside the td element - html_data_type support now 'selector' type  (must provide value for 'with html_data_selector' too), https://github.com/vedmack/yadcf/issues/116
 * Skip empty strings in the column (avoid entering empty strings into the select / auto_complete filters) https://github.com/vedmack/yadcf/pull/112
 * Support custom_func / multi_select_custom_func in exResetAllFilters and exFilterColumn functions https://github.com/vedmack/yadcf/issues/126
-* Bugs / Issues fix https://github.com/vedmack/yadcf/issues/136 / https://github.com/vedmack/yadcf/issues/131 / https://github.com/vedmack/yadcf/issues/142 /
+* Bugs / Features 	https://github.com/vedmack/yadcf/issues/136 / https://github.com/vedmack/yadcf/issues/131 / https://github.com/vedmack/yadcf/issues/142 /
 					https://github.com/vedmack/yadcf/issues/123 / https://github.com/vedmack/yadcf/issues/139 / https://github.com/vedmack/yadcf/issues/148
 					https://github.com/vedmack/yadcf/issues/144 / https://github.com/vedmack/yadcf/issues/155
 
