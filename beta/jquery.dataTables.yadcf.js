@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.15
+* Version:     0.8.8.beta.13
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1880,20 +1880,39 @@ var yadcf = (function ($) {
 
 
 				if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
+
 					options_tmp = "<option value=\"" + "-1" + "\">" + filter_default_label + "</option>";
 
 					if (columnObj.select_type === 'select2' && columnObj.select_type_options.placeholder !== undefined && columnObj.select_type_options.allowClear === true) {
 						options_tmp = "<option value=\"\"></option>";
 					}
+					if (columnObj.append_data_to_table_data !== true) {
+						if (typeof column_data[0] === 'object') {
+							for (ii = 0; ii < column_data.length; ii++) {
+								options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
+							}
+						} else {
+							for (ii = 0; ii < column_data.length; ii++) {
+								options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
+							}
+						}
+					} else {
+						for (ii = 0; ii < column_data.length; ii++) {
+							if (typeof column_data[ii] === 'object') {
+								options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
+							} else {
+								options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
+							}
+						}
+					}
+					column_data = options_tmp;
+
 				} else if (columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
 					if (columnObj.select_type === undefined) {
 						options_tmp = "<option data-placeholder=\"true\" value=\"" + "-1" + "\">" + filter_default_label + "</option>";
 					} else {
 						options_tmp = "";
 					}
-				}
-
-				if (columnObj.append_data_to_table_data !== true) {
 					if (typeof column_data[0] === 'object') {
 						for (ii = 0; ii < column_data.length; ii++) {
 							options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
@@ -1903,19 +1922,11 @@ var yadcf = (function ($) {
 							options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
 						}
 					}
-				} else {
-					for (ii = 0; ii < column_data.length; ii++) {
-						if (typeof column_data[ii] === 'object') {
-							options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
-						} else {
-							options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
-						}
-					}
+					column_data = options_tmp;
 				}
-				column_data = options_tmp;
 
 				if ($filter_selector.length === 1) {
-					if (columnObj.filter_type === "select" || columnObj.filter_type === "multi_select" || columnObj.filter_type === 'custom_func' || columnObj.filter_type === 'multi_select_custom_func') {
+					if (columnObj.filter_type === "select" || columnObj.filter_type === "multi_select") {
 
 						$filter_selector.empty();
 						$filter_selector.append(column_data);
