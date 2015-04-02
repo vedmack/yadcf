@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.13
+* Version:     0.8.8.beta.16
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1741,7 +1741,8 @@ var yadcf = (function ($) {
 			filters_position,
 			unique_th,
 			settingsDt,
-			filterActionStr;
+			filterActionStr,
+			custom_func_filter_value_holder;
 
 		settingsDt = getSettingsObjFromTable(oTable);
 		table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector);
@@ -1880,39 +1881,20 @@ var yadcf = (function ($) {
 
 
 				if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
-
 					options_tmp = "<option value=\"" + "-1" + "\">" + filter_default_label + "</option>";
 
 					if (columnObj.select_type === 'select2' && columnObj.select_type_options.placeholder !== undefined && columnObj.select_type_options.allowClear === true) {
 						options_tmp = "<option value=\"\"></option>";
 					}
-					if (columnObj.append_data_to_table_data !== true) {
-						if (typeof column_data[0] === 'object') {
-							for (ii = 0; ii < column_data.length; ii++) {
-								options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
-							}
-						} else {
-							for (ii = 0; ii < column_data.length; ii++) {
-								options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
-							}
-						}
-					} else {
-						for (ii = 0; ii < column_data.length; ii++) {
-							if (typeof column_data[ii] === 'object') {
-								options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
-							} else {
-								options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
-							}
-						}
-					}
-					column_data = options_tmp;
-
 				} else if (columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
 					if (columnObj.select_type === undefined) {
 						options_tmp = "<option data-placeholder=\"true\" value=\"" + "-1" + "\">" + filter_default_label + "</option>";
 					} else {
 						options_tmp = "";
 					}
+				}
+
+				if (columnObj.append_data_to_table_data !== true) {
 					if (typeof column_data[0] === 'object') {
 						for (ii = 0; ii < column_data.length; ii++) {
 							options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
@@ -1922,12 +1904,22 @@ var yadcf = (function ($) {
 							options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
 						}
 					}
-					column_data = options_tmp;
+				} else {
+					for (ii = 0; ii < column_data.length; ii++) {
+						if (typeof column_data[ii] === 'object') {
+							options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
+						} else {
+							options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
+						}
+					}
 				}
+				column_data = options_tmp;
 
 				if ($filter_selector.length === 1) {
-					if (columnObj.filter_type === "select" || columnObj.filter_type === "multi_select") {
-
+					if (columnObj.filter_type === "select" || columnObj.filter_type === "multi_select" || columnObj.filter_type === 'custom_func' || columnObj.filter_type === 'multi_select_custom_func') {
+						if (columnObj.filter_type === 'custom_func' || columnObj.filter_type === 'multi_select_custom_func') {
+							custom_func_filter_value_holder = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val();
+						}
 						$filter_selector.empty();
 						$filter_selector.append(column_data);
 						if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
@@ -1942,11 +1934,21 @@ var yadcf = (function ($) {
 								$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr);
 							}
 						}
-						if (columnObj.select_type !== undefined && columnObj.select_type === 'chosen') {
-							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("chosen:updated");
-						} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
-							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
+						if (columnObj.filter_type === 'custom_func' || columnObj.filter_type === 'multi_select_custom_func') {
+							tmpStr = custom_func_filter_value_holder;
+							if (tmpStr === '-1' || tmpStr === undefined) {
+								$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr);
+							} else {
+								$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
+							}
 						}
+						/*if (columnObj.filter_type === "select" || columnObj.filter_type === "multi_select") {
+							if (columnObj.select_type !== undefined && columnObj.select_type === 'chosen') {
+								$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("chosen:updated");
+							} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
+								$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
+							}
+						}*/
 					} else if (columnObj.filter_type === "auto_complete") {
 						$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_data);
 					}
