@@ -559,6 +559,8 @@ var yadcf = (function ($) {
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("chosen:updated");
 			} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(columnObj.select_type_options);
+			} else if(columnObj.select_type !== undefined && columnObj.select_type === 'jqueryui') {
+				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).multiselect("destroy").multiselect(columnObj.select_type_options);
 			}
 		} else {
 			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
@@ -614,6 +616,8 @@ var yadcf = (function ($) {
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("chosen:updated");
 			} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(columnObj.select_type_options);
+			} else if(columnObj.select_type !== undefined && columnObj.select_type === 'jqueryui')	{
+				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).multiselect("destroy").multiselect(columnObj.select_type_options);
 			}
 			return;
 		}
@@ -1771,7 +1775,10 @@ var yadcf = (function ($) {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("chosen:updated");
 						} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(columnObj.select_type_options);
+						} else if (columnObj.select_type !== undefined && columnObj.select_type === 'jqueryui') {
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).multiselect("destroy").multiselect(columnObj.select_type_options);
 						}
+					
 					} else if (columnObj.filter_type === "auto_complete") {
 						$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_data);
 					}
@@ -1834,8 +1841,9 @@ var yadcf = (function ($) {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
 						} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2(columnObj.select_type_options);
+						} else if (columnObj.select_type !== undefined && columnObj.select_type === 'jqueryui') {
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).multiselect(columnObj.select_type_options);
 						}
-
 					} else if (columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
 
 						//add a wrapper to hold both filter and reset button
@@ -1890,8 +1898,9 @@ var yadcf = (function ($) {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
 						} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2(columnObj.select_type_options);
+						} else if (columnObj.select_type !== undefined && columnObj.select_type === 'jqueryui') {
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).multiselect(columnObj.select_type_options);
 						}
-
 					} else if (columnObj.filter_type === "auto_complete") {
 
 						//add a wrapper to hold both filter and reset button
@@ -2294,7 +2303,7 @@ var yadcf = (function ($) {
 		serachVal = event.target.value;
 		smart = false;
 		caseInsen = columnsObj.case_insensitive;
-/*
+		/*
 		if (columnsObj.filter_match_mode === "contains") {
 			regex = false;
 		} else if (columnsObj.filter_match_mode === "exact") {
@@ -2683,6 +2692,8 @@ var yadcf = (function ($) {
 								$('#' + filterOptions.filter_container_id + ' select').next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
 							} else if (filterOptions.select_type !== undefined && filterOptions.select_type === 'select2') {
 								$('#' + filterOptions.filter_container_id + ' select').select2(filterOptions.select_type_options);
+							} else if (filterOptions.select_type !== undefined && filterOptions.select_type === 'jqueryui') {
+								$('#' + filterOptions.filter_container_id + ' select').multiselect(filterOptions.select_type_options);
 							}
 						});
 					}
@@ -2708,6 +2719,8 @@ var yadcf = (function ($) {
 				$("#yadcf-filter-" + table_selector_jq_friendly).next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
 			} else if (filterOptions.select_type !== undefined && filterOptions.select_type === 'select2') {
 				$("#yadcf-filter-" + table_selector_jq_friendly).select2(filterOptions.select_type_options);
+			} else if (filterOptions.select_type !== undefined && filterOptions.select_type === 'jqueryui') {
+				$("#yadcf-filter-" + table_selector_jq_friendly).multiselect(filterOptions.select_type_options);
 			}
 			if (filterOptions.filter_reset_button_text !== false) {
 				$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" " +
@@ -2829,6 +2842,8 @@ var yadcf = (function ($) {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
 						} else if (optionsObj.select_type === 'select2') {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(optionsObj.select_type_options);
+						} else if (optionsObj.select_type === 'jqueryui') {
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).multiselect("destroy").multiselect(optionsObj.select_type_options);
 						}
 					}
 					break;
@@ -2841,6 +2856,8 @@ var yadcf = (function ($) {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
 						} else if (optionsObj.select_type === 'select2') {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(optionsObj.select_type_options);
+						} else if (optionsObj.select_type === 'jqueryui') {
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).multiselect("destroy").multiselect(optionsObj.select_type_options);
 						}
 					}
 					break;
@@ -2907,6 +2924,8 @@ var yadcf = (function ($) {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
 						} else if (optionsObj.select_type === 'select2') {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(optionsObj.select_type_options);
+						} else if (optionsObj.select_type === 'jqueryui') {
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).multiselect("destroy").multiselect(optionsObj.select_type_options);
 						}
 					}
 					break;
@@ -3020,6 +3039,8 @@ var yadcf = (function ($) {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
 						} else if (optionsObj.select_type === 'select2') {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(optionsObj.select_type_options);
+						} else if (optionsObj.select_type === 'jqueryui') {
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).multiselect("destroy").multiselect(optionsObj.select_type_options);
 						}
 					}
 					break;
@@ -3039,6 +3060,8 @@ var yadcf = (function ($) {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
 						} else if (optionsObj.select_type === 'select2') {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("destroy").select2(optionsObj.select_type_options);
+						} else if (optionsObj.select_type === 'jqueryui') {
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).multiselect("destroy").multiselect(optionsObj.select_type_options);
 						}
 					}
 					break;
