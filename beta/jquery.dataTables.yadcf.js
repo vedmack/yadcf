@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.16
+* Version:     0.8.8.beta.17
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -54,9 +54,12 @@
 	
 * append_data_to_table_data	
 				Required:			false
-				Type:				boolean
+				Type:				string
 				Default value:		undefined
-				Description:		Set it to true when you want to use the array you set in data attribute in addition to values that yadcf will grab from the table for you
+				Possible values:	before / sorted
+				Description:		Use 'before' to place your data array before the values that yadcf grabs from the table
+									use 'sorted' to place the data array sorted along with the values that yadcf grabs from the table
+				Note:				'sorted' option will have affect only if you data is an array of primitives (not objects)
 				
 * column_data_type
 				Required:			false
@@ -1557,7 +1560,7 @@ var yadcf = (function ($) {
 	}
 
 	function sortColumnData(column_data, columnObj) {
-		if (columnObj.filter_type === "select" || columnObj.filter_type === "auto_complete" || columnObj.filter_type === "multi_select" || columnObj.filter_type === "custom_func") {
+		if (columnObj.filter_type === "select" || columnObj.filter_type === "auto_complete" || columnObj.filter_type === "multi_select" || columnObj.filter_type === "custom_func" || columnObj.filter_type === "multi_select_custom_func") {
 			if (columnObj.sort_as === "alpha") {
 				if (columnObj.sort_order === "asc") {
 					column_data.sort();
@@ -1723,6 +1726,7 @@ var yadcf = (function ($) {
 			filter_match_mode,
 
 			column_data,
+			column_data_temp,
 			options_tmp,
 			j,
 			k,
@@ -1762,6 +1766,7 @@ var yadcf = (function ($) {
 
 				data = columnObj.data;
 				column_data = [];
+				column_data_temp = [];
 				filter_container_id = columnObj.filter_container_id;
 				column_number = columnObj.column_number;
 				column_number = +column_number;
@@ -1826,17 +1831,25 @@ var yadcf = (function ($) {
 					filter_reset_button_text = "x";
 				}
 
-				if (data === undefined || columnObj.append_data_to_table_data === true) {
-					columnObj.col_filter_array = undefined;
-					column_data = parseTableColumn(oTable, columnObj);
-				}
 				if (data !== undefined) {
 					for (ii = 0; ii < data.length; ii++) {
 						column_data.push(data[ii]);
 					}
 				}
+				if (data === undefined || columnObj.append_data_to_table_data !== undefined) {
+					columnObj.col_filter_array = undefined;
+					column_data_temp = parseTableColumn(oTable, columnObj);
+					if (columnObj.append_data_to_table_data !== 'before') {
+						column_data = column_data.concat(column_data_temp);
+					} else {
+						column_data_temp = sortColumnData(column_data_temp, columnObj);
+						column_data = column_data.concat(column_data_temp);
+					}
+				}
 
-				column_data = sortColumnData(column_data, columnObj);
+				if (columnObj.append_data_to_table_data === undefined || columnObj.append_data_to_table_data === 'sorted') {
+					column_data = sortColumnData(column_data, columnObj);
+				}
 
 				if (columnObj.filter_type === "range_number_slider") {
 					min_val = findMinInArray(column_data, ignore_char);
@@ -1894,7 +1907,7 @@ var yadcf = (function ($) {
 					}
 				}
 
-				if (columnObj.append_data_to_table_data !== true) {
+				if (columnObj.append_data_to_table_data === undefined) {
 					if (typeof column_data[0] === 'object') {
 						for (ii = 0; ii < column_data.length; ii++) {
 							options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
