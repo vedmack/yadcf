@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.17
+* Version:     0.8.8.beta.18
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -154,7 +154,20 @@
 				Default value:		contains
 				Possible values:	contains / exact / startsWith
 				Description:		Allows to control the matching mode of the filter (supported in select / auto_complete / text filters)
+
+* exclude
+				Required:			false
+				Type:				boolean
+				Default value:		undefined
+				Description:		Adds a checkbox next to the filter that allows to do a "not/exclude" filtering (acts the same  all filter_match_mode)
+				Note:				Currently available for the text filter
 				
+* exclude_label
+				Required:			false
+				Type:				string
+				Default value:		exclude
+				Description:		The label that will appear above the exclude checkbox
+					
 * select_type
 				Required:			false
 				Type:				String
@@ -397,7 +410,8 @@ var yadcf = (function ($) {
 				select_type_options : {},
 				case_insensitive : true,
 				column_data_type: 'text',
-				html_data_type: 'text'
+				html_data_type: 'text',
+				exclude_label: 'exclude'
 			},
 			adaptContainerCssClassImpl = function (dummy) { return ''; };
 
@@ -537,14 +551,18 @@ var yadcf = (function ($) {
 		return ret_val;
 	}
 
-	function yadcfMatchFilter(oTable, selected_value, filter_match_mode, column_number) {
+	function yadcfMatchFilter(oTable, selected_value, filter_match_mode, column_number, exclude) {
 		var case_insensitive = yadcf.getOptions(oTable.selector)[column_number].case_insensitive;
-		if (filter_match_mode === "contains") {
-			oTable.fnFilter(selected_value, column_number, false, true, true, case_insensitive);
-		} else if (filter_match_mode === "exact") {
-			oTable.fnFilter("^" + selected_value + "$", column_number, true, false, true, case_insensitive);
-		} else if (filter_match_mode === "startsWith") {
-			oTable.fnFilter("^" + selected_value, column_number, true, false, true, case_insensitive);
+		if (exclude !== true) {
+			if (filter_match_mode === "contains") {
+				oTable.fnFilter(selected_value, column_number, false, true, true, case_insensitive);
+			} else if (filter_match_mode === "exact") {
+				oTable.fnFilter("^" + selected_value + "$", column_number, true, false, true, case_insensitive);
+			} else if (filter_match_mode === "startsWith") {
+				oTable.fnFilter("^" + selected_value, column_number, true, false, true, case_insensitive);
+			}
+		} else {
+			oTable.fnFilter("^((?!" + selected_value + ").)*$", column_number, true, false, true, case_insensitive);
 		}
 	}
 
@@ -1746,7 +1764,8 @@ var yadcf = (function ($) {
 			unique_th,
 			settingsDt,
 			filterActionStr,
-			custom_func_filter_value_holder;
+			custom_func_filter_value_holder,
+			exclude_str;
 
 		settingsDt = getSettingsObjFromTable(oTable);
 		table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector);
@@ -2128,7 +2147,13 @@ var yadcf = (function ($) {
 							filterActionStr = '';
 						}
 
-						$(filter_selector_string).append("<input type=\"text\" id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);"
+						exclude_str = '';
+						if (columnObj.exclude === true) {
+							exclude_str = '<span class="yadcf-exclude-wrapper" onmousedown="yadcf.stopPropagation(event);" onclick="yadcf.stopPropagation(event);">' +
+								'<div class="yadcf-label small">' + columnObj.exclude_label + '</div><input type="checkbox" title="' + columnObj.exclude_label + '" onclick="yadcf.stopPropagation(event);yadcf.textKeyUP(\'' + table_selector_jq_friendly + '\',' + column_number + ');"></span>';
+						}
+
+						$(filter_selector_string).append(exclude_str + "<input type=\"text\" id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);"
 							+ "' placeholder='" + filter_default_label + "'" + " filter_match_mode='" + filter_match_mode + "' " + filterActionStr + "></input>");
 
 						if (filter_reset_button_text !== false) {
@@ -2668,8 +2693,9 @@ var yadcf = (function ($) {
 		var column_number_filter,
 			oTable = oTables[table_selector_jq_friendly],
 			keyUp,
-			options,
-			settingsDt = getSettingsObjFromTable(oTable);
+			columnObj,
+			settingsDt = getSettingsObjFromTable(oTable),
+			exclude;
 
 		if (settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) {
 			initColReorder(settingsDt.oSavedState, table_selector_jq_friendly);
@@ -2677,12 +2703,12 @@ var yadcf = (function ($) {
 		} else {
 			column_number_filter = column_number;
 		}
-		options = getOptions(oTable.selector)[column_number];
+		columnObj = getOptions(oTable.selector)[column_number];
 
 		keyUp = function (table_selector_jq_friendly, column_number, clear) {
 			$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 
-			if (clear !== undefined || $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val() === '') {
+			if (clear === 'clear' || $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val() === '') {
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
 				oTable.fnFilter("", column_number_filter);
@@ -2690,19 +2716,22 @@ var yadcf = (function ($) {
 				return;
 			}
 
+			if (columnObj.exclude === true) {
+				exclude = $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).closest('.yadcf-filter-wrapper').find('.yadcf-exclude-wrapper :checkbox').prop('checked');
+			}
 			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
 
-			yadcfMatchFilter(oTable, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val(), options.filter_match_mode, column_number_filter);
+			yadcfMatchFilter(oTable, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val(), columnObj.filter_match_mode, column_number_filter, exclude);
 
 			resetIApiIndex();
 		};
 
-		if (options.filter_delay === undefined) {
+		if (columnObj.filter_delay === undefined) {
 			keyUp(table_selector_jq_friendly, column_number, clear);
 		} else {
 			yadcfDelay(function () {
 				keyUp(table_selector_jq_friendly, column_number, clear);
-			}, options.filter_delay);
+			}, columnObj.filter_delay);
 		}
 	}
 
