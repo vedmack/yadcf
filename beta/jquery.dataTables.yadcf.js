@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.18
+* Version:     0.8.8.beta.19
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2163,6 +2163,9 @@ var yadcf = (function ($) {
 
 						if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
 							tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
+							if (columnObj.exclude === true) {
+								tmpStr = tmpStr.substring(5, tmpStr.indexOf(').)'));
+							}
 							tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
 						}
