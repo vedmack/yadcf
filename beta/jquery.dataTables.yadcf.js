@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.19
+* Version:     0.8.8.beta.20
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2164,6 +2164,9 @@ var yadcf = (function ($) {
 						if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
 							tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 							if (columnObj.exclude === true) {
+								if (tmpStr.indexOf('^((?!') !== -1) {
+									$('#yadcf-filter-wrapper-' + table_selector_jq_friendly + '-' + column_number).find(':checkbox').prop('checked', true);
+								}
 								tmpStr = tmpStr.substring(5, tmpStr.indexOf(').)'));
 							}
 							tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
@@ -3377,13 +3380,17 @@ var yadcf = (function ($) {
 			sliderId,
 			tableOptions,
 			optionsObj,
-			columnObjKey;
+			columnObjKey,
+			settingsDt = getSettingsObjFromTable(table_arg),
+			i;
+
 		//check if the table arg is from new datatables API (capital "D")
 		if (table_arg.settings !== undefined) {
 			table_arg = table_arg.settings()[0].oInstance;
 		}
 		tableOptions = getOptions(table_arg.selector);
 		table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_arg.selector);
+		settingsDt = getSettingsObjFromTable(table_arg);
 
 		for (columnObjKey in tableOptions) {
 			if (tableOptions.hasOwnProperty(columnObjKey)) {
@@ -3472,7 +3479,15 @@ var yadcf = (function ($) {
 			}
 		}
 		if (noRedraw !== true) {
-			table_arg.fnDraw();
+			//clear global filter
+			settingsDt.oPreviousSearch.sSearch = '';
+			if (settingsDt.aanFeatures.f !== 'undefined') {
+				for (i = 0; i < settingsDt.aanFeatures.f.length; i++) {
+					$('input', settingsDt.aanFeatures.f[i]).val('');
+				}
+			}
+			//end of clear global filter
+			table_arg.fnDraw(settingsDt);
 		}
 	}
 
