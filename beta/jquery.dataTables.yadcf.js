@@ -352,11 +352,7 @@ var yadcf = (function ($) {
 		return tmp;
 	}
 
-	function initColReorder(state, table_selector_jq_friendly, clear) {
-		if (clear === true) {
-			plugins[table_selector_jq_friendly] = undefined;
-			return;
-		}
+	function initColReorder(state, table_selector_jq_friendly) {
 		if (state != undefined && state.ColReorder !== undefined) {
 			if (plugins[table_selector_jq_friendly] === undefined) {
 				plugins[table_selector_jq_friendly] = {};
@@ -365,7 +361,7 @@ var yadcf = (function ($) {
 		}
 	}
 
-	function initColReorder2(colReorderArray, table_selector_jq_friendly) {
+	function initColReorderFromEvent(colReorderArray, table_selector_jq_friendly) {
 		if (colReorderArray != undefined) {
 			if (plugins[table_selector_jq_friendly] === undefined) {
 				plugins[table_selector_jq_friendly] = {};
@@ -2828,10 +2824,6 @@ var yadcf = (function ($) {
 						}
 					}
 				});
-				$(document).off('column-reorder.dt', oTable.selector).on('column-reorder.dt', oTable.selector, function (e, settings, json) {
-					var table_selector_jq_friendly = generateTableSelectorJQFriendly(oTable.selector);
-					initColReorder('', table_selector_jq_friendly, true);
-				});
 				$(document).off('column-visibility.dt', oTable.selector).on('column-visibility.dt', oTable.selector, function (e, settings, col_num, state) {
 					var obj = {};
 					if (state === true) {
@@ -2871,9 +2863,9 @@ var yadcf = (function ($) {
 				removeFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
 			});
 		}
-		$(document).off('column-reorder', oTable.selector).on('column-reorder', oTable.selector, function (e, settings, json) {
+		$(document).off('column-reorder.dt', oTable.selector).on('column-reorder.dt', oTable.selector, function (e, settings, json) {
 			var table_selector_jq_friendly = generateTableSelectorJQFriendly(oTable.selector);
-			initColReorder2(json.aiInvertMapping, table_selector_jq_friendly);
+			initColReorderFromEvent(json.aiInvertMapping, table_selector_jq_friendly);
 		});
 		if (oTable.fnSettings().oFeatures.bStateSave === true) {
 			if (yadcfVersionCheck('1.10')) {
