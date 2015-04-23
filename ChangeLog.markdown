@@ -9,7 +9,9 @@
 * Added multi_select with selects & chosen for initMultipleTables and initMultipleColumns https://github.com/vedmack/yadcf/issues/132
 * Predefined data can be added in addition to values that yadcf grabs from the table column, usage - append_data_to_table_data: true , https://github.com/vedmack/yadcf/issues/178
 * custom_func and multi_select_custom_func passing third argument (array that holds the values of the entire row) to the custom function, https://github.com/vedmack/yadcf/issues/179
-* Bugs / Features 	https://github.com/vedmack/yadcf/issues/159 / https://github.com/vedmack/yadcf/issues/122
+* New property for filter, style_class - allows adding additional class/classes to filter - available for the following filters: select / multi_select / text / custom_func / multi_select_custom_func
+* Bugs / Features 	https://github.com/vedmack/yadcf/issues/159 / https://github.com/vedmack/yadcf/issues/122 / https://github.com/vedmack/yadcf/issues/163
+					https://github.com/vedmack/yadcf/issues/183
   
 ## 0.8.7
 
