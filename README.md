@@ -57,11 +57,12 @@ Features:
  - define in which date format the date will be parsed and displayed in datepicker widget
  - support aoColumns { "bVisible": false }
  - support for case sensitive filtering
+ - allow addition of classes to filters
 - External API functions:
  - exFilterColumn: Allows to trigger filter/s externally/programmatically (support ALL filter types!!!) , perfect for showing table with pre filtered columns
  - exGetColumnFilterVal: Allows to retreive  column current filtered value (support ALL filter types!!!)	
 - Notable datatables API / Features support
- - ColReorder (atm for select and text filters) / scrollX / scrollY / stateSave / deferRender / HTML5 data-* attributes / Complex headers
+ - ColReorder / scrollX / scrollY / stateSave / deferRender / HTML5 data-* attributes / Complex headers
 
 Examples:
 =====
@@ -133,6 +134,7 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 * case_insensitive
 * filter_delay
 * html5_data
+* style_class
 
 
 License:
