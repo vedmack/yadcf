@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.23
+* Version:     0.8.8.beta.24
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -125,10 +125,17 @@
 				Required:			false
 				Type:				String
 				Default value:		alpha
-				Possible values:	alpha / num / none
-				Description:		Defines how the values in the filter will be sorted, alphabetically or numerically or not sorted at all (none is useful to preserve
+				Possible values:	alpha / num / alphaNum / none
+				Description:		Defines how the values in the filter will be sorted, alphabetically / numerically / alphanumeric / custom / not sorted at all (none is useful to preserve
 									the order of the data attribute as is)
+				Note:				When custom value is set you must provide a custom sorting function for the sort_as_custom_func property
 
+* sort_as_custom_func
+				Required:			false
+				Type:				function
+				Default value:		undefined
+				Description:		Allows to provide a custom sorting function for the filter elements
+				
 * sort_order
 				Required:			false
 				Type:				String
@@ -1611,6 +1618,8 @@ var yadcf = (function ($) {
 	}
 
 	function sortColumnData(column_data, columnObj) {
+		var numArray = [],
+			alphaArray = [];
 		if (columnObj.filter_type === "select" || columnObj.filter_type === "auto_complete" || columnObj.filter_type === "multi_select" || columnObj.filter_type === "custom_func" || columnObj.filter_type === "multi_select_custom_func") {
 			if (columnObj.sort_as === "alpha") {
 				if (columnObj.sort_order === "asc") {
@@ -1626,7 +1635,14 @@ var yadcf = (function ($) {
 					column_data.sort(sortNumDesc);
 				}
 			} else if (columnObj.sort_as === "alphaNum") {
-				column_data.sort(sortAlphaNum);
+				if (columnObj.sort_order === "asc") {
+					column_data.sort(sortAlphaNum);
+				} else if (columnObj.sort_order === "desc") {
+					column_data.sort(sortAlphaNum);
+					column_data.reverse();
+				}
+			} else if (columnObj.sort_as === "custom") {
+				column_data.sort(columnObj.sort_as_custom_func);
 			}
 		}
 		return column_data;
