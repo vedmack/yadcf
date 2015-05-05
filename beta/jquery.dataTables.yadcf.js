@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.24
+* Version:     0.8.8.beta.26
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -149,6 +149,7 @@
 				Default value:		mm/dd/yyyy
 				Possible values:	mm/dd/yyyy / dd/mm/yyyy (eventually I replace yyyy into yy for jquery datepicker)
 				Description:		Defines the format in which the date values are being parsed into Date object
+				Note:				You can replace the / separator with other one , for example mm-dd-yy
 
 * ignore_char
 				Required:			false
@@ -179,8 +180,8 @@
 				Required:			false
 				Type:				String
 				Default value:		undefined
-				Possible values:	chosen / select2
-				Description:		Turns the simple select element into "Chosen/Select2 select" (make use of the Chosen/Select2 jQuery plugin)
+				Possible values:	chosen / select2 
+				Description:		Turns the simple select element into Chosen / Select2 (make use of the Chosen / Select2 select jQuery plugins)
 				
 				
 * select_type_options
@@ -604,12 +605,12 @@ var yadcf = (function ($) {
 			if (exGetColumnFilterVal(oTable, column_number) === '') {
 				return;
 			}
-			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("-1").focus();
+			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val('-1').focus();
 			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
 			if (columnObj.select_type === 'chosen') {
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("chosen:updated");
 			} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
-				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
+				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2('val', '-1');
 			}
 		} else {
 			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
@@ -667,7 +668,7 @@ var yadcf = (function ($) {
 			if (getOptions(oTable.selector)[column_number].select_type === 'chosen') {
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("chosen:updated");
 			} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
-				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
+				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2('val', '-1');
 			}
 			return;
 		}
@@ -1170,11 +1171,12 @@ var yadcf = (function ($) {
 			table_selector_jq_friendly = column_number.substring(0, dashIndex),
 			date_str,
 			column_number_filter,
-			settingsDt = getSettingsObjFromTable(oTable);
+			settingsDt;
 
 		column_number = column_number.substring(dashIndex + 1);
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 		oTable = oTables[table_selector_jq_friendly];
+		settingsDt = getSettingsObjFromTable(oTable);
 
 		if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) || (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
 			initColReorder(settingsDt.oSavedState, table_selector_jq_friendly);
@@ -2028,7 +2030,7 @@ var yadcf = (function ($) {
 						if (columnObj.select_type === 'chosen') {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("chosen:updated");
 						} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
-							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2("val", tmpStr);
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2('val', tmpStr);
 						}
 					} else if (columnObj.filter_type === "auto_complete") {
 						$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_data);
@@ -2100,6 +2102,9 @@ var yadcf = (function ($) {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
 						} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2(columnObj.select_type_options);
+							if ($("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).next().hasClass('select2-container')) {
+								$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
+							}
 						}
 
 					} else if (columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
@@ -2167,6 +2172,9 @@ var yadcf = (function ($) {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
 						} else if (columnObj.select_type !== undefined && columnObj.select_type === 'select2') {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2(columnObj.select_type_options);
+							if ($("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).next().hasClass('select2-container')) {
+								$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
+							}
 						}
 
 					} else if (columnObj.filter_type === "auto_complete") {
@@ -2618,7 +2626,7 @@ var yadcf = (function ($) {
 			if (columnsObj.select_type === 'chosen') {
 				$('#' + columnsObj.filter_container_id + ' select').trigger("chosen:updated");
 			} else if (columnsObj.select_type === 'select2') {
-				$('#' + columnsObj.filter_container_id + ' select').trigger("change");
+				$('#' + columnsObj.filter_container_id + ' select').select2('val', '-1');
 			}
 			return;
 		}
@@ -2680,7 +2688,7 @@ var yadcf = (function ($) {
 			if (columnsObj.select_type === 'chosen') {
 				$('#' + columnsObj.filter_container_id + ' select').trigger("chosen:updated");
 			} else if (columnsObj.select_type === 'select2') {
-				$('#' + columnsObj.filter_container_id + ' select').trigger("change");
+				$('#' + columnsObj.filter_container_id + ' select').select2('val', '-1');
 			}
 			return;
 		}
@@ -3110,6 +3118,9 @@ var yadcf = (function ($) {
 								$('#' + filterOptions.filter_container_id + ' select').next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
 							} else if (filterOptions.select_type !== undefined && filterOptions.select_type === 'select2') {
 								$('#' + filterOptions.filter_container_id + ' select').select2(filterOptions.select_type_options);
+								if ($('#' + filterOptions.filter_container_id + ' select').next().hasClass('select2-container')) {
+									$('#' + filterOptions.filter_container_id + ' select').next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
+								}
 							}
 						});
 					}
@@ -3150,6 +3161,9 @@ var yadcf = (function ($) {
 				$("#yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str).next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
 			} else if (filterOptions.select_type !== undefined && filterOptions.select_type === 'select2') {
 				$("#yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str).select2(filterOptions.select_type_options);
+				if ($("#yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str).next().hasClass('select2-container')) {
+					$("#yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str).next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
+				}
 			}
 			break;
 		default:
@@ -3266,7 +3280,7 @@ var yadcf = (function ($) {
 						if (optionsObj.select_type === 'chosen') {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
 						} else if (optionsObj.select_type === 'select2') {
-							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2('val', filter_value);
 						}
 					}
 					break;
@@ -3278,7 +3292,7 @@ var yadcf = (function ($) {
 						if (optionsObj.select_type === 'chosen') {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
 						} else if (optionsObj.select_type === 'select2') {
-							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2('val', filter_value);
 						}
 					}
 					break;
@@ -3350,7 +3364,7 @@ var yadcf = (function ($) {
 						if (optionsObj.select_type === 'chosen') {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
 						} else if (optionsObj.select_type === 'select2') {
-							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2('val', filter_value);
 						}
 					}
 					break;
@@ -3490,7 +3504,7 @@ var yadcf = (function ($) {
 						if (optionsObj.select_type === 'chosen') {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
 						} else if (optionsObj.select_type === 'select2') {
-							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2('val', '-1');
 						}
 					}
 					break;
@@ -3509,7 +3523,7 @@ var yadcf = (function ($) {
 						if (optionsObj.select_type === 'chosen') {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
 						} else if (optionsObj.select_type === 'select2') {
-							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).trigger("change");
+							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2('val', '-1');
 						}
 					}
 					break;
