@@ -408,6 +408,15 @@ var yadcf = (function ($) {
 		return pEvent;
 	}
 
+	function dot2obj(tmpObj, dot_refs) {
+		var i = 0;
+		dot_refs = dot_refs.split(".");
+		for (i = 0; i < dot_refs.length; i++) {
+			tmpObj = tmpObj[dot_refs[i]];
+		}
+		return tmpObj;
+	}
+
 	function setOptions(selector_arg, options_arg, params) {
 		var tmpOptions = {},
 			i,
@@ -803,38 +812,46 @@ var yadcf = (function ($) {
 	}
 
 	function findMinInArray(array, ignore_char) {
-		var narray = [], i;
+		var narray = [], i, num;
 		for (i = 0; i < array.length; i++) {
 			if (array[i] !== null) {
 				if (ignore_char !== undefined) {
 					array[i] = array[i].toString().replace(ignore_char, "");
 				}
-				narray.push(array[i]);
+				num = +array[i];
+				if (isNaN(num)) {
+					continue;
+				}
+				narray.push(num);
 			}
 		}
 		return Math.min.apply(Math, narray);
 	}
 
 	function findMaxInArray(array, ignore_char) {
-		var narray = [], i;
+		var narray = [], i, num;
 		for (i = 0; i < array.length; i++) {
 			if (array[i] !== null) {
 				if (ignore_char !== undefined) {
 					array[i] = array[i].toString().replace(ignore_char, "");
 				}
-				narray.push(array[i]);
+				num = +array[i];
+				if (isNaN(num)) {
+					continue;
+				}
+				narray.push(num);
 			}
 		}
 		return Math.max.apply(Math, narray);
 	}
 
-	function addRangeNumberFilterCapability(table_selector_jq_friendly, fromId, toId, col_num, ignore_char) {
+	function addRangeNumberAndSliderFilterCapability(table_selector_jq_friendly, fromId, toId, col_num, ignore_char) {
 
 		$.fn.dataTableExt.afnFiltering.push(
 			function (settingsDt, aData, iDataIndex, rowData) {
-				var min = document.getElementById(fromId).value,
-					max = document.getElementById(toId).value,
-					val = aData[col_num] === "-" ? 0 : aData[col_num],
+				var min,
+					max,
+					val,
 					retVal = false,
 					table_selector_jq_friendly_local = table_selector_jq_friendly,
 					current_table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(settingsDt.oInstance.selector),
@@ -846,25 +863,38 @@ var yadcf = (function ($) {
 					columnObj,
 					column_number_filter;
 
+				if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
+					return true;
+				}
+				columnObj = getOptions(settingsDt.oInstance.selector)[col_num];
+				if (columnObj.filter_type === 'range_number_slider') {
+					min = $('#' + fromId).text();
+					max = $('#' + toId).text();
+				} else {
+					min = document.getElementById(fromId).value;
+					max = document.getElementById(toId).value;
+				}
 				if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) || (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
 					initColReorder(settingsDt.oSavedState, table_selector_jq_friendly);
 					column_number_filter = plugins[table_selector_jq_friendly].ColReorder[col_num];
 				} else {
 					column_number_filter = col_num;
 				}
-
+				console.log(settingsDt.oInstance.selector + ',' + column_number_filter + ', ' + columnObj.selector);
 				if (rowData !== undefined) {
 					aData = rowData;
+					if (columnObj.column_number_data !== undefined) {
+						column_number_filter = columnObj.column_number_data;
+						val = dot2obj(aData, column_number_filter);
+					} else {
+						val = aData[column_number_filter];
+					}
+				} else {
+					val = aData[column_number_filter];
 				}
-				val = aData[column_number_filter] === "-" ? 0 : aData[column_number_filter];
-				if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
-					return true;
-				}
-
 				if (!isFinite(min) || !isFinite(max)) {
 					return true;
 				}
-				columnObj = getOptions(settingsDt.oInstance.selector)[col_num];
 				column_data_type = columnObj.column_data_type;
 				html_data_type = columnObj.html_data_type;
 
@@ -895,7 +925,6 @@ var yadcf = (function ($) {
 						}
 					}
 				}
-
 				if (ignore_char_local !== undefined) {
 					min = min.replace(ignore_char_local, "");
 					max = max.replace(ignore_char_local, "");
@@ -905,7 +934,6 @@ var yadcf = (function ($) {
 						val = "";
 					}
 				}
-
 				min = (min !== "") ? (+min) : min;
 				max = (max !== "") ? (+max) : max;
 				val = (val !== "") ? (+val) : val;
@@ -916,6 +944,8 @@ var yadcf = (function ($) {
 				} else if (min <= val && "" === max) {
 					retVal = true;
 				} else if (min <= val && val <= max) {
+					retVal = true;
+				} else if (val === '' || isNaN(val)) {
 					retVal = true;
 				}
 				return retVal;
@@ -1009,100 +1039,6 @@ var yadcf = (function ($) {
 		);
 	}
 
-	function addRangeNumberSliderFilterCapability(table_selector_jq_friendly, fromId, toId, col_num, ignore_char) {
-
-		$.fn.dataTableExt.afnFiltering.push(
-			function (settingsDt, aData, iDataIndex, rowData) {
-				var min = $('#' + fromId).text(),
-					max = $('#' + toId).text(),
-					val,
-					retVal = false,
-					table_selector_jq_friendly_local = table_selector_jq_friendly,
-					current_table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(settingsDt.oInstance.selector),
-					ignore_char_local = ignore_char,
-					column_data_type,
-					html_data_type,
-					i,
-					columnObjKey,
-					columnObj,
-					column_number_filter;
-
-				if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) || (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
-					initColReorder(settingsDt.oSavedState, table_selector_jq_friendly);
-					column_number_filter = plugins[table_selector_jq_friendly].ColReorder[col_num];
-				} else {
-					column_number_filter = col_num;
-				}
-
-				if (rowData !== undefined) {
-					aData = rowData;
-				}
-				val = aData[column_number_filter] === "-" ? 0 : aData[column_number_filter];
-				if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
-					return true;
-				}
-
-				if (!isFinite(min) || !isFinite(max)) {
-					return true;
-				}
-				columnObj = getOptions(settingsDt.oInstance.selector)[col_num];
-				column_data_type = columnObj.column_data_type;
-				html_data_type = columnObj.html_data_type;
-
-				if (column_data_type === "html" || column_data_type === "rendered_html") {
-					if (html_data_type === undefined) {
-						html_data_type = "text";
-					}
-					if ($(val).length !== 0) {
-						switch (html_data_type) {
-						case "text":
-							val = $(val).text();
-							break;
-						case "value":
-							val = $(val).val();
-							break;
-						case "id":
-							val = val.id;
-							break;
-						case "selector":
-							val = $(val).find(columnObj.html_data_selector).text();
-							break;
-						}
-					}
-				} else {
-					if (typeof val === 'object') {
-						if (columnObj.html5_data !== undefined) {
-							val = val['@' + columnObj.html5_data];
-						}
-					}
-				}
-				if (ignore_char_local !== undefined) {
-					min = min.replace(ignore_char_local, "");
-					max = max.replace(ignore_char_local, "");
-					if (val) {
-						val = val.toString().replace(ignore_char_local, "");
-					} else {
-						val = "";
-					}
-				}
-
-				min = (min !== "") ? (+min) : min;
-				max = (max !== "") ? (+max) : max;
-				val = (val !== "") ? (+val) : val;
-				if (min === "" && max === "") {
-					retVal = true;
-				} else if (min === "" && val <= max) {
-					retVal = true;
-				} else if (min <= val && "" === max) {
-					retVal = true;
-				} else if (min <= val && val <= max) {
-					retVal = true;
-				}
-				return retVal;
-			}
-		);
-	}
-
 	function addRangeNumberFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, filter_default_label, ignore_char) {
 		var fromId = "yadcf-filter-" + table_selector_jq_friendly + "-from-" + column_number,
 			toId = "yadcf-filter-" + table_selector_jq_friendly + "-to-" + column_number,
@@ -1159,7 +1095,7 @@ var yadcf = (function ($) {
 		resetIApiIndex();
 
 		if (oTable.fnSettings().oFeatures.bServerSide !== true) {
-			addRangeNumberFilterCapability(table_selector_jq_friendly, fromId, toId, column_number, ignore_char);
+			addRangeNumberAndSliderFilterCapability(table_selector_jq_friendly, fromId, toId, column_number, ignore_char);
 		}
 
 	}
@@ -1579,17 +1515,8 @@ var yadcf = (function ($) {
 		resetIApiIndex();
 
 		if (oTable.fnSettings().oFeatures.bServerSide !== true) {
-			addRangeNumberSliderFilterCapability(table_selector_jq_friendly, min_tip_id, max_tip_id, column_number, ignore_char);
+			addRangeNumberAndSliderFilterCapability(table_selector_jq_friendly, min_tip_id, max_tip_id, column_number, ignore_char);
 		}
-	}
-
-	function dot2obj(tmpObj, dot_refs) {
-		var i = 0;
-		dot_refs = dot_refs.split(".");
-		for (i = 0; i < dot_refs.length; i++) {
-			tmpObj = tmpObj[dot_refs[i]];
-		}
-		return tmpObj;
 	}
 
 	function removeFilters(oTable, args, table_selector) {
