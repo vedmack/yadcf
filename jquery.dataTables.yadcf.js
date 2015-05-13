@@ -1393,7 +1393,7 @@ var yadcf = (function ($) {
 	}
 
 	function sortColumnData(column_data, columnObj) {
-		if (columnObj.filter_type === "select" || columnObj.filter_type === "auto_complete" || columnObj.filter_type === "multi_select" || columnObj.filter_type === "custom_func") {
+		if (columnObj.filter_type === "select" || columnObj.filter_type === "auto_complete" || columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func' || columnObj.filter_type === "custom_func") {
 			if (columnObj.sort_as === "alpha") {
 				if (columnObj.sort_order === "asc") {
 					column_data.sort();
