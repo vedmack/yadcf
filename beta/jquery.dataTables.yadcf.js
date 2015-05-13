@@ -160,7 +160,7 @@
 				Required:			false
 				Type:				String
 				Default value:		contains
-				Possible values:	contains / exact / startsWith
+				Possible values:	contains / exact / startsWith / regex
 				Description:		Allows to control the matching mode of the filter (supported in select / auto_complete / text filters)
 
 * exclude
@@ -565,6 +565,8 @@ var yadcf = (function ($) {
 				ret_val = "^" + selected_value + "$";
 			} else if (filter_match_mode === "startsWith") {
 				ret_val = "^" + selected_value;
+			} else if (filter_match_mode === "regex") {
+				ret_val = selected_value;
 			}
 		} else {
 			if (filter_match_mode === "contains") {
@@ -573,6 +575,8 @@ var yadcf = (function ($) {
 				ret_val = "^(" + selected_value.join("|") + ")$";
 			} else if (filter_match_mode === "startsWith") {
 				ret_val = "^(" + selected_value.join("|") + ")";
+			} else if (filter_match_mode === "regex") {
+				ret_val = selected_value;
 			}
 		}
 		return ret_val;
@@ -587,6 +591,14 @@ var yadcf = (function ($) {
 				oTable.fnFilter("^" + selected_value + "$", column_number, true, false, true, case_insensitive);
 			} else if (filter_match_mode === "startsWith") {
 				oTable.fnFilter("^" + selected_value, column_number, true, false, true, case_insensitive);
+			} else if (filter_match_mode === "regex") {
+				try {
+					//validate regex, only call fnFilter if valid
+					new RegExp(selected_value);
+				} catch (error) {
+					return;   
+				}
+				oTable.fnFilter(selected_value, column_number, true, false, true, case_insensitive);
 			}
 		} else {
 			oTable.fnFilter("^((?!" + selected_value + ").)*$", column_number, true, false, true, case_insensitive);
@@ -601,6 +613,8 @@ var yadcf = (function ($) {
 			retVal = tmpStr.substring(1, tmpStr.length - 1);
 		} else if (filter_match_mode === "startsWith") {
 			retVal = tmpStr.substring(1, tmpStr.length);
+		} else if (filter_match_mode === "regex") {
+			retVal = tmpStr;
 		}
 		return retVal;
 	}
@@ -735,6 +749,8 @@ var yadcf = (function ($) {
 					oTable.fnFilter("^(" + stringForSearch + ")$", column_number_filter, true, false, true);
 				} else if (filter_match_mode === "startsWith") {
 					oTable.fnFilter("^(" + stringForSearch + ")", column_number_filter, true, false, true);
+				} else if (filter_match_mode === "regex") {
+					oTable.fnFilter(stringForSearch, column_number_filter, true, false, true);
 				}
 			} else {
 				oTable.fnFilter("", column_number_filter);
@@ -755,6 +771,8 @@ var yadcf = (function ($) {
 		} else if (filter_match_mode === "startsWith") {
 			retVal = tmpStr.substring(1, tmpStr.length);
 			retVal = retVal.substring(1, retVal.length - 1);
+		} else if (filter_match_mode === "regex") {
+			retVal = tmpStr;
 		}
 		return retVal;
 	}
