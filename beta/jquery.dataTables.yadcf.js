@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.26 
+* Version:     0.8.8.beta.28
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -588,15 +588,17 @@ var yadcf = (function ($) {
 			if (filter_match_mode === "contains") {
 				oTable.fnFilter(selected_value, column_number, false, true, true, case_insensitive);
 			} else if (filter_match_mode === "exact") {
+				selected_value = escapeRegExp(selected_value);
 				oTable.fnFilter("^" + selected_value + "$", column_number, true, false, true, case_insensitive);
 			} else if (filter_match_mode === "startsWith") {
+				selected_value = escapeRegExp(selected_value);
 				oTable.fnFilter("^" + selected_value, column_number, true, false, true, case_insensitive);
 			} else if (filter_match_mode === "regex") {
 				try {
 					//validate regex, only call fnFilter if valid
 					new RegExp(selected_value);
 				} catch (error) {
-					return;   
+					return;
 				}
 				oTable.fnFilter(selected_value, column_number, true, false, true, case_insensitive);
 			}
@@ -604,15 +606,16 @@ var yadcf = (function ($) {
 			oTable.fnFilter("^((?!" + selected_value + ").)*$", column_number, true, false, true, case_insensitive);
 		}
 	}
-
 	function yadcfParseMatchFilter(tmpStr, filter_match_mode) {
 		var retVal;
 		if (filter_match_mode === "contains") {
 			retVal = tmpStr;
 		} else if (filter_match_mode === "exact") {
 			retVal = tmpStr.substring(1, tmpStr.length - 1);
+			retVal = retVal.replace(/([\\])/g, '');
 		} else if (filter_match_mode === "startsWith") {
 			retVal = tmpStr.substring(1, tmpStr.length);
+			retVal = retVal.replace(/([\\])/g, '');
 		} else if (filter_match_mode === "regex") {
 			retVal = tmpStr;
 		}
@@ -1567,7 +1570,7 @@ var yadcf = (function ($) {
 	function sortColumnData(column_data, columnObj) {
 		var numArray = [],
 			alphaArray = [];
-		if (columnObj.filter_type === "select" || columnObj.filter_type === "auto_complete" || columnObj.filter_type === "multi_select" || columnObj.filter_type === "custom_func" || columnObj.filter_type === "multi_select_custom_func") {
+		if (columnObj.filter_type === "select" || columnObj.filter_type === "auto_complete" || columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func' || columnObj.filter_type === "custom_func") {
 			if (columnObj.sort_as === "alpha") {
 				if (columnObj.sort_order === "asc") {
 					column_data.sort();
@@ -1595,7 +1598,7 @@ var yadcf = (function ($) {
 		return column_data;
 	}
 
-	function parseTableColumn(pTable, columnObj) {
+	function parseTableColumn(pTable, columnObj, table_selector_jq_friendly) {
 		var col_inner_elements,
 			col_inner_data,
 			j,
@@ -1603,18 +1606,29 @@ var yadcf = (function ($) {
 			col_filter_array = {},
 			column_data = [],
 			data = pTable.fnSettings().aoData,
-			data_length = data.length;
+			data_length = data.length,
+			settingsDt,
+			column_number_filter;
 
+		settingsDt = getSettingsObjFromTable(pTable);
 		if (isNaN(pTable.fnSettings().aoColumns[columnObj.column_number].mData) && typeof pTable.fnSettings().aoColumns[columnObj.column_number].mData !== 'object') {
 			columnObj.column_number_data = pTable.fnSettings().aoColumns[columnObj.column_number].mData;
 		}
 		if (columnObj.col_filter_array !== undefined) {
 			col_filter_array = columnObj.col_filter_array;
 		}
+		if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) || (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
+			initColReorder(settingsDt.oSavedState, table_selector_jq_friendly);
+		}
 		for (j = 0; j < data_length; j++) {
+			if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) || (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
+				column_number_filter = plugins[table_selector_jq_friendly].ColReorder[columnObj.column_number];
+			} else {
+				column_number_filter = columnObj.column_number;
+			}
 			if (columnObj.column_data_type === "html") {
 				if (columnObj.column_number_data === undefined) {
-					col_inner_elements = $(data[j]._aData[columnObj.column_number]);
+					col_inner_elements = $(data[j]._aData[column_number_filter]);
 				} else {
 					col_inner_elements = dot2obj(data[j]._aData, columnObj.column_number_data);
 					col_inner_elements = $(col_inner_elements);
@@ -1652,7 +1666,7 @@ var yadcf = (function ($) {
 			} else if (columnObj.column_data_type === "text") {
 				if (columnObj.text_data_delimiter !== undefined) {
 					if (columnObj.column_number_data === undefined) {
-						col_inner_elements = data[j]._aData[columnObj.column_number].split(columnObj.text_data_delimiter);
+						col_inner_elements = data[j]._aData[column_number_filter].split(columnObj.text_data_delimiter);
 					} else {
 						col_inner_elements = dot2obj(data[j]._aData, columnObj.column_number_data);
 						col_inner_elements = (col_inner_elements + '').split(columnObj.text_data_delimiter);
@@ -1666,7 +1680,7 @@ var yadcf = (function ($) {
 					}
 				} else {
 					if (columnObj.column_number_data === undefined) {
-						col_inner_data = data[j]._aData[columnObj.column_number];
+						col_inner_data = data[j]._aData[column_number_filter];
 						if (typeof col_inner_data === 'object') {
 							if (columnObj.html5_data !== undefined) {
 								col_inner_data = col_inner_data['@' + columnObj.html5_data];
@@ -1676,7 +1690,7 @@ var yadcf = (function ($) {
 							}
 						}
 					} else if (data[j]._aFilterData !== undefined && data[j]._aFilterData !== null) {
-						col_inner_data = data[j]._aFilterData[columnObj.column_number];
+						col_inner_data = data[j]._aFilterData[column_number_filter];
 					} else {
 						col_inner_data = dot2obj(data[j]._aData, columnObj.column_number_data);
 					}
@@ -1686,7 +1700,7 @@ var yadcf = (function ($) {
 					}
 				}
 			} else if (columnObj.column_data_type === "rendered_html") {
-				col_inner_elements = data[j]._aFilterData[columnObj.column_number];
+				col_inner_elements = data[j]._aFilterData[column_number_filter];
 				col_inner_elements = $(col_inner_elements);
 				if (col_inner_elements.length > 0) {
 					for (k = 0; k < col_inner_elements.length; k++) {
@@ -1781,6 +1795,7 @@ var yadcf = (function ($) {
 			if (args.hasOwnProperty(columnObjKey)) {
 				columnObj = args[columnObjKey];
 
+				tmpStr = '';
 				data = columnObj.data;
 				column_data = [];
 				column_data_temp = [];
@@ -1855,7 +1870,7 @@ var yadcf = (function ($) {
 				}
 				if (data === undefined || columnObj.append_data_to_table_data !== undefined) {
 					columnObj.col_filter_array = undefined;
-					column_data_temp = parseTableColumn(oTable, columnObj);
+					column_data_temp = parseTableColumn(oTable, columnObj, table_selector_jq_friendly);
 					if (columnObj.append_data_to_table_data !== 'before') {
 						column_data = column_data.concat(column_data_temp);
 					} else {
@@ -3040,7 +3055,7 @@ var yadcf = (function ($) {
 						columnsTmpArr = filterOptions.column_number;
 						for (column_number_index = 0; column_number_index < columnsTmpArr.length; column_number_index++) {
 							filterOptions.column_number = columnsTmpArr[column_number_index];
-							filterOptions.data = filterOptions.data.concat(parseTableColumn(tableTmp, filterOptions));
+							filterOptions.data = filterOptions.data.concat(parseTableColumn(tableTmp, filterOptions, table_selector_jq_friendly));
 						}
 						filterOptions.column_number = columnsTmpArr;
 					} else {
@@ -3050,7 +3065,7 @@ var yadcf = (function ($) {
 							columnsTmpArr = filterOptions.column_number;
 							for (column_number_index = 0; column_number_index < columnsTmpArr.length; column_number_index++) {
 								filterOptions.column_number = columnsTmpArr[column_number_index];
-								filterOptions.data = filterOptions.data.concat(parseTableColumn(tableTmp, filterOptions));
+								filterOptions.data = filterOptions.data.concat(parseTableColumn(tableTmp, filterOptions, table_selector_jq_friendly));
 							}
 							filterOptions.column_number = columnsTmpArr;
 							filterOptions.data = sortColumnData(filterOptions.data, filterOptions);
