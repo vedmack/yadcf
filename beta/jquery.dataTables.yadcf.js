@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.28 
+* Version:     0.8.8.beta.29
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1611,21 +1611,23 @@ var yadcf = (function ($) {
 			column_number_filter;
 
 		settingsDt = getSettingsObjFromTable(pTable);
-		if (isNaN(pTable.fnSettings().aoColumns[columnObj.column_number].mData) && typeof pTable.fnSettings().aoColumns[columnObj.column_number].mData !== 'object') {
-			columnObj.column_number_data = pTable.fnSettings().aoColumns[columnObj.column_number].mData;
-		}
+
 		if (columnObj.col_filter_array !== undefined) {
 			col_filter_array = columnObj.col_filter_array;
 		}
 		if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) || (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
 			initColReorder(settingsDt.oSavedState, table_selector_jq_friendly);
 		}
+		if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) || (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
+			column_number_filter = plugins[table_selector_jq_friendly].ColReorder[columnObj.column_number];
+		} else {
+			column_number_filter = columnObj.column_number;
+		}
+		if (isNaN(pTable.fnSettings().aoColumns[column_number_filter].mData) && typeof pTable.fnSettings().aoColumns[column_number_filter].mData !== 'object') {
+			columnObj.column_number_data = pTable.fnSettings().aoColumns[column_number_filter].mData;
+		}
+
 		for (j = 0; j < data_length; j++) {
-			if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) || (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
-				column_number_filter = plugins[table_selector_jq_friendly].ColReorder[columnObj.column_number];
-			} else {
-				column_number_filter = columnObj.column_number;
-			}
 			if (columnObj.column_data_type === "html") {
 				if (columnObj.column_number_data === undefined) {
 					col_inner_elements = $(data[j]._aData[column_number_filter]);
