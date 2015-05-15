@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.29
+* Version:     0.8.8.beta.30
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -794,7 +794,7 @@ var yadcf = (function ($) {
 		}
 
 		if (arg === "clear") {
-			if (exGetColumnFilterVal(oTable, column_number_filter) === '') {
+			if (exGetColumnFilterVal(oTable, column_number) === '') {
 				return;
 			}
 			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
@@ -840,10 +840,9 @@ var yadcf = (function ($) {
 					array[i] = array[i].toString().replace(ignore_char, "");
 				}
 				num = +array[i];
-				if (isNaN(num)) {
-					continue;
+				if (!isNaN(num)) {
+					narray.push(num);
 				}
-				narray.push(num);
 			}
 		}
 		return Math.min.apply(Math, narray);
@@ -857,10 +856,9 @@ var yadcf = (function ($) {
 					array[i] = array[i].toString().replace(ignore_char, "");
 				}
 				num = +array[i];
-				if (isNaN(num)) {
-					continue;
+				if (!isNaN(num)) {
+					narray.push(num);
 				}
-				narray.push(num);
 			}
 		}
 		return Math.max.apply(Math, narray);
@@ -1147,6 +1145,9 @@ var yadcf = (function ($) {
 			oTable.fnFilter(date, column_number_filter);
 			$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass("inuse");
 		} else if (clear === 'clear') {
+			if (exGetColumnFilterVal(oTable, column_number) === '') {
+				return;
+			}
 			oTable.fnFilter('', column_number_filter);
 			$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val('').removeClass("inuse");
 		}
@@ -1562,9 +1563,8 @@ var yadcf = (function ($) {
 			aN = parseInt(a.replace(reN, ""), 10);
 			bN = parseInt(b.replace(reN, ""), 10);
 			return aN === bN ? 0 : aN > bN ? 1 : -1;
-		} else {
-			return aA > bA ? 1 : -1;
 		}
+		return aA > bA ? 1 : -1;
 	}
 
 	function sortColumnData(column_data, columnObj) {
@@ -2762,6 +2762,9 @@ var yadcf = (function ($) {
 			$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 
 			if (clear === 'clear' || $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val() === '') {
+				if (clear === 'clear' && exGetColumnFilterVal(oTable, column_number) === '') {
+					return;
+				}
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
 				oTable.fnFilter("", column_number_filter);
