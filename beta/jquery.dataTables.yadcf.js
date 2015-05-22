@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.30
+* Version:     0.8.8.beta.34
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -155,6 +155,7 @@
 				Required:			false
 				Type:				String
 				Description:		Tells the range_number and range_number_slide to ignore specific char while filtering (that char can used as number separator)
+				Note:				Use double escape for regex chars , e.g \\$ , also you can use multiple ignore chars with | , e.g '_|\\.|\\$'
 				
 * filter_match_mode
 				Required:			false
@@ -315,7 +316,8 @@ var yadcf = (function ($) {
 
 	'use strict';
 
-	var oTables = {},
+	var tablesDT = {},
+		oTables = {},
 		oTablesIndex = {},
 		options = {},
 		plugins = {},
@@ -899,7 +901,6 @@ var yadcf = (function ($) {
 				} else {
 					column_number_filter = col_num;
 				}
-				console.log(settingsDt.oInstance.selector + ',' + column_number_filter + ', ' + columnObj.selector);
 				if (rowData !== undefined) {
 					aData = rowData;
 					if (columnObj.column_number_data !== undefined) {
@@ -984,6 +985,10 @@ var yadcf = (function ($) {
 					custom_func,
 					column_number_filter;
 
+				if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
+					return true;
+				}
+
 				if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) || (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
 					initColReorder(settingsDt.oSavedState, table_selector_jq_friendly);
 					column_number_filter = plugins[table_selector_jq_friendly].ColReorder[col_num];
@@ -992,10 +997,6 @@ var yadcf = (function ($) {
 				}
 
 				columnVal = aData[column_number_filter] === "-" ? 0 : aData[column_number_filter];
-
-				if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
-					return true;
-				}
 
 				custom_func = getOptions(settingsDt.oInstance.selector)[col_num].custom_func;
 
@@ -1008,27 +1009,73 @@ var yadcf = (function ($) {
 	function addRangeDateFilterCapability(table_selector_jq_friendly, fromId, toId, col_num, date_format) {
 
 		$.fn.dataTableExt.afnFiltering.push(
-			function (settingsDt, aData, iDataIndex) {
+			function (settingsDt, aData, iDataIndex, rowData) {
 				var min = document.getElementById(fromId) !== null ? document.getElementById(fromId).value : "",
 					max = document.getElementById(toId) !== null ? document.getElementById(toId).value : "",
 					val,
 					retVal = false,
 					table_selector_jq_friendly_local = table_selector_jq_friendly,
 					current_table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(settingsDt.oInstance.selector),
+					column_data_type,
+					html_data_type,
+					i,
+					columnObjKey,
+					columnObj,
 					column_number_filter;
 
+				if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
+					return true;
+				}
+				columnObj = getOptions(settingsDt.oInstance.selector)[col_num];
 				if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) || (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
 					initColReorder(settingsDt.oSavedState, table_selector_jq_friendly);
 					column_number_filter = plugins[table_selector_jq_friendly].ColReorder[col_num];
 				} else {
 					column_number_filter = col_num;
 				}
-
-				val = aData[column_number_filter] === "-" ? 0 : aData[column_number_filter];
-
-				if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
-					return true;
+				if (rowData !== undefined) {
+					aData = rowData;
+					if (columnObj.column_number_data !== undefined) {
+						column_number_filter = columnObj.column_number_data;
+						val = dot2obj(aData, column_number_filter);
+					} else {
+						val = aData[column_number_filter];
+					}
+				} else {
+					val = aData[column_number_filter];
 				}
+
+				column_data_type = columnObj.column_data_type;
+				html_data_type = columnObj.html_data_type;
+
+				if (column_data_type === "html" || column_data_type === "rendered_html") {
+					if (html_data_type === undefined) {
+						html_data_type = "text";
+					}
+					if ($(val).length !== 0) {
+						switch (html_data_type) {
+						case "text":
+							val = $(val).text();
+							break;
+						case "value":
+							val = $(val).val();
+							break;
+						case "id":
+							val = val.id;
+							break;
+						case "selector":
+							val = $(val).find(columnObj.html_data_selector).text();
+							break;
+						}
+					}
+				} else {
+					if (typeof val === 'object') {
+						if (columnObj.html5_data !== undefined) {
+							val = val['@' + columnObj.html5_data];
+						}
+					}
+				}
+
 				try {
 					if (min.length === (date_format.length + 2)) {
 						min = (min !== "") ? $.datepicker.parseDate(date_format, min) : min;
@@ -1779,10 +1826,13 @@ var yadcf = (function ($) {
 			settingsDt,
 			filterActionStr,
 			custom_func_filter_value_holder,
-			exclude_str;
+			exclude_str,
+			tableDT,
+			columnFilterVal;
 
 		settingsDt = getSettingsObjFromTable(oTable);
 		table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector);
+		tableDT = tablesDT[table_selector_jq_friendly];
 
 		initColReorder(settingsDt.oSavedState, table_selector_jq_friendly);
 
@@ -1969,6 +2019,8 @@ var yadcf = (function ($) {
 						}
 						$filter_selector.empty();
 						$filter_selector.append(column_data);
+						//console.log('column_position: ' + column_position + ', aoPreSearchCols[]: ' + settingsDt.aoPreSearchCols[column_position].sSearch);
+						//console.log('column_position: ' + column_position + ', column: ' + tableDT.column([column_position]).search());
 						if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
 							tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 							if (columnObj.filter_type === "select") {
@@ -2829,11 +2881,12 @@ var yadcf = (function ($) {
 		}
 	}
 
-	function initAndBindTable(oTable, table_selector, index) {
+	function initAndBindTable(oTable, table_selector, index, pTableDT) {
 
 		var table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector),
 			table_selector_tmp;
         oTables[table_selector_jq_friendly] = oTable;
+		tablesDT[table_selector_jq_friendly] = pTableDT;
 		oTablesIndex[table_selector_jq_friendly] = index;
 
 		scrollXYHandler(oTable, table_selector);
@@ -2856,12 +2909,14 @@ var yadcf = (function ($) {
 						table_selector_jq_friendly = generateTableSelectorJQFriendly(oTable.selector);
 					if (settings.oSavedState !== null) {
 						initColReorder(settings.oSavedState, table_selector_jq_friendly);
+					} else if (settings.oLoadedState !== null) {
+						initColReorder(settings.oLoadedState, table_selector_jq_friendly);
 					}
 					for (col_num in yadcf.getOptions(settings.oInstance.selector)) {
 						if (yadcf.getOptions(settings.oInstance.selector).hasOwnProperty(col_num)) {
 							if (json['yadcf_data_' + col_num] !== undefined) {
 								column_number_filter = col_num;
-								if (settings.oSavedState !== null) {
+								if (settings.oSavedState !== null || settings.oLoadedState !== null) {
 									column_number_filter = plugins[table_selector_jq_friendly].ColReorder[col_num];
 								}
 								yadcf.getOptions(settings.oInstance.selector)[col_num].data = json['yadcf_data_' + column_number_filter];
@@ -3211,6 +3266,7 @@ var yadcf = (function ($) {
 			j,
 			tmpStr,
 			column_number,
+			column_position,
 			filter_value,
 			fromId,
 			toId,
@@ -3226,6 +3282,10 @@ var yadcf = (function ($) {
 		if (isDOMSource(table_arg) || ajaxSource === true) {
 			for (j = 0; j < col_filter_arr.length; j++) {
 				column_number = col_filter_arr[j][0];
+				column_position = column_number;
+				if (plugins[table_selector_jq_friendly] !== undefined && (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
+					column_position = plugins[table_selector_jq_friendly].ColReorder[column_number];
+				}
 				optionsObj = getOptions(table_arg.selector)[column_number];
 				filter_value = col_filter_arr[j][1];
 
@@ -3234,13 +3294,13 @@ var yadcf = (function ($) {
 				case 'text':
 				case 'date':
 					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(filter_value).addClass('inuse');
-					tmpStr = yadcfMatchFilterString(table_arg, column_number, filter_value, optionsObj.filter_match_mode, false);
-					table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = tmpStr;
+					tmpStr = yadcfMatchFilterString(table_arg, column_position, filter_value, optionsObj.filter_match_mode, false);
+					table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = tmpStr;
 					break;
 				case 'select':
 					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(filter_value).addClass('inuse');
-					tmpStr = yadcfMatchFilterString(table_arg, column_number, filter_value, optionsObj.filter_match_mode, false);
-					table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = tmpStr;
+					tmpStr = yadcfMatchFilterString(table_arg, column_position, filter_value, optionsObj.filter_match_mode, false);
+					table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = tmpStr;
 					if (optionsObj.select_type !== undefined) {
 						if (optionsObj.select_type === 'chosen') {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
@@ -3251,8 +3311,8 @@ var yadcf = (function ($) {
 					break;
 				case 'multi_select':
 					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(filter_value);
-					tmpStr = yadcfMatchFilterString(table_arg, column_number, filter_value, optionsObj.filter_match_mode, true);
-					table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = tmpStr;
+					tmpStr = yadcfMatchFilterString(table_arg, column_position, filter_value, optionsObj.filter_match_mode, true);
+					table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = tmpStr;
 					if (optionsObj.select_type !== undefined) {
 						if (optionsObj.select_type === 'chosen') {
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).trigger('chosen:updated');
@@ -3275,7 +3335,7 @@ var yadcf = (function ($) {
 					if (table_arg.fnSettings().oFeatures.bServerSide === true) {
 						min = filter_value.from;
 						max = filter_value.to;
-						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = min + '-yadcf_delim-' + max;
+						table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = min + '-yadcf_delim-' + max;
 					}
 					break;
 				case 'range_number':
@@ -3290,7 +3350,7 @@ var yadcf = (function ($) {
 						$('#' + toId).addClass('inuse');
 					}
 					if (table_arg.fnSettings().oFeatures.bServerSide === true) {
-						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = filter_value.from + '-yadcf_delim-' + filter_value.to;
+						table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = filter_value.from + '-yadcf_delim-' + filter_value.to;
 					}
 					break;
 				case 'range_number_slider':
@@ -3316,14 +3376,14 @@ var yadcf = (function ($) {
 						$('#' + sliderId).slider('values', 1, filter_value.to);
 					}
 					if (table_arg.fnSettings().oFeatures.bServerSide === true) {
-						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = filter_value.from + '-yadcf_delim-' + filter_value.to;
+						table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = filter_value.from + '-yadcf_delim-' + filter_value.to;
 					}
 					break;
 				case 'custom_func':
 				case 'multi_select_custom_func':
 					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(filter_value).addClass('inuse');
 					if (table_arg.fnSettings().oFeatures.bServerSide === true) {
-						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = filter_value;
+						table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = filter_value;
 					}
 					if (optionsObj.select_type !== undefined) {
 						if (optionsObj.select_type === 'chosen') {
