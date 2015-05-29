@@ -1,10 +1,10 @@
-/*global $, jQuery, exFilterColumn, exGetColumnFilterVal*/
+/*global $, jQuery, exFilterColumn, exGetColumnFilterVal, saveStateSave*/
 /*jslint plusplus: true, nomen: true, eqeq: true */
 /*!
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8.beta.35 
+* Version:     0.8.8.beta.36 
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -3330,6 +3330,7 @@ var yadcf = (function ($) {
 						max = filter_value.to;
 						table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = min + '-yadcf_delim-' + max;
 					}
+					saveStateSave(table_arg, column_number, table_selector_jq_friendly, filter_value.from, filter_value.to);
 					break;
 				case 'range_number':
 					fromId = 'yadcf-filter-' + table_selector_jq_friendly + '-from-' + column_number;
@@ -3345,6 +3346,7 @@ var yadcf = (function ($) {
 					if (table_arg.fnSettings().oFeatures.bServerSide === true) {
 						table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = filter_value.from + '-yadcf_delim-' + filter_value.to;
 					}
+					saveStateSave(table_arg, column_number, table_selector_jq_friendly, filter_value.from, filter_value.to);
 					break;
 				case 'range_number_slider':
 					sliderId = 'yadcf-filter-' + table_selector_jq_friendly + '-slider-' + column_number;
@@ -3371,6 +3373,7 @@ var yadcf = (function ($) {
 					if (table_arg.fnSettings().oFeatures.bServerSide === true) {
 						table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = filter_value.from + '-yadcf_delim-' + filter_value.to;
 					}
+					saveStateSave(table_arg, column_number, table_selector_jq_friendly, filter_value.from, filter_value.to);
 					break;
 				case 'custom_func':
 				case 'multi_select_custom_func':
@@ -3385,6 +3388,7 @@ var yadcf = (function ($) {
 							$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2('val', filter_value);
 						}
 					}
+					saveStateSave(table_arg, column_number, table_selector_jq_friendly, filter_value, '');
 					break;
 				}
 			}
@@ -3477,6 +3481,30 @@ var yadcf = (function ($) {
 				yadcfState = {};
 				yadcfState[table_selector_jq_friendly] = [];
 				yadcfState[table_selector_jq_friendly][column_number] = undefined;
+				oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+			}
+			oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
+		}
+	}
+
+	function saveStateSave(oTable, column_number, table_selector_jq_friendly, from, to) {
+		var yadcfState;
+		if (oTable.fnSettings().oFeatures.bStateSave === true) {
+			if (!oTable.fnSettings().oLoadedState) {
+				oTable.fnSettings().oLoadedState = {};
+			}
+			if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
+				oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] = {
+					'from' : from,
+					'to' : to
+				};
+			} else {
+				yadcfState = {};
+				yadcfState[table_selector_jq_friendly] = [];
+				yadcfState[table_selector_jq_friendly][column_number] = {
+					'from' : from,
+					'to' : to
+				};
 				oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
 			}
 			oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
