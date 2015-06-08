@@ -1,16 +1,22 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
-## 0.8.8.beta (still in development)
+## 0.8.8
 
+* Add regex for filter_match_mode property (xmikew)
+* Added `alphaNum` and `custom` to the `sort_as` and added `sort_as_custom_func`
+* New property, style_class - allows adding additional class/classes to filter 
+* Added and exclude filtering checkbox (currently available for the text filter)
+* New property, append_data_to_table_data to place your data array in addition to the values that yadcf grabs from the table
+* Aded support for Select2 v.4.0 
 * Added exResetFilters function to reset specific filters (one or more) https://github.com/vedmack/yadcf/issues/162
 * Added html5_data support for range_number and range_number_slider https://github.com/vedmack/yadcf/issues/158
-* Added externally_triggered and exFilterExternallyTriggered function to allow creating "search forms" , fill the filters and hit the "filter" button to filter them all https://github.com/vedmack/yadcf/issues/141
+* Added externally_triggered and exFilterExternallyTriggered function to allow creating "search forms" , fill the filters and hit the "filter" button to filter them all http://yadcf-showcase.appspot.com/dom_source_externally_triggered.html
 * ColReorder support for all filter types! https://github.com/vedmack/yadcf/issues/138
 * Added multi_select with selects & chosen for initMultipleTables and initMultipleColumns https://github.com/vedmack/yadcf/issues/132
 * Predefined data can be added in addition to values that yadcf grabs from the table column, usage - append_data_to_table_data: true , https://github.com/vedmack/yadcf/issues/178
 * custom_func and multi_select_custom_func passing third argument (array that holds the values of the entire row) to the custom function, https://github.com/vedmack/yadcf/issues/179
 * New property for filter, style_class - allows adding additional class/classes to filter - available for the following filters: select / multi_select / text / custom_func / multi_select_custom_func
-* Bugs / Features 	TL;DR
+* TL;DR (Features / Enhancements / Bugs)
   
 ## 0.8.7
 
