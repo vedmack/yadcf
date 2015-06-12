@@ -4,16 +4,16 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.8
+* Version:     0.8.9.beta.1 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
 * Contact:     vedmack@gmail.com
 * Twitter:	   @danielreznick
-* Q&A		   https://groups.google.com/forum/#!forum/daniels_code	
+* Q&A		   http://stackoverflow.com/questions/tagged/yadcf
 *
-* Copyright 2014 Daniel Reznick, all rights reserved.
-* Copyright 2014 Released under the MIT License
+* Copyright 2015 Daniel Reznick, all rights reserved.
+* Copyright 2015 Released under the MIT License
 * 
 * This source file is distributed in the hope that it will be useful, but 
 * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
@@ -1842,6 +1842,7 @@ var yadcf = (function ($) {
 			if (args.hasOwnProperty(columnObjKey)) {
 				columnObj = args[columnObjKey];
 
+				options_tmp = '';
 				tmpStr = '';
 				data = columnObj.data;
 				column_data = [];
@@ -1971,42 +1972,42 @@ var yadcf = (function ($) {
 				}
 
 
+				if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func' || columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
+					if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
+						options_tmp = "<option value=\"" + "-1" + "\">" + filter_default_label + "</option>";
 
-				if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
-					options_tmp = "<option value=\"" + "-1" + "\">" + filter_default_label + "</option>";
-
-					if (columnObj.select_type === 'select2' && columnObj.select_type_options.placeholder !== undefined && columnObj.select_type_options.allowClear === true) {
-						options_tmp = "<option value=\"\"></option>";
-					}
-				} else if (columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
-					if (columnObj.select_type === undefined) {
-						options_tmp = "<option data-placeholder=\"true\" value=\"" + "-1" + "\">" + filter_default_label + "</option>";
-					} else {
-						options_tmp = "";
-					}
-				}
-
-				if (columnObj.append_data_to_table_data === undefined) {
-					if (typeof column_data[0] === 'object') {
-						for (ii = 0; ii < column_data.length; ii++) {
-							options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
+						if (columnObj.select_type === 'select2' && columnObj.select_type_options.placeholder !== undefined && columnObj.select_type_options.allowClear === true) {
+							options_tmp = "<option value=\"\"></option>";
 						}
-					} else {
-						for (ii = 0; ii < column_data.length; ii++) {
-							options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
-						}
-					}
-				} else {
-					for (ii = 0; ii < column_data.length; ii++) {
-						if (typeof column_data[ii] === 'object') {
-							options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
+					} else if (columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
+						if (columnObj.select_type === undefined) {
+							options_tmp = "<option data-placeholder=\"true\" value=\"" + "-1" + "\">" + filter_default_label + "</option>";
 						} else {
-							options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
+							options_tmp = "";
 						}
 					}
-				}
-				column_data = options_tmp;
 
+					if (columnObj.append_data_to_table_data === undefined) {
+						if (typeof column_data[0] === 'object') {
+							for (ii = 0; ii < column_data.length; ii++) {
+								options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
+							}
+						} else {
+							for (ii = 0; ii < column_data.length; ii++) {
+								options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
+							}
+						}
+					} else {
+						for (ii = 0; ii < column_data.length; ii++) {
+							if (typeof column_data[ii] === 'object') {
+								options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
+							} else {
+								options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
+							}
+						}
+					}
+					column_data = options_tmp;
+				}
 				if ($filter_selector.length === 1) {
 					if (columnObj.filter_type === "select" || columnObj.filter_type === "multi_select" || columnObj.filter_type === 'custom_func' || columnObj.filter_type === 'multi_select_custom_func') {
 						if (columnObj.filter_type === 'custom_func' || columnObj.filter_type === 'multi_select_custom_func') {
