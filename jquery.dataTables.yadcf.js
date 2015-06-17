@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 * 
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.1 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.2 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *  
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -196,7 +196,7 @@
 				Required:			false
 				Type:				Object
 				Default value:		undefined
-				Description:		This parameter will be passed to the jQuery Autocomplete plugin constructor
+				Description:		This parameter will be passed to the jQuery Autocomplete / Slider plugin constructor
 				
 * case_insensitive
 				Required:			false
@@ -1484,7 +1484,8 @@ var yadcf = (function ($) {
 			max_state_val = max_val,
 			columnObj,
 			slideFunc,
-			changeFunc;
+			changeFunc,
+			sliderObj;
 
 		filter_wrapper_id = "yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number;
 
@@ -1543,7 +1544,7 @@ var yadcf = (function ($) {
 					rangeNumberSldierDrawTips(ui.values[0], ui.values[1], min_tip_id, max_tip_id, table_selector_jq_friendly, column_number);
 				};
 			}
-			$("#" + sliderId).slider({
+			sliderObj = {
 				range: true,
 				min: min_val,
 				max: max_val,
@@ -1553,7 +1554,13 @@ var yadcf = (function ($) {
 				},
 				slide: slideFunc,
 				change: changeFunc
-			});
+			};
+
+			if (columnObj.filter_plugin_options !== undefined) {
+				$.extend(sliderObj, columnObj.filter_plugin_options);
+			}
+
+			$("#" + sliderId).slider(sliderObj);
 
 			if (filter_reset_button_text !== false) {
 				$(filter_selector_string_tmp).append("<button type=\"button\" onmousedown=\"yadcf.stopPropagation(event);\" " +
