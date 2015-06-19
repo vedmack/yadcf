@@ -3433,12 +3433,7 @@ var yadcf = (function ($) {
 
 			retVal.from = $('#' + fromId).text();
 			retVal.to = $('#' + toId).text();
-			
-			var sliderId = 'yadcf-filter-' + table_selector_jq_friendly + '-slider-' + column_number;
 
-			if(retVal.from == $('#' + fromId).parent().parent().find('.yadcf-filter-range-number-slider-min-tip-hidden').text() && retVal.to == $('#' + fromId).parent().parent().find('.yadcf-filter-range-number-slider-max-tip-hidden').text()) {
-				retVal.sliderInitialValue = true;
-			}
 			break;
 		default:
 			console.log('exGetColumnFilterVal error: no such filter_type: ' + optionsObj.filter_type);
