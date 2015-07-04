@@ -1,5 +1,11 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
+## 0.8.9 (still beta)
+
+* Added initSelectPluginCustomTriggers - Allows to set any select jquery plugin initialize and refresh functions.(PR by gauravjhs)
+* Fixed auto complete filter
+
+
 ## 0.8.8
 
 * Add regex for filter_match_mode property (xmikew)
