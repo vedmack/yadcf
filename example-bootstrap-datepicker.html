@@ -38,12 +38,16 @@
 
     <script>
         $(document).ready(function () {
+            var datepickerDefaults = {
+                showTodayButton: true,
+                showClear: true
+            };
             $('#example').dataTable().yadcf([
                 {column_number: 0},
                 {column_number: 1, filter_type: "range_number"},
                 {column_number: 2, data: ["Yes", "No"]},
                 {column_number: 3, text_data_delimiter: ","},
-                {column_number: 4, filter_type: "range_date", datepicker_lib: 'bootstrap', date_format: 'YYYY-MM-DD'},
+                {column_number: 4, filter_type: "range_date", datepicker_lib: 'bootstrap', date_format: 'YYYY-MM-DD', datepicker_opts: datepickerDefaults},
                 {column_number: 5, column_data_type: "html", html_data_type: "text", filter_default_label: "Select tag"}]);
         });
     </script>

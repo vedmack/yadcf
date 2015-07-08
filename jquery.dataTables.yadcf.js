@@ -222,6 +222,14 @@
 				Description:		You can choose datapicker library from defined in special notes
 				Special notes:		Currently supported only jQueryUI datepicker (datepicker) and Bootstrap datepicker (eonasdan-bootstrap-datetimepicker)
 				                    Bootstrap datepicker depends moment library. This plugin depends moment too.
+
+
+* datepicker_opts
+                Required:			false
+				Type:				object
+				Default value:		{}
+				Description:		Additional datepicker options, like format, icons...
+
 *
 *
 *
@@ -454,7 +462,8 @@ var yadcf = (function ($) {
 				html_data_type: 'text',
 				exclude_label: 'exclude',
 				style_class: '',
-                datepicker_lib: 'datepicker'
+                datepicker_lib: 'datepicker',
+                datepicker_opts: {}
 			},
 			adaptContainerCssClassImpl = function (dummy) { return ''; };
 
@@ -1386,14 +1395,16 @@ var yadcf = (function ($) {
         }
 
         var field_from = $("#" + fromId),
-            field_to = $("#" + toId);
+            field_to = $("#" + toId),
+            options = $.extend({}, columnObj.datepicker_opts, datepickerObj);
 
         if (columnObj.datepicker_lib === 'datepicker') {
-            field_from.datepicker(datepickerObj);
-            field_to.datepicker(datepickerObj);
+            field_from.datepicker(options);
+            field_to.datepicker(options);
+
         } else if (columnObj.datepicker_lib === 'bootstrap') {
-            field_from.datetimepicker(datepickerObj);
-            field_to.datetimepicker(datepickerObj);
+            field_from.datetimepicker(options);
+            field_to.datetimepicker(options);
             field_from.on("dp.change", function (e) {
                 field_to.data("DateTimePicker").minDate(e.date);
             });
