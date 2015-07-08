@@ -1399,8 +1399,12 @@ var yadcf = (function ($) {
             options = $.extend({}, columnObj.datepicker_opts, datepickerObj);
 
         if (columnObj.datepicker_lib === 'datepicker') {
-            field_from.datepicker(options);
-            field_to.datepicker(options);
+            field_from.datepicker($.extend(options, {onClose: function(selectedDate) {
+                field_to.datepicker('option', 'minDate', selectedDate);
+            }  }));
+            field_to.datepicker($.extend(options, {onClose: function(selectedDate) {
+                field_from.datepicker('option', 'maxDate', selectedDate);
+            }  }));
 
         } else if (columnObj.datepicker_lib === 'bootstrap') {
             field_from.datetimepicker(options);
