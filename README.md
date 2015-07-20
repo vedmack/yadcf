@@ -27,7 +27,7 @@ Features:
  - date input - make use of the jQuery UI Datepicker widget (with some enhancements)
  - range of numbers
  - range of numbers with slider widget - make use of the jQuery UI Slider widget (with some enhancements)
- - range of dates - make use of the jQuery UI Datepicker widget (with some enhancements)
+ - range of dates - make use of the jQuery UI Datepicker widget (with some enhancements) or Bootstrap Datepicker
  - custom function
 - Filters can be placed in the header (thead) or in the footer (tfoot) , second argument of yadcf constructor or third argument of init function
 - Parsing various types of columns: 
@@ -135,6 +135,7 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 * filter_delay
 * html5_data
 * style_class
+* datepicker_lib
 
 
 License:
