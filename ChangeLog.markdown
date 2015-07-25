@@ -4,6 +4,7 @@
 
 * Added initSelectPluginCustomTriggers - Allows to set any select jquery plugin initialize and refresh functions.(PR by gauravjhs)
 * Fixed auto complete filter
+* Fixed select2 (v.4.x) with server side processing https://github.com/vedmack/yadcf/issues/216
 
 
 ## 0.8.8

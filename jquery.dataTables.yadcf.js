@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.5 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.7 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -383,11 +383,34 @@ var yadcf = (function ($) {
 		return tmp;
 	}
 
+	function arraySwapValueWithIndex2(pArray) {
+		var tmp = [],
+			i;
+		for (i = 0; i < pArray.length; i++) {
+			tmp[pArray[i]._ColReorder_iOrigCol] = i;
+		}
+		return tmp;
+	}
+
 	function initColReorder(state, table_selector_jq_friendly) {
 		if (state != undefined && state.ColReorder !== undefined) {
 			if (plugins[table_selector_jq_friendly] === undefined) {
 				plugins[table_selector_jq_friendly] = {};
 				plugins[table_selector_jq_friendly].ColReorder = arraySwapValueWithIndex(state.ColReorder);
+			}
+		}
+	}
+
+	function initColReorder2(settingsDt, table_selector_jq_friendly) {
+		if (settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) {
+			if (plugins[table_selector_jq_friendly] === undefined) {
+				plugins[table_selector_jq_friendly] = {};
+				plugins[table_selector_jq_friendly].ColReorder = arraySwapValueWithIndex(settingsDt.oSavedState.ColReorder);
+			}
+		} else if (settingsDt.aoColumns[0]._ColReorder_iOrigCol !== undefined) {
+			if (plugins[table_selector_jq_friendly] === undefined) {
+				plugins[table_selector_jq_friendly] = {};
+				plugins[table_selector_jq_friendly].ColReorder = arraySwapValueWithIndex2(settingsDt.aoColumns);
 			}
 		}
 	}
@@ -583,7 +606,7 @@ var yadcf = (function ($) {
 		if (selectType === 'chosen') {
 			$selectObject.trigger("chosen:updated");
 		} else if (selectType === 'select2') {
-			$selectObject.select2('val', val);
+			$selectObject.val(val);
 		} else if (selectType === 'custom_select') {
 			selectElementCustomRefreshFunc($selectObject);
 		}
@@ -720,8 +743,10 @@ var yadcf = (function ($) {
 			columnObj,
 			settingsDt = getSettingsObjFromTable(oTable);
 
-		if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) || (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
-			initColReorder(settingsDt.oSavedState, table_selector_jq_friendly);
+		if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined)
+				|| settingsDt._colReorder != undefined
+				|| (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
+			initColReorder2(settingsDt, table_selector_jq_friendly);
 			column_number_filter = plugins[table_selector_jq_friendly].ColReorder[column_number];
 		} else {
 			column_number_filter = column_number;
@@ -1310,6 +1335,7 @@ var yadcf = (function ($) {
 			event = pDate.target;
 			if (pDate.date === false) {
 				$(event).removeClass("inuse");
+				$(event).data("DateTimePicker").minDate(false);
 			} else {
 				$(event).addClass("inuse");
 			}
@@ -2172,8 +2198,6 @@ var yadcf = (function ($) {
 						}
 						$filter_selector.empty();
 						$filter_selector.append(column_data);
-						//console.log('column_position: ' + column_position + ', aoPreSearchCols[]: ' + settingsDt.aoPreSearchCols[column_position].sSearch);
-						//console.log('column_position: ' + column_position + ', column: ' + tableDT.column([column_position]).search());
 						if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
 							tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 							if (columnObj.filter_type === "select") {
@@ -2195,7 +2219,7 @@ var yadcf = (function ($) {
 							}
 						}
 
-						refreshSelectPlugin(columnObj.select_type, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number), tmpStr);
+						initializeSelectPlugin(columnObj.select_type, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number), columnObj.select_type_options);
 
 					} else if (columnObj.filter_type === "auto_complete") {
 						$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_data);
@@ -2452,7 +2476,8 @@ var yadcf = (function ($) {
 			settingsDt,
 			column_number,
 			column_number_filter,
-			currentFilterValues;
+			currentFilterValues,
+			columnObj;
 
 		settingsDt = getSettingsObjFromTable(oTable);
 		column_number = parseInt($(event.target).parent().attr("id").replace('yadcf-filter-wrapper-' + table_selector_jq_friendly + '-', ''), 10);
@@ -2467,6 +2492,12 @@ var yadcf = (function ($) {
 		currentFilterValues = exGetColumnFilterVal(oTable, column_number);
 		if (currentFilterValues.from === '' && currentFilterValues.to === '') {
 			return;
+		}
+
+		columnObj = getOptions(oTable.selector)[column_number];
+		if (columnObj.filter_type === 'range_date' && columnObj.datepicker_type === 'bootstrap-datetimepicker') {
+			$($(event.target).parent().find(".yadcf-filter-range")[0]).data("DateTimePicker").maxDate(false);
+			$($(event.target).parent().find(".yadcf-filter-range")[1]).data("DateTimePicker").minDate(false);
 		}
 
 		$(event.target).parent().find(".yadcf-filter-range").val("");
@@ -2770,7 +2801,7 @@ var yadcf = (function ($) {
 		if (clear !== undefined || selected_values == undefined || selected_values.length === 0) {
 			if (clear !== undefined) {
 				$(event.target).parent().find('select').val('-1').focus();
-				$(event.target).parent().find('select').removeClass("inuse");
+				$(event.target).parent().find('selectn ').removeClass("inuse");
 			}
 			if (columnsObj.column_number instanceof Array) {
 				tablesAsOne.columns(columnsObj.column_number).search('').draw();
@@ -2937,12 +2968,15 @@ var yadcf = (function ($) {
 			settingsDt = getSettingsObjFromTable(oTable),
 			exclude;
 
-		if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) || (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
-			initColReorder(settingsDt.oSavedState, table_selector_jq_friendly);
+		if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined)
+				|| settingsDt._colReorder != undefined
+				|| (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
+			initColReorder2(settingsDt, table_selector_jq_friendly);
 			column_number_filter = plugins[table_selector_jq_friendly].ColReorder[column_number];
 		} else {
 			column_number_filter = column_number;
 		}
+
 		columnObj = getOptions(oTable.selector)[column_number];
 
 		keyUp = function (table_selector_jq_friendly, column_number, clear) {
