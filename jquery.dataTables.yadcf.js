@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.8 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.9 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2981,7 +2981,9 @@ var yadcf = (function ($) {
 	}
 
 	function isDOMSource(tableVar) {
-		if (tableVar.fnSettings().sAjaxSource == undefined && tableVar.fnSettings().ajax == undefined) {
+		var settingsDt;
+		settingsDt = getSettingsObjFromTable(tableVar);
+		if (settingsDt.sAjaxSource == undefined && settingsDt.ajax == undefined) {
 			return true;
 		}
 		return false;
@@ -3229,7 +3231,11 @@ var yadcf = (function ($) {
 				filterOptions.data = [];
 				tableTmpArr = tablesSelectors.split(',');
 				for (tableTmpArrIndex = 0; tableTmpArrIndex < tableTmpArr.length; tableTmpArrIndex++) {
-					tableTmp = $('#' + tablesArray[tableTmpArrIndex].table().node().id).dataTable();
+					if (tablesArray[tableTmpArrIndex].table !== undefined) {
+						tableTmp = $('#' + tablesArray[tableTmpArrIndex].table().node().id).dataTable();
+					} else {
+						tableTmp = tablesArray[tableTmpArrIndex];
+					}
 					if (isDOMSource(tableTmp)) {
 						//check if ajax source, if so, listen for dt.draw
 						columnsTmpArr = filterOptions.column_number;
@@ -3340,7 +3346,11 @@ var yadcf = (function ($) {
 			dummyArr.push(columnsObj);
 			tablesSelectors = '';
 			for (i = 0; i < tablesArray.length; i++) {
-				tablesSelectors += tablesArray[i].table().node().id + ',';
+				if (tablesArray[i].table !== undefined) {
+					tablesSelectors += tablesArray[i].table().node().id + ',';
+				} else {
+					tablesSelectors += getSettingsObjFromTable(tablesArray[i]).sTableId;
+				}
 			}
 			tablesSelectors = tablesSelectors.substring(0, tablesSelectors.length - 1);
 
