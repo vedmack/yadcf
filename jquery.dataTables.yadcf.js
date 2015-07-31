@@ -3728,7 +3728,7 @@ var yadcf = (function ($) {
 		if (noRedraw !== true) {
 			//clear global filter
 			settingsDt.oPreviousSearch.sSearch = '';
-			if (settingsDt.aanFeatures.f !== 'undefined') {
+			if (typeof settingsDt.aanFeatures.f !== 'undefined') {
 				for (i = 0; i < settingsDt.aanFeatures.f.length; i++) {
 					$('input', settingsDt.aanFeatures.f[i]).val('');
 				}
