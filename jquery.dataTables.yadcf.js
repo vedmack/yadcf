@@ -1692,8 +1692,10 @@ var yadcf = (function ($) {
 					rangeNumberSldierDrawTips(ui.values[0], ui.values[1], min_tip_id, max_tip_id, table_selector_jq_friendly, column_number);
 				};
 			}
+			var step_option = columnObj["filter_plugin_options"].step ? columnObj["filter_plugin_options"].step : '';
 			sliderObj = {
 				range: true,
+				step:step_option,
 				min: min_val,
 				max: max_val,
 				values: [min_state_val, max_state_val],
