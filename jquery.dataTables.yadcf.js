@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.11 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.12 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -688,7 +688,7 @@ var yadcf = (function ($) {
 			yadcfState,
 			columnObj = getOptions(oTable.selector)[column_number];
 
-		if (arg === "clear" || arg.value === "-1") {
+		if (arg === "clear") {
 			if (exGetColumnFilterVal(oTable, column_number) === '') {
 				return;
 			}
@@ -1035,7 +1035,7 @@ var yadcf = (function ($) {
 					custom_func,
 					column_number_filter;
 
-				if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
+				if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly || filterVal === '-1') {
 					return true;
 				}
 
