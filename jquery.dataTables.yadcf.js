@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.12 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.13 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -221,6 +221,29 @@
 				Special notes:		Currently supported only jQueryUI datepicker (datepicker) and Bootstrap datepicker (eonasdan-bootstrap-datetimepicker)
 				                    Bootstrap datepicker depends moment library. This plugin depends moment too.
 
+* Global Parameters (per table rather than per column)
+*
+* Usage example yadcf.init(oTable,[{column_number : 0}, {column_number: 3}],{cumulative_filtering: true});
+* -------------
+
+* externally_triggered
+                Required:			false
+				Type:				boolean
+				Default value:		false
+				Description:		Filters will filter only when yadcf.exFilterExternallyTriggered(table_arg) is called
+				Special notes:		Useful when you want to build some form with filters and you want to trigger the filter when that form
+									"submit" button is clicked (instead of filtering per filter input change)
+
+* cumulative_filtering
+                Required:			false
+				Type:				boolean
+				Default value:		false
+				Description:		Change the default behaviour of the filters so its options will be populated from the filtered rows (remaining
+									table data after filtering) only unlike the normal behaviour in which the options of the filters are from all the table data
+				Special notes:		Useful when you want to build some form with filters and you want to trigger the filter when that form
+									"submit" button is clicked (instead of filtering per filter input change)
+
+
 *
 *
 *
@@ -266,6 +289,10 @@
 									refreshFunc : function that will refresh the plugin.
 				Usage example:		yadcf.initSelectPluginCustomTriggers(function($filterSelector){$filterSelector.multiselect({});}, function($filterSelector){$filterSelector.multiselect("refresh")});
 
+* exFilterExternallyTriggered
+				Description:		Triggers all the available filters, should be used only when the externally_triggered option used
+				Arguments:			table_arg: (variable of the datatable)
+				Usage example:		yadcf.exResetAllFilters(table_arg);
 *
 *
 *
@@ -1794,6 +1821,22 @@ var yadcf = (function ($) {
 		}
 		return column_data;
 	}
+	function getFilteredRows(table) {
+		var dataTmp,
+			data = [],
+			i;
+		if (yadcfVersionCheck('1.10')) {
+			dataTmp = table._('tr', {filter: 'applied' });
+		} else {
+			dataTmp = table.rows({filter: 'applied'}).data().toArray();
+		}
+		for (i = 0; i < dataTmp.length; i++) {
+			data.push({
+				_aData: dataTmp[i]
+			});
+		}
+		return data;
+	}
 
 	function parseTableColumn(pTable, columnObj, table_selector_jq_friendly) {
 		var col_inner_elements,
@@ -1802,19 +1845,26 @@ var yadcf = (function ($) {
 			k,
 			col_filter_array = {},
 			column_data = [],
-			data = pTable.fnSettings().aoData,
-			data_length = data.length,
+			data,
+			data_length,
 			settingsDt,
 			column_number_filter;
 
 		settingsDt = getSettingsObjFromTable(pTable);
 
+		if (columnObj.cumulative_filtering !== true) {
+			data = settingsDt.aoData;
+			data_length = data.length;
+		} else {
+			data = getFilteredRows(pTable);
+			data_length = data.length;
+		}
 		if (columnObj.col_filter_array !== undefined) {
 			col_filter_array = columnObj.col_filter_array;
 		}
 		column_number_filter = calcColumnNumberFilter(settingsDt, columnObj.column_number, table_selector_jq_friendly);
-		if (isNaN(pTable.fnSettings().aoColumns[column_number_filter].mData) && typeof pTable.fnSettings().aoColumns[column_number_filter].mData !== 'object') {
-			columnObj.column_number_data = pTable.fnSettings().aoColumns[column_number_filter].mData;
+		if (isNaN(settingsDt.aoColumns[column_number_filter].mData) && typeof settingsDt.aoColumns[column_number_filter].mData !== 'object') {
+			columnObj.column_number_data = settingsDt.aoColumns[column_number_filter].mData;
 		}
 
 		for (j = 0; j < data_length; j++) {
@@ -2400,12 +2450,8 @@ var yadcf = (function ($) {
 				}
 				if (columnObj.filter_type === "auto_complete") {
 					if (columnObj.filter_plugin_options !== undefined) {
-						if (columnObj.filter_plugin_options.source !== undefined) {
-							columnObj.filter_plugin_options.select = autocompleteSelect;
-						} else {
-							columnObj.filter_plugin_options.source = $(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number);
-							columnObj.filter_plugin_options.select = autocompleteSelect;
-						}
+						columnObj.filter_plugin_options.source = $(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number);
+						columnObj.filter_plugin_options.select = autocompleteSelect;
 					} else {
 						columnObj.filter_plugin_options = {
 							source: $(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number),
@@ -3005,6 +3051,15 @@ var yadcf = (function ($) {
 		}
 	}
 
+	function firstFromObject(obj) {
+		var key;
+		for (key in obj) {
+			if (obj.hasOwnProperty(key)) {
+				return key;
+			}
+		}
+	}
+
 	function initAndBindTable(oTable, table_selector, index, pTableDT) {
 
 		var table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector),
@@ -3020,9 +3075,19 @@ var yadcf = (function ($) {
 			if (table_selector.indexOf(":eq") !== -1) {
 				table_selector_tmp = table_selector.substring(0, table_selector.lastIndexOf(":eq"));
 			}
-			appendFilters(oTable, yadcf.getOptions(table_selector_tmp), table_selector);
+			appendFilters(oTable, getOptions(table_selector_tmp), table_selector);
+			if (getOptions(table_selector_tmp)[firstFromObject(getOptions(table_selector_tmp))].cumulative_filtering === true) {
+				//when filters should be populated only from visible rows (non filtered)
+				$(document).off('search.dt', oTable.selector).on('search.dt', oTable.selector, function (e, settings, json) {
+					var table_selector_tmp = oTable.selector;
+					if (table_selector.indexOf(":eq") !== -1) {
+						table_selector_tmp = table_selector.substring(0, table_selector.lastIndexOf(":eq"));
+					}
+					appendFilters(oTable, getOptions(table_selector_tmp), oTable.selector);
+				});
+			}
         } else {
-			appendFilters(oTable, yadcf.getOptions(table_selector), table_selector);
+			appendFilters(oTable, getOptions(table_selector), table_selector);
 			if (yadcfVersionCheck('1.10')) {
 				$(document).off('draw.dt', oTable.selector).on('draw.dt', oTable.selector, function (event, ui) {
 					appendFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
@@ -3089,6 +3154,7 @@ var yadcf = (function ($) {
 			var table_selector_jq_friendly = generateTableSelectorJQFriendly(oTable.selector);
 			initColReorderFromEvent(table_selector_jq_friendly);
 		});
+
 		if (oTable.fnSettings().oFeatures.bStateSave === true) {
 			if (yadcfVersionCheck('1.10')) {
 				$(oTable.selector).off('stateSaveParams.dt').on('stateSaveParams.dt', function (e, settings, data) {
