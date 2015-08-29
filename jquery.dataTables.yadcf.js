@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.13 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.14 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -216,7 +216,7 @@
                 Required:			false
 				Type:				string
 				Default value:		'jquery-ui'
-				Possible values:    'jquery-ui', 'bootstrap-datetimepicker'
+				Possible values:    'jquery-ui', 'bootstrap-datetimepicker', 'bootstrap-datepicker'
 				Description:		You can choose datapicker library from defined in special notes
 				Special notes:		Currently supported only jQueryUI datepicker (datepicker) and Bootstrap datepicker (eonasdan-bootstrap-datetimepicker)
 				                    Bootstrap datepicker depends moment library. This plugin depends moment too.
@@ -494,7 +494,9 @@ var yadcf = (function ($) {
 				html_data_type: 'text',
 				exclude_label: 'exclude',
 				style_class: '',
-                datepicker_type: 'jquery-ui'
+                datepicker_type: 'jquery-ui',
+				range_data_type: 'single',
+				range_data_type_delim: '-'
 			},
 			adaptContainerCssClassImpl = function (dummy) { return ''; };
 
@@ -914,14 +916,19 @@ var yadcf = (function ($) {
 		return b - a;
 	}
 
-	function findMinInArray(array, ignore_char) {
+	function findMinInArray(array, columnObj) {
 		var narray = [], i, num;
 		for (i = 0; i < array.length; i++) {
 			if (array[i] !== null) {
-				if (ignore_char !== undefined) {
-					array[i] = array[i].toString().replace(ignore_char, "");
+				if (columnObj.ignore_char !== undefined) {
+					array[i] = array[i].toString().replace(columnObj.ignore_char, "");
 				}
-				num = +array[i];
+				if (columnObj.range_data_type === 'single') {
+					num = +array[i];
+				} else {
+					num = array[i].split(columnObj.range_data_type_delim);
+					num = num[0];
+				}
 				if (!isNaN(num)) {
 					narray.push(num);
 				}
@@ -930,14 +937,19 @@ var yadcf = (function ($) {
 		return Math.min.apply(Math, narray);
 	}
 
-	function findMaxInArray(array, ignore_char) {
+	function findMaxInArray(array, columnObj) {
 		var narray = [], i, num;
 		for (i = 0; i < array.length; i++) {
 			if (array[i] !== null) {
-				if (ignore_char !== undefined) {
-					array[i] = array[i].toString().replace(ignore_char, "");
+				if (columnObj.ignore_char !== undefined) {
+					array[i] = array[i].toString().replace(columnObj.ignore_char, "");
 				}
-				num = +array[i];
+				if (columnObj.range_data_type === 'single') {
+					num = +array[i];
+				} else {
+					num = array[i].split(columnObj.range_data_type_delim);
+					num = num[1];
+				}
 				if (!isNaN(num)) {
 					narray.push(num);
 				}
@@ -962,7 +974,9 @@ var yadcf = (function ($) {
 					i,
 					columnObjKey,
 					columnObj,
-					column_number_filter;
+					column_number_filter,
+					valFrom,
+					valTo;
 
 				if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
 					return true;
@@ -1033,17 +1047,34 @@ var yadcf = (function ($) {
 				}
 				min = (min !== "") ? (+min) : min;
 				max = (max !== "") ? (+max) : max;
-				val = (val !== "") ? (+val) : val;
-				if (min === "" && max === "") {
-					retVal = true;
-				} else if (min === "" && val <= max) {
-					retVal = true;
-				} else if (min <= val && "" === max) {
-					retVal = true;
-				} else if (min <= val && val <= max) {
-					retVal = true;
-				} else if (val === '' || isNaN(val)) {
-					retVal = true;
+				if (columnObj.range_data_type === 'single') {
+					val = (val !== "") ? (+val) : val;
+					if (min === "" && max === "") {
+						retVal = true;
+					} else if (min === "" && val <= max) {
+						retVal = true;
+					} else if (min <= val && "" === max) {
+						retVal = true;
+					} else if (min <= val && val <= max) {
+						retVal = true;
+					} else if (val === '' || isNaN(val)) {
+						retVal = true;
+					}
+				} else if (columnObj.range_data_type === 'range') {
+					val = val.split(columnObj.range_data_type_delim);
+					valFrom = (val[0] !== "") ? (+val[0]) : val[0];
+					valTo = (val[1] !== "") ? (+val[1]) : val[1];
+					if (min === "" && max === "") {
+						retVal = true;
+					} else if (min === "" && valTo <= max) {
+						retVal = true;
+					} else if (min <= valFrom && "" === max) {
+						retVal = true;
+					} else if (min <= valFrom && valTo <= max) {
+						retVal = true;
+					} else if ((valFrom === '' || isNaN(valFrom)) && (valTo === '' || isNaN(valTo))) {
+						retVal = true;
+					}
 				}
 				return retVal;
 			}
@@ -1392,26 +1423,29 @@ var yadcf = (function ($) {
 			columnObj,
 			datepickerObj = {},
 			filterActionStr,
+			filterClass = '',
 			$fromInput,
-            $toInput;
+            $toInput,
+			innerWrapperAdditionalClass = '';
 
 		filter_wrapper_id = "yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number;
 
 		if ($("#" + filter_wrapper_id).length > 0) {
 			return;
 		}
-
+		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
+		oTable = oTables[table_selector_jq_friendly];
+		columnObj = getOptions(oTable.selector)[column_number];
+		if (columnObj.datepicker_type === 'bootstrap-datepicker') {
+			innerWrapperAdditionalClass = 'input-daterange';
+		}
 		//add a wrapper to hold both filter and reset button
 		$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper\"></div>");
 		filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
 		filter_selector_string_tmp = filter_selector_string;
 
-		$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-inner-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter-wrapper-inner\"></div>");
+		$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-inner-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter-wrapper-inner " + innerWrapperAdditionalClass + "\"></div>");
 		filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper-inner";
-
-		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
-		oTable = oTables[table_selector_jq_friendly];
-		columnObj = getOptions(oTable.selector)[column_number];
 
 		filterActionStr = 'onkeyup="yadcf.rangeDateKeyUP(\'' + table_selector_jq_friendly + '\',\'' + date_format + '\',event);"';
 		if (columnObj.externally_triggered === true) {
@@ -1467,7 +1501,10 @@ var yadcf = (function ($) {
 		    if (columnObj.externally_triggered !== true) {
                 $fromInput.add($toInput).on('dp.change', dateSelect);
             }
-        }
+        } else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
+			//$fromInput.datepicker({});
+			//$toInput.datepicker({});
+		}
 
 		if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
 			if (oTable.fnSettings().oLoadedState.yadcfState && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
@@ -1546,7 +1583,9 @@ var yadcf = (function ($) {
 			if (columnObj.externally_triggered !== true) {
                 $("#" + dateId).on('dp.change', dateSelectSingle);
             }
-        }
+        } else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
+			$("#" + dateId).datepicker({});
+		}
 
 		if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
 			$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(oTable.fnSettings().aoPreSearchCols[column_number].sSearch).addClass("inuse");
@@ -2130,8 +2169,8 @@ var yadcf = (function ($) {
 				}
 
 				if (columnObj.filter_type === "range_number_slider") {
-					min_val = findMinInArray(column_data, ignore_char);
-					max_val = findMaxInArray(column_data, ignore_char);
+					min_val = findMinInArray(column_data, columnObj);
+					max_val = findMaxInArray(column_data, columnObj);
 				}
 
 
