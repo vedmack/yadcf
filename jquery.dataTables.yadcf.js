@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.16 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.17 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -216,7 +216,7 @@
                 Required:			false
 				Type:				string
 				Default value:		'jquery-ui'
-				Possible values:    'jquery-ui', 'bootstrap-datetimepicker', 'bootstrap-datepicker'
+				Possible values:    'jquery-ui', 'bootstrap-datetimepicker'
 				Description:		You can choose datapicker library from defined in special notes
 				Special notes:		Currently supported only jQueryUI datepicker (datepicker) and Bootstrap datepicker (eonasdan-bootstrap-datetimepicker)
 				                    Bootstrap datepicker depends moment library. This plugin depends moment too.
@@ -334,7 +334,7 @@
 									{
 										column_number: [2], filter_container_id: 'multi-table-filter-1', filter_default_label: 'Filter all tables column 3!'
 									}]);
-				Valid properties:	filter_type: 'text' (default) / 'select',
+				Valid properties:	filter_type: 'text' (default) / 'select' / 'multi_select',
 									column_number: not required (in that case the filter will be global)
 												   can be either number(single column filter) or array of numbers(multiple columns filter)
 									filter_container_id: '' (required),
@@ -350,7 +350,7 @@
 									{
 										column_number: [2, 3], filter_container_id: 'multi-table-filter-1', filter_default_label: 'Filter column 3 and 4!'
 									}]);
-				Valid properties:	filter_type: 'text' (default) / 'select',
+				Valid properties:	filter_type: 'text' (default) / 'select' / 'multi_select',
 									column_number: not required (in that case the filter will be global)
 												   can be either number(single column filter) or array of numbers(multiple columns filter)
 									filter_container_id: '' (required),
@@ -3138,6 +3138,9 @@ var yadcf = (function ($) {
 					var col_num,
 						column_number_filter,
 						table_selector_jq_friendly = generateTableSelectorJQFriendly(oTable.selector);
+					if (json === undefined) {
+						console.log('datatables xhr.dt event came back with null as data (nothing for yadcf to do with it).');
+					}
 					if (settings.oSavedState !== null) {
 						initColReorder2(settings, table_selector_jq_friendly);
 					}
