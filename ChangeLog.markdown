@@ -6,6 +6,7 @@
 * Fixed auto complete filter
 * Fixed select2 (v.4.x) with server side processing https://github.com/vedmack/yadcf/issues/216
 * Fixed select2 reset https://github.com/vedmack/yadcf/issues/232
+* Some of additional closed issues https://github.com/vedmack/yadcf/issues/227 / https://github.com/vedmack/yadcf/issues/236
 
 
 ## 0.8.8

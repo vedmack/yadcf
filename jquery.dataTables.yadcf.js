@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.17 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.18 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -3138,8 +3138,9 @@ var yadcf = (function ($) {
 					var col_num,
 						column_number_filter,
 						table_selector_jq_friendly = generateTableSelectorJQFriendly(oTable.selector);
-					if (json === undefined) {
+					if (json == undefined) {
 						console.log('datatables xhr.dt event came back with null as data (nothing for yadcf to do with it).');
+						return;
 					}
 					if (settings.oSavedState !== null) {
 						initColReorder2(settings, table_selector_jq_friendly);
@@ -3148,7 +3149,7 @@ var yadcf = (function ($) {
 						if (yadcf.getOptions(settings.oInstance.selector).hasOwnProperty(col_num)) {
 							if (json['yadcf_data_' + col_num] !== undefined) {
 								column_number_filter = col_num;
-								if (settings.oSavedState !== null) {
+								if (settings.oSavedState !== null && plugins[table_selector_jq_friendly] !== undefined) {
 									column_number_filter = plugins[table_selector_jq_friendly].ColReorder[col_num];
 								}
 								yadcf.getOptions(settings.oInstance.selector)[col_num].data = json['yadcf_data_' + column_number_filter];
