@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.18 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.19 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -287,7 +287,8 @@
 									Great for integrating any jquey select plugin  (Selectize / MultiSelect / etc)
 				Arguments:			initFunc  : function which will initialize the plugin
 									refreshFunc : function that will refresh the plugin.
-				Usage example:		yadcf.initSelectPluginCustomTriggers(function($filterSelector){$filterSelector.multiselect({});}, function($filterSelector){$filterSelector.multiselect("refresh")});
+									destroyFunc : function that will destroy the plugin (upon table destroy even trigger).
+				Usage example:		yadcf.initSelectPluginCustomTriggers(function($filterSelector){$filterSelector.multiselect({});}, function($filterSelector){$filterSelector.multiselect("refresh")}, , function($filterSelector){$filterSelector.multiselect("destroy")});
 
 * exFilterExternallyTriggered
 				Description:		Triggers all the available filters, should be used only when the externally_triggered option used
@@ -370,7 +371,8 @@ var yadcf = (function ($) {
 		reA = /[^a-zA-Z]/g,
 		reN = /[^0-9]/g,
 		selectElementCustomInitFunc,
-		selectElementCustomRefreshFunc;
+		selectElementCustomRefreshFunc,
+		selectElementCustomDestroyFunc;
 
 	//From ColReorder (SpryMedia Ltd (www.sprymedia.co.uk))
 	function getSettingsObjFromTable(dt) {
@@ -635,9 +637,10 @@ var yadcf = (function ($) {
 		}
 	}
 
-	function initSelectPluginCustomTriggers(initFunc, refreshFunc) {
+	function initSelectPluginCustomTriggers(initFunc, refreshFunc, destroyFunc) {
 		selectElementCustomInitFunc = initFunc;
 		selectElementCustomRefreshFunc = refreshFunc;
+		selectElementCustomDestroyFunc = destroyFunc;
 	}
 
 	//Used by exFilterColumn for translating readable search value into proper search string for datatables filtering
@@ -1807,6 +1810,84 @@ var yadcf = (function ($) {
 		}
 	}
 
+	function destroyThirdPartyPlugins(table_arg) {
+
+		var tableOptions,
+			table_selector_jq_friendly,
+			settingsDt,
+			columnObjKey,
+			column_number,
+			optionsObj,
+			fromId,
+			toId;
+
+		//check if the table arg is from new datatables API (capital "D")
+		if (table_arg.settings !== undefined) {
+			table_arg = table_arg.settings()[0].oInstance;
+		}
+		tableOptions = getOptions(table_arg.selector);
+		table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_arg.selector);
+		settingsDt = getSettingsObjFromTable(table_arg);
+
+		for (columnObjKey in tableOptions) {
+			if (tableOptions.hasOwnProperty(columnObjKey)) {
+				optionsObj = tableOptions[columnObjKey];
+				column_number = optionsObj.column_number;
+
+				switch (optionsObj.filter_type) {
+				case 'multi_select':
+				case 'multi_select_custom_func':
+				case 'select':
+				case 'custom_func':
+					switch (optionsObj.select_type) {
+					case 'chosen':
+						$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).chosen('destroy');
+						break;
+					case 'select2':
+						$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).select2('destroy');
+						break;
+					case 'custom_select':
+						if (selectElementCustomDestroyFunc !== undefined) {
+							selectElementCustomDestroyFunc($("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number));
+						}
+						break;
+					}
+					break;
+				case 'auto_complete':
+					$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).autocomplete("destroy");
+					break;
+				case 'date':
+					switch (optionsObj.select_type) {
+					case 'jquery-ui':
+						$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).datepicker("destroy");
+						break;
+					case 'bootstrap-datetimepicker':
+						$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).destroy();
+						break;
+					}
+					break;
+				case 'range_date':
+					fromId = "yadcf-filter-" + table_selector_jq_friendly + "-from-date-" + column_number;
+					toId = "yadcf-filter-" + table_selector_jq_friendly + "-to-date-" + column_number;
+					switch (optionsObj.select_type) {
+					case 'jquery-ui':
+						$("#" + fromId).datepicker("destroy");
+						$("#" + toId).datepicker("destroy");
+						break;
+					case 'bootstrap-datetimepicker':
+						$("#" + fromId).destroy();
+						$("#" + toId).destroy();
+						break;
+					}
+					break;
+				case 'range_number_slider':
+					$("#yadcf-filter-" + table_selector_jq_friendly + "-slider-" + column_number).slider("destroy");
+					break;
+				}
+			}
+		}
+	}
+
 	function removeFilters(oTable, args, table_selector) {
 		$('.yadcf-filter-wrapper').remove();
 		if (yadcfVersionCheck('1.10')) {
@@ -1818,6 +1899,7 @@ var yadcf = (function ($) {
 			$(document).off('draw', oTable.selector);
 			$(document).off('destroy', oTable.selector);
 		}
+		destroyThirdPartyPlugins(oTable);
 	}
 
 	function sortAlphaNum(a, b) {

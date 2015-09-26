@@ -6,6 +6,7 @@
 * Fixed auto complete filter
 * Fixed select2 (v.4.x) with server side processing https://github.com/vedmack/yadcf/issues/216
 * Fixed select2 reset https://github.com/vedmack/yadcf/issues/232
+* Destroy third party plugins on datatable destroy https://github.com/vedmack/yadcf/issues/213
 * Some of additional closed issues https://github.com/vedmack/yadcf/issues/227 / https://github.com/vedmack/yadcf/issues/236
 
 
