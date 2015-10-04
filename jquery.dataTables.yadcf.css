@@ -60,8 +60,6 @@
 .yadcf-filter-wrapper-inner {
 	display: inline-block;
 	border: 1px solid #ABADB3;
-	padding-left: 2px;
-	padding-right: 2px;
 }
 
 .yadcf-number-slider-filter-wrapper-inner {
@@ -122,4 +120,7 @@
 }
 .yadcf-label.small {
 	font-size: 10px;
+}
+.dataTables_scrollHead {
+	overflow: visible !important;
 }

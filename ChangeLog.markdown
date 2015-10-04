@@ -2,6 +2,7 @@
 
 ## 0.8.9 (still beta)
 
+* Time (single / range) filtering is now possible (hh:mm / HH:mm when using datepicker_type: 'bootstrap-datetimepicker') https://github.com/vedmack/yadcf/issues/168
 * Added initSelectPluginCustomTriggers - Allows to set any select jquery plugin initialize and refresh functions.(PR by gauravjhs)
 * Fixed auto complete filter
 * Fixed select2 (v.4.x) with server side processing https://github.com/vedmack/yadcf/issues/216
