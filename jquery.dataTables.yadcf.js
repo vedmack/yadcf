@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.21 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.22 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2790,10 +2790,14 @@ var yadcf = (function ($) {
 			toId,
 			column_number,
 			options,
-			keyUp;
+			keyUp,
+			settingsDt,
+			column_number_filter;
 
 		column_number = parseInt($(event.target).attr("id").replace('-from-date-', '').replace('-to-date-', '').replace('yadcf-filter-' + table_selector_jq_friendly, ''), 10);
 		options = getOptions(oTable.selector)[column_number];
+		settingsDt = getSettingsObjFromTable(oTable);
+		column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
 
 		keyUp = function () {
 			if (event.target.id.indexOf("-from-") !== -1) {
@@ -2826,7 +2830,7 @@ var yadcf = (function ($) {
 				if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 					oTable.fnDraw();
 				} else {
-					oTable.fnFilter(document.getElementById(fromId).value + '-yadcf_delim-' + document.getElementById(toId).value, column_number);
+					oTable.fnFilter(document.getElementById(fromId).value + '-yadcf_delim-' + document.getElementById(toId).value, column_number_filter);
 				}
 
 				if (min instanceof Date) {
