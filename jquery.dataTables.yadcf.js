@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.23 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.24 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -52,6 +52,14 @@
 									array of objects [{value: 'Some Data 1', label: 'One'}, {value: 'Some Data 3', label: 'Three'}] (supported in select / multi_select filters)
 				Note:				that when filter_type is custom_func / multi_select_custom_func this array will populate the custom filter select element
 
+* data_as_is
+				Required:			false
+				Type:				boolean
+				Default value:		false
+				Description:		When set to true, the value of the data attribute will be fed into the filter as is (without any modification/decoration).
+									Perfect to use when you want to define your own <option></option> for the filter
+				Note:				Currently supported by the select / multi_select filters
+				
 * append_data_to_table_data
 				Required:			false
 				Type:				string
@@ -2334,38 +2342,42 @@ var yadcf = (function ($) {
 
 
 				if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func' || columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
-					if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
-						options_tmp = "<option value=\"" + "-1" + "\">" + filter_default_label + "</option>";
+					if (columnObj.data_as_is !== true) {
+						if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
+							options_tmp = "<option value=\"" + "-1" + "\">" + filter_default_label + "</option>";
 
-						if (columnObj.select_type === 'select2' && columnObj.select_type_options.placeholder !== undefined && columnObj.select_type_options.allowClear === true) {
-							options_tmp = "<option value=\"\"></option>";
+							if (columnObj.select_type === 'select2' && columnObj.select_type_options.placeholder !== undefined && columnObj.select_type_options.allowClear === true) {
+								options_tmp = "<option value=\"\"></option>";
+							}
+						} else if (columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
+							if (columnObj.select_type === undefined) {
+								options_tmp = "<option data-placeholder=\"true\" value=\"" + "-1" + "\">" + filter_default_label + "</option>";
+							} else {
+								options_tmp = "";
+							}
 						}
-					} else if (columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
-						if (columnObj.select_type === undefined) {
-							options_tmp = "<option data-placeholder=\"true\" value=\"" + "-1" + "\">" + filter_default_label + "</option>";
-						} else {
-							options_tmp = "";
-						}
-					}
 
-					if (columnObj.append_data_to_table_data === undefined) {
-						if (typeof column_data[0] === 'object') {
-							for (ii = 0; ii < column_data.length; ii++) {
-								options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
+						if (columnObj.append_data_to_table_data === undefined) {
+							if (typeof column_data[0] === 'object') {
+								for (ii = 0; ii < column_data.length; ii++) {
+									options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
+								}
+							} else {
+								for (ii = 0; ii < column_data.length; ii++) {
+									options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
+								}
 							}
 						} else {
 							for (ii = 0; ii < column_data.length; ii++) {
-								options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
+								if (typeof column_data[ii] === 'object') {
+									options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
+								} else {
+									options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
+								}
 							}
 						}
 					} else {
-						for (ii = 0; ii < column_data.length; ii++) {
-							if (typeof column_data[ii] === 'object') {
-								options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
-							} else {
-								options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
-							}
-						}
+						options_tmp = columnObj.data;
 					}
 					column_data = options_tmp;
 				}

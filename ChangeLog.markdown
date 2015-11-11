@@ -9,6 +9,7 @@
 * Fixed select2 reset https://github.com/vedmack/yadcf/issues/232
 * Destroy third party plugins on datatable destroy https://github.com/vedmack/yadcf/issues/213
 * Prevent column sort when hitting Enter in filter https://github.com/vedmack/yadcf/issues/233
+* Added data_as_is attribute to use when you want to define your own <option></option> for the filter https://github.com/vedmack/yadcf/issues/245
 * Some of additional closed issues https://github.com/vedmack/yadcf/issues/227 / https://github.com/vedmack/yadcf/issues/236
 
 
