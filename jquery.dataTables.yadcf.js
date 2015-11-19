@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.24 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.25 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -652,7 +652,7 @@ var yadcf = (function ($) {
 	}
 
 	//Used by exFilterColumn for translating readable search value into proper search string for datatables filtering
-	function yadcfMatchFilterString(table_arg, column_number, selected_value, filter_match_mode, multiple) {
+	function yadcfMatchFilterString(table_arg, column_number, selected_value, filter_match_mode, multiple, exclude) {
 		var case_insensitive = yadcf.getOptions(table_arg.selector)[column_number].case_insensitive,
 			ret_val;
 
@@ -661,16 +661,20 @@ var yadcf = (function ($) {
 		table_arg.fnSettings().aoPreSearchCols[column_number].bCaseInsensitive = case_insensitive;
 
 		if (multiple === undefined || multiple === false) {
-			if (filter_match_mode === "contains") {
-				table_arg.fnSettings().aoPreSearchCols[column_number].bSmart = true;
-				table_arg.fnSettings().aoPreSearchCols[column_number].bRegex = false;
-				ret_val = selected_value;
-			} else if (filter_match_mode === "exact") {
-				ret_val = "^" + selected_value + "$";
-			} else if (filter_match_mode === "startsWith") {
-				ret_val = "^" + selected_value;
-			} else if (filter_match_mode === "regex") {
-				ret_val = selected_value;
+			if (exclude !== true) {
+				if (filter_match_mode === "contains") {
+					table_arg.fnSettings().aoPreSearchCols[column_number].bSmart = true;
+					table_arg.fnSettings().aoPreSearchCols[column_number].bRegex = false;
+					ret_val = selected_value;
+				} else if (filter_match_mode === "exact") {
+					ret_val = "^" + selected_value + "$";
+				} else if (filter_match_mode === "startsWith") {
+					ret_val = "^" + selected_value;
+				} else if (filter_match_mode === "regex") {
+					ret_val = selected_value;
+				}
+			} else {
+				ret_val = "^((?!" + selected_value + ").)*$"
 			}
 		} else {
 			if (filter_match_mode === "contains") {
@@ -2577,8 +2581,13 @@ var yadcf = (function ($) {
 
 						exclude_str = '';
 						if (columnObj.exclude === true) {
-							exclude_str = '<span class="yadcf-exclude-wrapper" onmousedown="yadcf.stopPropagation(event);" onclick="yadcf.stopPropagation(event);">' +
-								'<div class="yadcf-label small">' + columnObj.exclude_label + '</div><input type="checkbox" title="' + columnObj.exclude_label + '" onclick="yadcf.stopPropagation(event);yadcf.textKeyUP(\'' + table_selector_jq_friendly + '\',' + column_number + ');"></span>';
+							if (columnObj.externally_triggered !== true) {
+								exclude_str = '<span class="yadcf-exclude-wrapper" onmousedown="yadcf.stopPropagation(event);" onclick="yadcf.stopPropagation(event);">' +
+									'<div class="yadcf-label small">' + columnObj.exclude_label + '</div><input type="checkbox" title="' + columnObj.exclude_label + '" onclick="yadcf.stopPropagation(event);yadcf.textKeyUP(\'' + table_selector_jq_friendly + '\',' + column_number + ');"></span>';
+							} else {
+								exclude_str = '<span class="yadcf-exclude-wrapper" onmousedown="yadcf.stopPropagation(event);" onclick="yadcf.stopPropagation(event);">' +
+									'<div class="yadcf-label small">' + columnObj.exclude_label + '</div><input type="checkbox" title="' + columnObj.exclude_label + '" onclick="yadcf.stopPropagation(event);"></span>';
+							}
 						}
 
 						$(filter_selector_string).append(exclude_str + "<input type=\"text\" onkeydown=\"yadcf.preventDefaultForEnter(event);\" id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter " + columnObj.style_class + "\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);"
@@ -3685,7 +3694,8 @@ var yadcf = (function ($) {
 			sliderId,
 			optionsObj,
 			min,
-			max;
+			max,
+			exclude = false;
 		//check if the table arg is from new datatables API (capital "D")
 		if (table_arg.settings !== undefined) {
 			table_arg = table_arg.settings()[0].oInstance;
@@ -3705,8 +3715,12 @@ var yadcf = (function ($) {
 				case 'auto_complete':
 				case 'text':
 				case 'date':
+					if (filter_value !== undefined && filter_value.indexOf('_exclude_') !== -1) {
+						exclude = true;
+						filter_value = filter_value.replace('_exclude_', '');
+					}
 					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(filter_value).addClass('inuse');
-					tmpStr = yadcfMatchFilterString(table_arg, column_position, filter_value, optionsObj.filter_match_mode, false);
+					tmpStr = yadcfMatchFilterString(table_arg, column_position, filter_value, optionsObj.filter_match_mode, false, exclude);
 					table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = tmpStr;
 					break;
 				case 'select':
@@ -3816,7 +3830,8 @@ var yadcf = (function ($) {
 			fromId,
 			toId,
 			table_selector_jq_friendly,
-			optionsObj;
+			optionsObj,
+			$filterElement;
 
 		//check if the table arg is from new datatables API (capital "D")
 		if (table_arg.settings !== undefined) {
@@ -3826,10 +3841,11 @@ var yadcf = (function ($) {
 		optionsObj = getOptions(table_arg.selector)[column_number];
 		table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_arg.selector);
 
+		$filterElement = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
 		switch (optionsObj.filter_type) {
 		case 'select':
 		case 'custom_func':
-			retVal = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val();
+			retVal = $filterElement.val();
 			if (retVal === '-1') {
 				retVal = '';
 			}
@@ -3837,10 +3853,13 @@ var yadcf = (function ($) {
 		case 'auto_complete':
 		case 'text':
 		case 'date':
-			retVal = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val();
+			retVal = $filterElement.val();
+			if ($filterElement.prev().hasClass('yadcf-exclude-wrapper') && $filterElement.prev().find('input').prop('checked') === true) {
+				retVal = '_exclude_' + retVal;
+			}
 			break;
 		case 'multi_select':
-			retVal = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val();
+			retVal = $filterElement.val();
 			if (retVal === null) {
 				retVal = '';
 			}
@@ -3929,7 +3948,8 @@ var yadcf = (function ($) {
 			optionsObj,
 			columnObjKey,
 			settingsDt = getSettingsObjFromTable(table_arg),
-			i;
+			i,
+			$filterElement;
 
 		//check if the table arg is from new datatables API (capital "D")
 		if (table_arg.settings !== undefined) {
@@ -3949,28 +3969,33 @@ var yadcf = (function ($) {
 				}
 				$(document).removeData("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val");
 
+				$filterElement = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
+
 				switch (optionsObj.filter_type) {
 				case 'select':
 				case 'custom_func':
-					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val('-1').removeClass('inuse');
+					$filterElement.val('-1').removeClass('inuse');
 					table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
 					if (optionsObj.select_type !== undefined) {
-						refreshSelectPlugin(optionsObj, $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number), '-1');
+						refreshSelectPlugin(optionsObj, $filterElement, '-1');
 					}
 					break;
 				case 'auto_complete':
 				case 'text':
 				case 'date':
-					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val('').removeClass('inuse');
+					$filterElement.val('').removeClass('inuse');
 					table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
+					if ($filterElement.prev().hasClass('yadcf-exclude-wrapper')) {
+						$filterElement.prev().find('input').prop('checked', false);
+					}
 					break;
 				case 'multi_select':
 				case 'multi_select_custom_func':
-					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val('-1');
+					$filterElement.val('-1');
 					$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", undefined);
 					table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
 					if (optionsObj.select_type !== undefined) {
-						refreshSelectPlugin(optionsObj, $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number), '-1');
+						refreshSelectPlugin(optionsObj, $filterElement, '-1');
 					}
 					break;
 				case 'range_date':
