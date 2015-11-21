@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.25 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.26 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -247,9 +247,7 @@
 				Type:				boolean
 				Default value:		false
 				Description:		Change the default behaviour of the filters so its options will be populated from the filtered rows (remaining
-									table data after filtering) only unlike the normal behaviour in which the options of the filters are from all the table data
-				Special notes:		Useful when you want to build some form with filters and you want to trigger the filter when that form
-									"submit" button is clicked (instead of filtering per filter input change)
+									table data after filtering) only, unlike the normal behaviour in which the options of the filters are from all the table data
 
 
 *
@@ -529,7 +527,7 @@ var yadcf = (function ($) {
 			//validate custom function required attributes
 			if (options_arg[i].filter_type !== undefined && options_arg[i].filter_type.indexOf('custom_func') !== -1) {
 				if (options_arg[i].custom_func === undefined) {
-					alert('You are trying to use filter_type: "custom_func / multi_select_custom_func" for column ' + options_arg[i].column_number + ' but there is no such custom_func attribute provided (custom_func: \"function reference goes here...\")');
+					console.log('Error: You are trying to use filter_type: "custom_func / multi_select_custom_func" for column ' + options_arg[i].column_number + ' but there is no such custom_func attribute provided (custom_func: \"function reference goes here...\")');
 					return;
 				}
 			}
@@ -2099,7 +2097,7 @@ var yadcf = (function ($) {
 							if (columnObj.html5_data !== undefined) {
 								col_inner_data = col_inner_data['@' + columnObj.html5_data];
 							} else {
-								alert('Looks like you have forgot to define the html5_data attribute for the ' + columnObj.column_number + ' column');
+								console.log('Warning: Looks like you have forgot to define the html5_data attribute for the ' + columnObj.column_number + ' column');
 								return;
 							}
 						}
