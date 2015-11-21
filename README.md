@@ -67,23 +67,27 @@ Features:
 Examples:
 =====
 
-[DOM source example](http://yadcf-showcase.appspot.com/DOM_source.html)
+[DOM source](http://yadcf-showcase.appspot.com/DOM_source.html)
 
-[DOM source with chosen example](http://yadcf-showcase.appspot.com/DOM_source_chosen.html)
+[DOM source with chosen](http://yadcf-showcase.appspot.com/DOM_source_chosen.html)
 
-[DOM source with select2 example](http://yadcf-showcase.appspot.com/DOM_source_select2.html)
+[DOM source with select2](http://yadcf-showcase.appspot.com/DOM_source_select2.html)
 
-[DOM / Multiple Columns and Tables 1.10.0 example] (http://yadcf-showcase.appspot.com/dom_multi_columns_tables_1.10.html)
+[DOM / Multiple columns and tables 1.10.0] (http://yadcf-showcase.appspot.com/dom_multi_columns_tables_1.10.html)
 
-[AJAX source example](http://yadcf-showcase.appspot.com/ajax_source.html)
+[AJAX source](http://yadcf-showcase.appspot.com/ajax_source.html)
 
-[AJAX mData (deep) example](http://yadcf-showcase.appspot.com/ajax_mData_source.html)
+[AJAX mData (deep)](http://yadcf-showcase.appspot.com/ajax_mData_source.html)
 
-[Multiple tables example](http://yadcf-showcase.appspot.com/multiple_tables.html)
+[Multiple tables](http://yadcf-showcase.appspot.com/multiple_tables.html)
 
-[Server side source example](http://yadcf-showcase.appspot.com/server_side_source.html)
+[Server side source](http://yadcf-showcase.appspot.com/server_side_source.html)
 
-[DOM Ajax Multiple 1.10](http://yadcf-showcase.appspot.com/DOM_Ajax_Multiple_1.10.html)
+[DOM / Ajax multiple 1.10](http://yadcf-showcase.appspot.com/DOM_Ajax_Multiple_1.10.html)
+
+[Externally triggered](http://yadcf-showcase.appspot.com/dom_source_externally_triggered.html)
+
+[Cumulative filtering](http://yadcf-showcase.appspot.com/cumulative_filtering.html)
 
 
 Usage:
@@ -111,7 +115,7 @@ $(document).ready(function(){
 });
 ```
 
-All available parameters (detailed explanation inside jquery.dataTables.yadcf.js)
+Available parameters - being set per column (detailed explanation inside jquery.dataTables.yadcf.js)
 
 * column_number
 * filter_type
@@ -126,6 +130,7 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 * enable_auto_complete
 * sort_as
 * sort_order
+* sort_as_custom_func
 * date_format
 * ignore_char
 * filter_match_mode
@@ -135,7 +140,16 @@ All available parameters (detailed explanation inside jquery.dataTables.yadcf.js
 * filter_delay
 * html5_data
 * style_class
-* datepicker_lib
+* datepicker_type
+* exclude
+* exclude_label
+* filter_plugin_options
+
+
+Available global parameters - being set per table (detailed explanation inside jquery.dataTables.yadcf.js)
+
+ * externally_triggered
+ * cumulative_filtering
 
 
 License:
