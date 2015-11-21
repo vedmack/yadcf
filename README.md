@@ -85,7 +85,7 @@ Examples:
 
 [DOM / Ajax multiple 1.10](http://yadcf-showcase.appspot.com/DOM_Ajax_Multiple_1.10.html)
 
-[Externally triggered](http://yadcf-showcase.appspot.com/dom_source_externally_triggered.html)
+[Externally triggered filters](http://yadcf-showcase.appspot.com/dom_source_externally_triggered.html)
 
 [Cumulative filtering](http://yadcf-showcase.appspot.com/cumulative_filtering.html)
 
