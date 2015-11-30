@@ -1383,6 +1383,7 @@ var yadcf = (function ($) {
 		}
 		//A simple code to assign values for from or to value based when either of it is selected or not 
 		//Which is very helpful when using Datatables with Server side processing processing
+		/* Using Javascript
 		if(to == ''){
 			var today = new Date();
 			var dd = today.getDate();
@@ -1398,7 +1399,13 @@ var yadcf = (function ($) {
 			to=curr_date;
 		}else if(from=''){
 			from = '1970-01-01';
-		}
+		}*/
+		/* Using Moment.js	
+		if(to == ''){
+			to=moment().format(columnObj.date_format);
+		} if(from==''){
+			from=moment("1970-01-01T00:00:00+00:00").format(columnObj.date_format);
+		}*/
 		
 		if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 			oTable.fnDraw();
