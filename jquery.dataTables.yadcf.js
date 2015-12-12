@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.26 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.27 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -672,7 +672,7 @@ var yadcf = (function ($) {
 					ret_val = selected_value;
 				}
 			} else {
-				ret_val = "^((?!" + selected_value + ").)*$"
+				ret_val = "^((?!" + selected_value + ").)*$";
 			}
 		} else {
 			if (filter_match_mode === "contains") {
@@ -3294,39 +3294,37 @@ var yadcf = (function ($) {
 						}
 					}
 				});
-				$(document).off('column-visibility.dt', oTable.selector).on('column-visibility.dt', oTable.selector, function (e, settings, col_num, state) {
-					var obj = {};
-					if (state === true) {
-						if ((plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
-							col_num = plugins[table_selector_jq_friendly].ColReorder[col_num];
-						} else if (settings.oSavedState != undefined && settings.oSavedState.ColReorder !== undefined) {
-							col_num = settings.oSavedState.ColReorder[col_num];
-						}
-						obj[col_num] = yadcf.getOptions(settings.oInstance.selector)[col_num];
-						if (obj[col_num] !== undefined) {
-							obj[col_num].column_number = col_num;
-							if (obj[col_num] !== undefined) {
-								appendFilters(oTables[yadcf.generateTableSelectorJQFriendly(settings.oInstance.selector)],
-									obj,
-									settings.oInstance.selector);
-							}
-						}
-					}
-				});
-				$(document).off('destroy.dt', oTable.selector).on('destroy.dt', oTable.selector, function (event, ui) {
-					removeFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
-				});
 			} else {
 				$(document).off('draw', oTable.selector).on('draw', oTable.selector, function (event, ui) {
 					appendFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
-				});
-				$(document).off('destroy', oTable.selector).on('destroy', oTable.selector, function (event, ui) {
-					removeFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
 				});
 			}
         }
 		//events that affects both DOM and Ajax
 		if (yadcfVersionCheck('1.10')) {
+			$(document).off('column-visibility.dt', oTable.selector).on('column-visibility.dt', oTable.selector, function (e, settings, col_num, state) {
+				var obj = {};
+				if (state === true) {
+					if ((plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
+						col_num = plugins[table_selector_jq_friendly].ColReorder[col_num];
+					} else if (settings.oSavedState != undefined && settings.oSavedState.ColReorder !== undefined) {
+						col_num = settings.oSavedState.ColReorder[col_num];
+					}
+					obj[col_num] = yadcf.getOptions(settings.oInstance.selector)[col_num];
+					if (obj[col_num] !== undefined) {
+						obj[col_num].column_number = col_num;
+						if (obj[col_num] !== undefined) {
+							appendFilters(oTables[yadcf.generateTableSelectorJQFriendly(settings.oInstance.selector)],
+								obj,
+								settings.oInstance.selector);
+						}
+					}
+				}
+			});
+			$(document).off('column-reorder.dt', oTable.selector).on('column-reorder.dt', oTable.selector, function (e, settings, json) {
+				var table_selector_jq_friendly = generateTableSelectorJQFriendly(oTable.selector);
+				initColReorderFromEvent(table_selector_jq_friendly);
+			});
 			$(document).off('destroy.dt', oTable.selector).on('destroy.dt', oTable.selector, function (event, ui) {
 				removeFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
 			});
@@ -3335,11 +3333,6 @@ var yadcf = (function ($) {
 				removeFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
 			});
 		}
-		$(document).off('column-reorder.dt', oTable.selector).on('column-reorder.dt', oTable.selector, function (e, settings, json) {
-			var table_selector_jq_friendly = generateTableSelectorJQFriendly(oTable.selector);
-			initColReorderFromEvent(table_selector_jq_friendly);
-		});
-
 		if (oTable.fnSettings().oFeatures.bStateSave === true) {
 			if (yadcfVersionCheck('1.10')) {
 				$(oTable.selector).off('stateSaveParams.dt').on('stateSaveParams.dt', function (e, settings, data) {
@@ -3703,6 +3696,7 @@ var yadcf = (function ($) {
 			for (j = 0; j < col_filter_arr.length; j++) {
 				column_number = col_filter_arr[j][0];
 				column_position = column_number;
+				exclude = false;
 				if (plugins[table_selector_jq_friendly] !== undefined && (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
 					column_position = plugins[table_selector_jq_friendly].ColReorder[column_number];
 				}
