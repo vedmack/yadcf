@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.27 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.28 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1002,8 +1002,8 @@ var yadcf = (function ($) {
 					min = $('#' + fromId).text();
 					max = $('#' + toId).text();
 				} else {
-					min = document.getElementById(fromId).value;
-					max = document.getElementById(toId).value;
+					min = $('#' + fromId).val();
+					max = $('#' + toId).val();
 				}
 
 				column_number_filter = calcColumnNumberFilter(settingsDt, col_num, table_selector_jq_friendly);
