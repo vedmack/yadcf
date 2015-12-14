@@ -12,6 +12,7 @@
 * Added data_as_is attribute to use when you want to define your own <option></option> for the filter https://github.com/vedmack/yadcf/issues/245
 * Some of additional closed issues https://github.com/vedmack/yadcf/issues/227 / https://github.com/vedmack/yadcf/issues/236 / https://github.com/vedmack/yadcf/issues/257
   https://github.com/vedmack/yadcf/issues/242 / https://github.com/vedmack/yadcf/issues/264 / https://github.com/vedmack/yadcf/issues/265 / https://github.com/vedmack/yadcf/issues/252
+  https://github.com/vedmack/yadcf/issues/270
 
 
 ## 0.8.8

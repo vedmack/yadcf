@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.28 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.29 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -3268,9 +3268,6 @@ var yadcf = (function ($) {
         } else {
 			appendFilters(oTable, getOptions(table_selector), table_selector);
 			if (yadcfVersionCheck('1.10')) {
-				$(document).off('draw.dt', oTable.selector).on('draw.dt', oTable.selector, function (event, ui) {
-					appendFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
-				});
 				$(document).off('xhr.dt', oTable.selector).on('xhr.dt', oTable.selector, function (e, settings, json) {
 					var col_num,
 						column_number_filter,
@@ -3294,14 +3291,13 @@ var yadcf = (function ($) {
 						}
 					}
 				});
-			} else {
-				$(document).off('draw', oTable.selector).on('draw', oTable.selector, function (event, ui) {
-					appendFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
-				});
 			}
         }
 		//events that affects both DOM and Ajax
 		if (yadcfVersionCheck('1.10')) {
+			$(document).off('draw.dt', oTable.selector).on('draw.dt', oTable.selector, function (event, ui) {
+				appendFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
+			});
 			$(document).off('column-visibility.dt', oTable.selector).on('column-visibility.dt', oTable.selector, function (e, settings, col_num, state) {
 				var obj = {};
 				if (state === true) {
@@ -3329,6 +3325,9 @@ var yadcf = (function ($) {
 				removeFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
 			});
 		} else {
+			$(document).off('draw', oTable.selector).on('draw', oTable.selector, function (event, ui) {
+				appendFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
+			});
 			$(document).off('destroy', oTable.selector).on('destroy', oTable.selector, function (event, ui) {
 				removeFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
 			});
