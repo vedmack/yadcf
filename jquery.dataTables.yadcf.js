@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.29 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.30 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1142,7 +1142,8 @@ var yadcf = (function ($) {
 					columnObj,
 					column_number_filter,
 					min_time,
-					max_time;
+					max_time,
+					dataRenderFunc;
 
 				if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
 					return true;
@@ -1150,14 +1151,15 @@ var yadcf = (function ($) {
 				columnObj = getOptions(settingsDt.oInstance.selector)[col_num];
 
 				column_number_filter = calcColumnNumberFilter(settingsDt, col_num, table_selector_jq_friendly);
-
-				if (rowData !== undefined) {
-					aData = rowData;
+				if (typeof columnObj.column_number_data === 'function' || typeof columnObj.column_number_render === 'function') {
+					dataRenderFunc = true;
+				}
+				if (rowData !== undefined && dataRenderFunc !== true) {
 					if (columnObj.column_number_data !== undefined) {
 						column_number_filter = columnObj.column_number_data;
-						val = dot2obj(aData, column_number_filter);
+						val = dot2obj(rowData, column_number_filter);
 					} else {
-						val = aData[column_number_filter];
+						val = rowData[column_number_filter];
 					}
 				} else {
 					val = aData[column_number_filter];
@@ -2036,6 +2038,9 @@ var yadcf = (function ($) {
 		if (isNaN(settingsDt.aoColumns[column_number_filter].mData) && typeof settingsDt.aoColumns[column_number_filter].mData !== 'object') {
 			columnObj.column_number_data = settingsDt.aoColumns[column_number_filter].mData;
 		}
+		if (isNaN(settingsDt.aoColumns[column_number_filter].mRender) && typeof settingsDt.aoColumns[column_number_filter].mRender !== 'object') {
+			columnObj.column_number_render = settingsDt.aoColumns[column_number_filter].mRender;
+		}
 
 		for (j = 0; j < data_length; j++) {
 			if (columnObj.column_data_type === "html") {
@@ -2229,6 +2234,9 @@ var yadcf = (function ($) {
 				if (isNaN(settingsDt.aoColumns[column_position].mData) && typeof settingsDt.aoColumns[column_position].mData !== 'object') {
 					column_number_data = settingsDt.aoColumns[column_position].mData;
 					columnObj.column_number_data = column_number_data;
+				}
+				if (isNaN(settingsDt.aoColumns[column_position].mRender) && typeof settingsDt.aoColumns[column_position].mRender !== 'object') {
+					columnObj.column_number_render = settingsDt.aoColumns[column_position].mRender;
 				}
 				column_data_type = columnObj.column_data_type;
 				html_data_type = columnObj.html_data_type;
