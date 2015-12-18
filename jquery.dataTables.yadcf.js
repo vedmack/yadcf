@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.30 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.31 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -286,6 +286,8 @@
 				Description:		Allows to reset specific filters externally/programmatically (support ALL filter types!!!) , can be used for resetting one or more filters
 				Arguments:			table_arg: (variable of the datatable)
 									array with columns numbers
+									noRedraw:	(boolean) , use it if you don't want your table to be reloaded after the filter reset,
+												for example if you planning to call exFilterColumn function right after the exResetFilters (to avoid two AJAX requests)
 				Usage example:		yadcf.exResetAllFilters(oTable, [1,2]);
 
 * initSelectPluginCustomTriggers
@@ -4054,8 +4056,8 @@ var yadcf = (function ($) {
 		}
 	}
 
-	function exResetFilters(table_arg, columns) {
-		exResetAllFilters(table_arg, false, columns);
+	function exResetFilters(table_arg, columns, noRedraw) {
+		exResetAllFilters(table_arg, noRedraw, columns);
 	}
 
 	function exFilterExternallyTriggered(table_arg) {
