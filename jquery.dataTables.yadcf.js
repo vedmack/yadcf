@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.33 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.34 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -3743,12 +3743,22 @@ var yadcf = (function ($) {
 						exclude = true;
 						filter_value = filter_value.replace('_exclude_', '');
 					}
-					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(filter_value).addClass('inuse');
+					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(filter_value);
+					if (filter_value !== '') {
+						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass('inuse');
+					} else {
+						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).removeClass('inuse');
+					}
 					tmpStr = yadcfMatchFilterString(table_arg, column_position, filter_value, optionsObj.filter_match_mode, false, exclude);
 					table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = tmpStr;
 					break;
 				case 'select':
-					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(filter_value).addClass('inuse');
+					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(filter_value);
+					if (filter_value !== '') {
+						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass('inuse');
+					} else {
+						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).removeClass('inuse');
+					}
 					tmpStr = yadcfMatchFilterString(table_arg, column_position, filter_value, optionsObj.filter_match_mode, false);
 					table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = tmpStr;
 					if (optionsObj.select_type !== undefined) {
@@ -3766,13 +3776,17 @@ var yadcf = (function ($) {
 				case 'range_date':
 					fromId = 'yadcf-filter-' + table_selector_jq_friendly + '-from-date-' + column_number;
 					toId = 'yadcf-filter-' + table_selector_jq_friendly + '-to-date-' + column_number;
+					$('#' + fromId).val(filter_value.from);
 					if (filter_value.from !== '') {
-						$('#' + fromId).val(filter_value.from);
 						$('#' + fromId).addClass('inuse');
+					} else {
+						$('#' + fromId).removeClass('inuse');
 					}
+					$('#' + toId).val(filter_value.to);
 					if (filter_value.to !== '') {
-						$('#' + toId).val(filter_value.to);
 						$('#' + toId).addClass('inuse');
+					} else {
+						$('#' + toId).removeClass('inuse');
 					}
 					if (table_arg.fnSettings().oFeatures.bServerSide === true) {
 						min = filter_value.from;
@@ -3784,13 +3798,17 @@ var yadcf = (function ($) {
 				case 'range_number':
 					fromId = 'yadcf-filter-' + table_selector_jq_friendly + '-from-' + column_number;
 					toId = 'yadcf-filter-' + table_selector_jq_friendly + '-to-' + column_number;
+					$('#' + fromId).val(filter_value.from);
 					if (filter_value.from !== '') {
-						$('#' + fromId).val(filter_value.from);
 						$('#' + fromId).addClass('inuse');
+					} else {
+						$('#' + fromId).removeClass('inuse');
 					}
+					$('#' + toId).val(filter_value.to);
 					if (filter_value.to !== '') {
-						$('#' + toId).val(filter_value.to);
 						$('#' + toId).addClass('inuse');
+					} else {
+						$('#' + toId).removeClass('inuse');
 					}
 					if (table_arg.fnSettings().oFeatures.bServerSide === true) {
 						table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = filter_value.from + '-yadcf_delim-' + filter_value.to;
@@ -3808,6 +3826,9 @@ var yadcf = (function ($) {
 						if (min !== filter_value.from) {
 							$('#' + fromId).parent().addClass('inuse');
 							$('#' + fromId).parent().parent().find('ui-slider-range').addClass('inuse');
+						} else {
+							$('#' + fromId).parent().removeClass('inuse');
+							$('#' + fromId).parent().parent().find('ui-slider-range').removeClass('inuse');
 						}
 						$('#' + sliderId).slider('values', 0, filter_value.from);
 					}
@@ -3816,6 +3837,9 @@ var yadcf = (function ($) {
 						if (max !== filter_value.to) {
 							$('#' + toId).parent().addClass('inuse');
 							$('#' + toId).parent().parent().find('.ui-slider-range').addClass('inuse');
+						} else {
+							$('#' + toId).parent().removeClass('inuse');
+							$('#' + toId).parent().parent().find('.ui-slider-range').removeClass('inuse');
 						}
 						$('#' + sliderId).slider('values', 1, filter_value.to);
 					}
@@ -3826,7 +3850,12 @@ var yadcf = (function ($) {
 					break;
 				case 'custom_func':
 				case 'multi_select_custom_func':
-					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(filter_value).addClass('inuse');
+					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(filter_value);
+					if (filter_value !== '') {
+						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass('inuse');
+					} else {
+						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).removeClass('inuse');
+					}
 					if (table_arg.fnSettings().oFeatures.bServerSide === true) {
 						table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = filter_value;
 					}
@@ -4101,12 +4130,10 @@ var yadcf = (function ($) {
 			if (columnsObj.hasOwnProperty(columnObjKey)) {
 				columnObj = columnsObj[columnObjKey];
 				filterValue = exGetColumnFilterVal(table_arg, columnObj.column_number);
-				if ((typeof filterValue === 'string' && filterValue !== '') || (typeof filterValue === 'object' && (filterValue.from !== '' || filterValue.to !== ''))) {
-					filtersValuesSingleElem = [];
-					filtersValuesSingleElem.push(columnObj.column_number);
-					filtersValuesSingleElem.push(filterValue);
-					filtersValuesArr.push(filtersValuesSingleElem);
-				}
+				filtersValuesSingleElem = [];
+				filtersValuesSingleElem.push(columnObj.column_number);
+				filtersValuesSingleElem.push(filterValue);
+				filtersValuesArr.push(filtersValuesSingleElem);
 			}
 		}
 		exFilterColumn(table_arg, filtersValuesArr, true);
