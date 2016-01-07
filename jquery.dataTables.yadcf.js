@@ -981,7 +981,7 @@ var yadcf = (function ($) {
 		return Math.max.apply(Math, narray);
 	}
 
-	function addRangeNumberAndSliderFilterCapability(table_selector_jq_friendly, fromId, toId, col_num, ignore_char) {
+	function addRangeNumberAndSliderFilterCapability(table_selector_jq_friendly, fromId, toId, col_num, ignore_char, sliderMaxMin) {
 
 		$.fn.dataTableExt.afnFiltering.push(
 			function (settingsDt, aData, iDataIndex, rowData) {
@@ -1069,8 +1069,14 @@ var yadcf = (function ($) {
 					}
 				}
 				//omit empty rows when filtering
-				if (val === '' && (min !== '' || max !== '')) {
-					return false;
+				if (columnObj.filter_type === 'range_number_slider') {
+					if (val === '' && ((+min) !== sliderMaxMin.min || (+max) !== sliderMaxMin.max)) {
+						return false;
+					}
+				} else {
+					if (val === '' && (min !== '' || max !== '')) {
+						return false;
+					}
 				}
 				min = (min !== "") ? (+min) : min;
 				max = (max !== "") ? (+max) : max;
@@ -1767,7 +1773,11 @@ var yadcf = (function ($) {
 			columnObj,
 			slideFunc,
 			changeFunc,
-			sliderObj;
+			sliderObj,
+			sliderMaxMin = {
+				min: min_val,
+				max: max_val
+			};
 
 		filter_wrapper_id = "yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number;
 
@@ -1868,7 +1878,7 @@ var yadcf = (function ($) {
 		resetIApiIndex();
 
 		if (oTable.fnSettings().oFeatures.bServerSide !== true) {
-			addRangeNumberAndSliderFilterCapability(table_selector_jq_friendly, min_tip_id, max_tip_id, column_number, ignore_char);
+			addRangeNumberAndSliderFilterCapability(table_selector_jq_friendly, min_tip_id, max_tip_id, column_number, ignore_char, sliderMaxMin);
 		}
 	}
 
