@@ -10,6 +10,7 @@
 * Destroy third party plugins on datatable destroy https://github.com/vedmack/yadcf/issues/213
 * Prevent column sort when hitting Enter in filter https://github.com/vedmack/yadcf/issues/233
 * Added data_as_is attribute to use when you want to define your own <option></option> for the filter https://github.com/vedmack/yadcf/issues/245
+* Ignore empty/sparse rows for range filters https://github.com/vedmack/yadcf/issues/273
 * Some of additional closed issues https://github.com/vedmack/yadcf/issues/227 / https://github.com/vedmack/yadcf/issues/236 / https://github.com/vedmack/yadcf/issues/257
   https://github.com/vedmack/yadcf/issues/242 / https://github.com/vedmack/yadcf/issues/264 / https://github.com/vedmack/yadcf/issues/265 / https://github.com/vedmack/yadcf/issues/252
   https://github.com/vedmack/yadcf/issues/270 / https://github.com/vedmack/yadcf/issues/262 / https://github.com/vedmack/yadcf/issues/272 / https://github.com/vedmack/yadcf/issues/263

@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.34 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.35 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1068,6 +1068,10 @@ var yadcf = (function ($) {
 						val = "";
 					}
 				}
+				//omit empty rows when filtering
+				if (val === '' && (min !== '' || max !== '')) {
+					return false;
+				}
 				min = (min !== "") ? (+min) : min;
 				max = (max !== "") ? (+max) : max;
 				if (columnObj.range_data_type === 'single') {
@@ -1202,7 +1206,10 @@ var yadcf = (function ($) {
 						}
 					}
 				}
-
+				//omit empty rows when filtering
+				if (val === '' && (min !== '' || max !== '')) {
+					return false;
+				}
 				try {
 					if (min.length === (date_format.length + 2) || columnObj.datepicker_type === 'bootstrap-datetimepicker') {
                         if (columnObj.datepicker_type === 'jquery-ui') {
