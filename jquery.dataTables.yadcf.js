@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.35 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.36 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -589,16 +589,18 @@ var yadcf = (function ($) {
 
 	}
 
-	function generateTableSelectorJQFriendly(tmpStr) {
-		return tmpStr.replace(":", "-").replace("(", "").replace(")", "").replace(".", "-").replace("#", "-");
-	}
-
 	function escapeRegExp(string) {
 		return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 	}
 
 	function replaceAll(string, find, replace) {
 		return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+	}
+
+	function generateTableSelectorJQFriendly(tmpStr) {
+		tmpStr = replaceAll(tmpStr, ".", "-");
+		tmpStr = replaceAll(tmpStr, ' ', '');
+		return tmpStr.replace(":", "-").replace("(", "").replace(")", "").replace("#", "-");
 	}
 
 	function generateTableSelectorJQFriendlyNew(tmpStr) {
