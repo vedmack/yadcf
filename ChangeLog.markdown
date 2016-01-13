@@ -14,6 +14,7 @@
 * Some of additional closed issues https://github.com/vedmack/yadcf/issues/227 / https://github.com/vedmack/yadcf/issues/236 / https://github.com/vedmack/yadcf/issues/257
   https://github.com/vedmack/yadcf/issues/242 / https://github.com/vedmack/yadcf/issues/264 / https://github.com/vedmack/yadcf/issues/265 / https://github.com/vedmack/yadcf/issues/252
   https://github.com/vedmack/yadcf/issues/270 / https://github.com/vedmack/yadcf/issues/262 / https://github.com/vedmack/yadcf/issues/272 / https://github.com/vedmack/yadcf/issues/263
+  https://github.com/vedmack/yadcf/issues/271 / https://github.com/vedmack/yadcf/issues/276
   
 
 

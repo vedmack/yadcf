@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9.beta.36 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.8.9.beta.37 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1321,7 +1321,7 @@ var yadcf = (function ($) {
 
 		if (filter_reset_button_text !== false) {
 			$(filter_selector_string_tmp).append("<button type=\"button\" onmousedown=\"yadcf.stopPropagation(event);\" " +
-				"onclick=\"yadcf.stopPropagation(event);yadcf.rangeClear('" + table_selector_jq_friendly + "',event); return false;\" class=\"yadcf-filter-reset-button\">" + filter_reset_button_text + "</button>");
+				"onclick=\"yadcf.stopPropagation(event);yadcf.rangeClear('" + table_selector_jq_friendly + "',event," + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">" + filter_reset_button_text + "</button>");
 		}
 
 		if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
@@ -1528,7 +1528,7 @@ var yadcf = (function ($) {
 
 		if (filter_reset_button_text !== false) {
 			$(filter_selector_string_tmp).append("<button type=\"button\" onmousedown=\"yadcf.stopPropagation(event);\" " +
-				"onclick=\"yadcf.stopPropagation(event);yadcf.rangeClear('" + table_selector_jq_friendly + "',event); return false;\" class=\"yadcf-filter-reset-button\">" + filter_reset_button_text + "</button>");
+				"onclick=\"yadcf.stopPropagation(event);yadcf.rangeClear('" + table_selector_jq_friendly + "',event," + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">" + filter_reset_button_text + "</button>");
 		}
 
         if (columnObj.datepicker_type === 'jquery-ui') {
@@ -2372,7 +2372,7 @@ var yadcf = (function ($) {
 						columnObj.filter_container_selector = "#" + filter_container_id;
 					}
 					if ($(columnObj.filter_container_selector).length === 0) {
-						alert("Filter container could not be found.");
+						console.log("ERROR: Filter container could not be found.");
 						return;
 					}
 					filter_selector_string = columnObj.filter_container_selector;
@@ -2703,19 +2703,17 @@ var yadcf = (function ($) {
 		return str.indexOf(suffix, str.length - suffix.length) !== -1;
 	}
 
-	function rangeClear(table_selector_jq_friendly, event) {
+	function rangeClear(table_selector_jq_friendly, event, column_number) {
 		event = eventTargetFixUp(event);
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 		var oTable = oTables[table_selector_jq_friendly],
 			yadcfState,
 			settingsDt,
-			column_number,
 			column_number_filter,
 			currentFilterValues,
 			columnObj;
 
 		settingsDt = getSettingsObjFromTable(oTable);
-		column_number = parseInt($(event.target).parent().attr("id").replace('yadcf-filter-wrapper-' + table_selector_jq_friendly + '-', ''), 10);
 
 		column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
 
@@ -3347,12 +3345,13 @@ var yadcf = (function ($) {
         }
 		//events that affects both DOM and Ajax
 		if (yadcfVersionCheck('1.10')) {
-			$(document).off('draw.dt', oTable.selector).on('draw.dt', oTable.selector, function (event, ui) {
-				appendFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
+			$(document).off('draw.dt', oTable.selector).on('draw.dt', oTable.selector, function (event, settings) {
+				appendFilters(oTable, yadcf.getOptions(settings.oInstance.selector), settings.oInstance.selector);
 			});
 			$(document).off('column-visibility.dt', oTable.selector).on('column-visibility.dt', oTable.selector, function (e, settings, col_num, state) {
-				var obj = {};
-				if (state === true) {
+				var obj = {},
+					columnsObj = getOptions(settings.oInstance.selector);
+				if (state === true && settings._oFixedColumns === undefined) {
 					if ((plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
 						col_num = plugins[table_selector_jq_friendly].ColReorder[col_num];
 					} else if (settings.oSavedState != undefined && settings.oSavedState.ColReorder !== undefined) {
@@ -3367,6 +3366,10 @@ var yadcf = (function ($) {
 								settings.oInstance.selector);
 						}
 					}
+				} else if (settings._oFixedColumns !== undefined) {
+					appendFilters(oTables[yadcf.generateTableSelectorJQFriendly(settings.oInstance.selector)],
+						columnsObj,
+						settings.oInstance.selector);
 				}
 			});
 			$(document).off('column-reorder.dt', oTable.selector).on('column-reorder.dt', oTable.selector, function (e, settings, json) {
