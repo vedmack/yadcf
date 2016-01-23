@@ -746,13 +746,14 @@ var yadcf = (function ($) {
 			if (exGetColumnFilterVal(oTable, column_number) === '') {
 				return;
 			}
+		}
+
+		if (arg.value !== "-1") {
+			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
+		} else {
 			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val('-1').focus();
 			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
-
 			refreshSelectPlugin(columnObj, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number), '-1');
-
-		} else {
-			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
 		}
 
 		if (!oTable.fnSettings().oLoadedState) {
