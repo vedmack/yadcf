@@ -21,5 +21,6 @@
 		"filter",
 		"column",
 		"plugin"
-	]
+	],
+	"license": "MIT"
 }
