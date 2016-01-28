@@ -1,6 +1,6 @@
 # Yet Another DataTables Column Filter (Yadcf) Change-log
 
-## 0.8.9 (still beta)
+## 0.8.9
 
 * Time (single / range) filtering is now possible (hh:mm / HH:mm when using datepicker_type: 'bootstrap-datetimepicker') https://github.com/vedmack/yadcf/issues/168
 * Added initSelectPluginCustomTriggers - Allows to set any select jquery plugin initialize and refresh functions.(PR by gauravjhs)
@@ -14,7 +14,7 @@
 * Some of additional closed issues https://github.com/vedmack/yadcf/issues/227 / https://github.com/vedmack/yadcf/issues/236 / https://github.com/vedmack/yadcf/issues/257
   https://github.com/vedmack/yadcf/issues/242 / https://github.com/vedmack/yadcf/issues/264 / https://github.com/vedmack/yadcf/issues/265 / https://github.com/vedmack/yadcf/issues/252
   https://github.com/vedmack/yadcf/issues/270 / https://github.com/vedmack/yadcf/issues/262 / https://github.com/vedmack/yadcf/issues/272 / https://github.com/vedmack/yadcf/issues/263
-  https://github.com/vedmack/yadcf/issues/271 / https://github.com/vedmack/yadcf/issues/276
+  https://github.com/vedmack/yadcf/issues/271 / https://github.com/vedmack/yadcf/issues/276 / https://github.com/vedmack/yadcf/issues/279
   
 
 
