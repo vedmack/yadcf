@@ -2,6 +2,7 @@
 
 ## 0.8.9
 
+* Cumulative filtering - filter values are being populated from the filtered rows (remaining table data after filtering) https://github.com/vedmack/yadcf/issues/196
 * Time (single / range) filtering is now possible (hh:mm / HH:mm when using datepicker_type: 'bootstrap-datetimepicker') https://github.com/vedmack/yadcf/issues/168
 * Added initSelectPluginCustomTriggers - Allows to set any select jquery plugin initialize and refresh functions.(PR by gauravjhs)
 * Fixed auto complete filter
