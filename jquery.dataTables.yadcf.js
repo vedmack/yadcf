@@ -385,7 +385,13 @@ var yadcf = (function ($) {
 		reN = /[^0-9]/g,
 		selectElementCustomInitFunc,
 		selectElementCustomRefreshFunc,
-		selectElementCustomDestroyFunc;
+		selectElementCustomDestroyFunc,
+		placeholderLang = {
+			'select': 'Select value',
+			'filter': 'Type to filter',
+			'range': ['From', 'To'],
+			'date': 'Select a date'
+		};
 
 	//From ColReorder (SpryMedia Ltd (www.sprymedia.co.uk))
 	function getSettingsObjFromTable(dt) {
@@ -2299,15 +2305,15 @@ var yadcf = (function ($) {
 
 				if (filter_default_label === undefined) {
 					if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
-						filter_default_label = "Select value";
+						filter_default_label = placeholderLang['select'];
 					} else if (columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
-						filter_default_label = "Select values";
+						filter_default_label = placeholderLang['select'];
 					} else if (columnObj.filter_type === "auto_complete" || columnObj.filter_type === "text") {
-						filter_default_label = 'Type to filter';
+						filter_default_label = placeholderLang['filter'];
 					} else if (columnObj.filter_type === "range_number" || columnObj.filter_type === "range_date") {
-						filter_default_label = ["from", "to"];
+						filter_default_label = placeholderLang['range'];
 					} else if (columnObj.filter_type === "date") {
-						filter_default_label = "Select a date";
+						filter_default_label = placeholderLang['date'];
 					}
 					columnObj.filter_default_label = filter_default_label;
 				}
@@ -3471,6 +3477,13 @@ var yadcf = (function ($) {
 			params.filters_position = 'thead';
 		} else {
 			params.filters_position = 'tfoot';
+		}
+		if (typeof (params.lang) !== 'undefined') {
+			for (tmpParams in placeholderLang) {
+				if (typeof (params.lang[tmpParams]) !== 'undefined') {
+					placeholderLang[tmpParams] = params.lang[tmpParams];
+				}
+			}
 		}
 		$(document).data(instance.selector + "_filters_position", params.filters_position);
 
