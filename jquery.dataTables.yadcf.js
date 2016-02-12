@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.8.9
+* Version:     0.9.0.beta.1 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -388,6 +388,7 @@ var yadcf = (function ($) {
 		selectElementCustomDestroyFunc,
 		placeholderLang = {
 			'select': 'Select value',
+			'select_multi': 'Select values',
 			'filter': 'Type to filter',
 			'range': ['From', 'To'],
 			'date': 'Select a date'
@@ -2305,15 +2306,15 @@ var yadcf = (function ($) {
 
 				if (filter_default_label === undefined) {
 					if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
-						filter_default_label = placeholderLang['select'];
+						filter_default_label = placeholderLang.select;
 					} else if (columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
-						filter_default_label = placeholderLang['select'];
+						filter_default_label = placeholderLang.select_multi;
 					} else if (columnObj.filter_type === "auto_complete" || columnObj.filter_type === "text") {
-						filter_default_label = placeholderLang['filter'];
+						filter_default_label = placeholderLang.filter;
 					} else if (columnObj.filter_type === "range_number" || columnObj.filter_type === "range_date") {
-						filter_default_label = placeholderLang['range'];
+						filter_default_label = placeholderLang.range;
 					} else if (columnObj.filter_type === "date") {
-						filter_default_label = placeholderLang['date'];
+						filter_default_label = placeholderLang.date;
 					}
 					columnObj.filter_default_label = filter_default_label;
 				}
@@ -3441,6 +3442,15 @@ var yadcf = (function ($) {
 		} else {
 			params.filters_position = 'tfoot';
 		}
+		if (params.language !== undefined) {
+			for (tmpParams in placeholderLang) {
+				if (placeholderLang.hasOwnProperty(tmpParams)) {
+					if (params.language[tmpParams] !== undefined) {
+						placeholderLang[tmpParams] = params.language[tmpParams];
+					}
+				}
+			}
+		}
 		$(document).data(this.selector + "_filters_position", params.filters_position);
 
 		if ($(this.selector).length === 1) {
@@ -3478,10 +3488,12 @@ var yadcf = (function ($) {
 		} else {
 			params.filters_position = 'tfoot';
 		}
-		if (typeof (params.lang) !== 'undefined') {
+		if (params.language !== undefined) {
 			for (tmpParams in placeholderLang) {
-				if (typeof (params.lang[tmpParams]) !== 'undefined') {
-					placeholderLang[tmpParams] = params.lang[tmpParams];
+				if (placeholderLang.hasOwnProperty(tmpParams)) {
+					if (params.language[tmpParams] !== undefined) {
+						placeholderLang[tmpParams] = params.language[tmpParams];
+					}
 				}
 			}
 		}
