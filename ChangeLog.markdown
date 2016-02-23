@@ -1,4 +1,10 @@
-# Yet Another DataTables Column Filter (Yadcf) Change-log
+# Yet Another DataTables Column Filter (yadcf) Change-log
+
+## 0.9.0 still in beta (grab latest stable from https://github.com/vedmack/yadcf/releases)
+
+* Fixed autocomplete with dt in ajax source https://github.com/vedmack/yadcf/issues/282
+
+
 
 ## 0.8.9
 

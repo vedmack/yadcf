@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.5 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.6 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2701,7 +2701,7 @@ var yadcf = (function ($) {
 				}
 				if (columnObj.filter_type === "auto_complete") {
 					if (columnObj.filter_plugin_options !== undefined) {
-						if (columnObj.filter_plugin_options.source === undefined) {
+						if (columnObj.filter_plugin_options.source === undefined || columnObj.filter_plugin_options.source.length === 0) {
 							columnObj.filter_plugin_options.source = $(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number);
 						}
 						columnObj.filter_plugin_options.select = autocompleteSelect;
@@ -3494,7 +3494,8 @@ var yadcf = (function ($) {
 		var instance = oTable.settings()[0].oInstance,
 			i = 0,
 			selector,
-			tmpParams;
+			tmpParams,
+			tableSelector = '#' + oTable.table().node().id;
 
 		if (params === undefined) {
 			params = {};
