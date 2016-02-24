@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.6 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.7 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -392,7 +392,8 @@ var yadcf = (function ($) {
 			'filter': 'Type to filter',
 			'range': ['From', 'To'],
 			'date': 'Select a date'
-		};
+		},
+		settingsMap = {};
 
 	//From ColReorder (SpryMedia Ltd (www.sprymedia.co.uk))
 	function getSettingsObjFromTable(dt) {
@@ -1799,7 +1800,8 @@ var yadcf = (function ($) {
 			sliderMaxMin = {
 				min: min_val,
 				max: max_val
-			};
+			},
+			settingsDt;
 
 		filter_wrapper_id = "yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number;
 
@@ -1809,15 +1811,17 @@ var yadcf = (function ($) {
 
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 		oTable = oTables[table_selector_jq_friendly];
+		settingsDt = settingsMap[generateTableSelectorJQFriendly2(oTable)];
+
 		columnObj = getOptions(oTable.selector)[column_number];
 
-		if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
-			if (oTable.fnSettings().oLoadedState.yadcfState && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
-				if (min_val !== oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from) {
-					min_state_val = oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from;
+		if (settingsDt.oFeatures.bStateSave === true && settingsDt.oLoadedState) {
+			if (settingsDt.oLoadedState.yadcfState && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly] && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
+				if (min_val !== settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from) {
+					min_state_val = settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from;
 				}
-				if (max_val !== oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].to) {
-					max_state_val = oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].to;
+				if (max_val !== settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].to) {
+					max_state_val = settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].to;
 				}
 			}
 		}
@@ -1884,22 +1888,22 @@ var yadcf = (function ($) {
 
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 		oTable = oTables[table_selector_jq_friendly];
-		if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
-			if (oTable.fnSettings().oLoadedState.yadcfState && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
-				if (isFinite(min_val) && min_val !== oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from) {
+		if (settingsDt.oFeatures.bStateSave === true && settingsDt.oLoadedState) {
+			if (settingsDt.oLoadedState.yadcfState && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly] && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
+				if (isFinite(min_val) && min_val !== settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from) {
 					$($(filter_selector_string).find(".ui-slider-handle")[0]).addClass("inuse");
 				}
-				if (isFinite(max_val) && max_val !== oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].to) {
+				if (isFinite(max_val) && max_val !== settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].to) {
 					$($(filter_selector_string).find(".ui-slider-handle")[1]).addClass("inuse");
 				}
-				if ((isFinite(min_val) && isFinite(max_val)) && (min_val !== oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from || max_val !== oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].to)) {
+				if ((isFinite(min_val) && isFinite(max_val)) && (min_val !== settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from || max_val !== settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].to)) {
 					$($(filter_selector_string).find(".ui-slider-range")).addClass("inuse");
 				}
 			}
 		}
 		resetIApiIndex();
 
-		if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+		if (settingsDt.oFeatures.bServerSide !== true) {
 			addRangeNumberAndSliderFilterCapability(table_selector_jq_friendly, min_tip_id, max_tip_id, column_number, ignore_char, sliderMaxMin);
 		}
 	}
@@ -2253,6 +2257,7 @@ var yadcf = (function ($) {
 		} else {
 			settingsDt = pSettings;
 		}
+		settingsMap[generateTableSelectorJQFriendly2(oTable)] = settingsDt;
 
 		table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly2(oTable);
 		tableDT = tablesDT[table_selector_jq_friendly];
