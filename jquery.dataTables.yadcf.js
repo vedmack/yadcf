@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.7 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.8 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -121,6 +121,13 @@
 				Type:				String / Array of string in case of range_number filter (first entry is for the first input and the second entry is for the second input
 				Default value:		Select value
 				Description:		The label that will appear in the select menu filter when no value is selected from the filter
+
+* ommit_default_label
+				Required:			false
+				Type:				boolean
+				Default value:		false
+				Description:		Prevent yadcf from adding "default_label" (Select value / Select values)
+				Note				Currently supported in select / multi_select / custom_func / multi_select_custom_func
 
 * filter_reset_button_text
 				Required:			false
@@ -519,7 +526,8 @@ var yadcf = (function ($) {
 				style_class: '',
                 datepicker_type: 'jquery-ui',
 				range_data_type: 'single',
-				range_data_type_delim: '-'
+				range_data_type_delim: '-',
+				ommit_default_label: false
 			},
 			adaptContainerCssClassImpl = function (dummy) { return ''; };
 
@@ -2416,17 +2424,19 @@ var yadcf = (function ($) {
 
 				if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func' || columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
 					if (columnObj.data_as_is !== true) {
-						if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
-							options_tmp = "<option value=\"" + "-1" + "\">" + filter_default_label + "</option>";
+						if (columnObj.ommit_default_label !== true) {
+							if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
+								options_tmp = "<option value=\"" + "-1" + "\">" + filter_default_label + "</option>";
 
-							if (columnObj.select_type === 'select2' && columnObj.select_type_options.placeholder !== undefined && columnObj.select_type_options.allowClear === true) {
-								options_tmp = "<option value=\"\"></option>";
-							}
-						} else if (columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
-							if (columnObj.select_type === undefined) {
-								options_tmp = "<option data-placeholder=\"true\" value=\"" + "-1" + "\">" + filter_default_label + "</option>";
-							} else {
-								options_tmp = "";
+								if (columnObj.select_type === 'select2' && columnObj.select_type_options.placeholder !== undefined && columnObj.select_type_options.allowClear === true) {
+									options_tmp = "<option value=\"\"></option>";
+								}
+							} else if (columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
+								if (columnObj.select_type === undefined) {
+									options_tmp = "<option data-placeholder=\"true\" value=\"" + "-1" + "\">" + filter_default_label + "</option>";
+								} else {
+									options_tmp = "";
+								}
 							}
 						}
 
