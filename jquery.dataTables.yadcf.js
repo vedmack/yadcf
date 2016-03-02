@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.8 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.9 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -122,7 +122,7 @@
 				Default value:		Select value
 				Description:		The label that will appear in the select menu filter when no value is selected from the filter
 
-* ommit_default_label
+* omit_default_label
 				Required:			false
 				Type:				boolean
 				Default value:		false
@@ -527,7 +527,7 @@ var yadcf = (function ($) {
                 datepicker_type: 'jquery-ui',
 				range_data_type: 'single',
 				range_data_type_delim: '-',
-				ommit_default_label: false
+				omit_default_label: false
 			},
 			adaptContainerCssClassImpl = function (dummy) { return ''; };
 
@@ -2424,7 +2424,7 @@ var yadcf = (function ($) {
 
 				if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func' || columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
 					if (columnObj.data_as_is !== true) {
-						if (columnObj.ommit_default_label !== true) {
+						if (columnObj.omit_default_label !== true) {
 							if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
 								options_tmp = "<option value=\"" + "-1" + "\">" + filter_default_label + "</option>";
 

@@ -3,7 +3,7 @@
 ## 0.9.0 still in beta (grab latest stable from https://github.com/vedmack/yadcf/releases)
 
 * Fixed autocomplete with dt in ajax source https://github.com/vedmack/yadcf/issues/282
-* New option, ommit_default_label - Prevent yadcf from adding "default_label" (Select value / Select values)
+* New option, omit_default_label - Prevent yadcf from adding "default_label" (Select value / Select values)
 
 
 
