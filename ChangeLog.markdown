@@ -4,7 +4,7 @@
 
 * Fixed autocomplete with dt in ajax source https://github.com/vedmack/yadcf/issues/282
 * New option, omit_default_label - Prevent yadcf from adding "default_label" (Select value / Select values)
-
+* Fixed destroy for multiple tables https://github.com/vedmack/yadcf/issues/293
 
 
 ## 0.8.9

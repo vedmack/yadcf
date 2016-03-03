@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.9 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.10 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -613,11 +613,16 @@ var yadcf = (function ($) {
 		return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
 	}
 
-	function generateTableSelectorJQFriendly(tmpStr) {
-		tmpStr = replaceAll(tmpStr, ".", "-");
-		tmpStr = replaceAll(tmpStr, ' ', '');
-		return tmpStr.replace(":", "-").replace("(", "").replace(")", "").replace("#", "-");
+	function getTableId(obj) {
+		var tableId;
+		if (obj.table !== undefined) {
+			tableId = obj.table().node().id;
+		} else {
+			tableId = getSettingsObjFromTable(obj).sTableId;
+		}
+		return tableId;
 	}
+
 	function generateTableSelectorJQFriendly2(obj) {
 		var tmpStr;
 		if (obj.oInstance !== undefined && obj.oInstance.selector !== undefined) {
@@ -639,6 +644,7 @@ var yadcf = (function ($) {
 		tmpStr = replaceAll(tmpStr, ",", "");
 		tmpStr = replaceAll(tmpStr, ".", "-");
 		tmpStr = replaceAll(tmpStr, "#", "-");
+		tmpStr = replaceAll(tmpStr, ' ', '');
 		return tmpStr;
 	}
 
@@ -1995,7 +2001,8 @@ var yadcf = (function ($) {
 	}
 
 	function removeFilters(oTable, args, table_selector) {
-		$('.yadcf-filter-wrapper').remove();
+		var tableId = getTableId(oTable);
+		$('#' + tableId + ' .yadcf-filter-wrapper').remove();
 		if (yadcfVersionCheck('1.10')) {
 			$(document).off('draw.dt', oTable.selector);
 			$(document).off('xhr.dt', oTable.selector);
@@ -2507,9 +2514,9 @@ var yadcf = (function ($) {
 							columnObj.filter_container_selector = "#" + filter_container_id;
 						}
 						if ($("#yadcf-filter-wrapper-" + columnObj.filter_container_selector).length === 0) {
-							$(columnObj.filter_container_selector).append("<div id=\"yadcf-filter-wrapper-" + generateTableSelectorJQFriendly(columnObj.filter_container_selector) + "\"></div>");
+							$(columnObj.filter_container_selector).append("<div id=\"yadcf-filter-wrapper-" + generateTableSelectorJQFriendlyNew(columnObj.filter_container_selector) + "\"></div>");
 						}
-						filter_selector_string = "#yadcf-filter-wrapper-" + generateTableSelectorJQFriendly(columnObj.filter_container_selector);
+						filter_selector_string = "#yadcf-filter-wrapper-" + generateTableSelectorJQFriendlyNew(columnObj.filter_container_selector);
 					}
 
 					if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
@@ -3311,7 +3318,7 @@ var yadcf = (function ($) {
 	function scrollXYHandler(oTable, table_selector) {
 		var $tmpSelector,
 			filters_position = $(document).data(table_selector + "_filters_position"),
-			table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector);
+			table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly2(oTable);
 
 		if (filters_position === 'thead') {
 			filters_position = '.dataTables_scrollHead';
@@ -3335,7 +3342,7 @@ var yadcf = (function ($) {
 
 	function initAndBindTable(oTable, table_selector, index, pTableDT) {
 
-		var table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly(table_selector),
+		var table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly2(oTable),
 			table_selector_tmp;
         oTables[table_selector_jq_friendly] = oTable;
 		tablesDT[table_selector_jq_friendly] = pTableDT;
@@ -4236,7 +4243,6 @@ var yadcf = (function ($) {
 		rangeClear : rangeClear,
 		rangeNumberSliderClear : rangeNumberSliderClear,
 		stopPropagation : stopPropagation,
-		generateTableSelectorJQFriendly : generateTableSelectorJQFriendly,
 		exFilterColumn : exFilterColumn,
 		exGetColumnFilterVal : exGetColumnFilterVal,
 		exResetAllFilters: exResetAllFilters,
