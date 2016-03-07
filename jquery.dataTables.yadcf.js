@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.10 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.11 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -41,8 +41,9 @@
 				Required:			true (when filter_type is custom_func / multi_select_custom_func)
 				Type:				function
 				Default value:		undefined
-				Description:		should be pointing to a function with the following signature myCustomFilterFunction(filterVal, columnVal, rowValues) , where filterVal is the value from the select box and
-									columnVal is the value from the relevant row column, rowValues is an array that holds the values of the entire row, this function should return true if the row matches your condition and the row should be displayed) and false otherwise
+				Description:		should be pointing to a function with the following signature myCustomFilterFunction(filterVal, columnVal, rowValues, stateVal) , where `filterVal` is the value from the select box,
+									`columnVal` is the value from the relevant row column, `rowValues` is an array that holds the values of the entire row and `stateVal` which holds the current state of the table row DOM
+									, stateVal is perfect to handle situations in which you placing radiobuttons / checkbox inside table column. This function should return true if the row matches your condition and the row should be displayed) and false otherwise
 				Note:				When using multi_select_custom_func as filter_type filterVal will hold an array of selected values from the multi select element
 
 * data
@@ -1173,7 +1174,7 @@ var yadcf = (function ($) {
 
 				custom_func = getOptions(settingsDt.oInstance.selector)[col_num].custom_func;
 
-				retVal = custom_func(filterVal, columnVal, aData);
+				retVal = custom_func(filterVal, columnVal, aData, stateVal);
 
 				return retVal;
 			}
