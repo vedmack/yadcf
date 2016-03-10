@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.11 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.12 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2188,26 +2188,30 @@ var yadcf = (function ($) {
 				}
 			} else if (columnObj.column_data_type === "rendered_html") {
 				col_inner_elements = data[j]._aFilterData[column_number_filter];
-				col_inner_elements = $(col_inner_elements);
-				if (col_inner_elements.length > 0) {
-					for (k = 0; k < col_inner_elements.length; k++) {
-						switch (columnObj.html_data_type) {
-						case "text":
-							col_inner_data = $(col_inner_elements[k]).text();
-							break;
-						case "value":
-							col_inner_data = $(col_inner_elements[k]).val();
-							break;
-						case "id":
-							col_inner_data = col_inner_elements[k].id;
-							break;
-						case "selector":
-							col_inner_data = $(col_inner_elements[k]).find(columnObj.html_data_selector).text();
-							break;
+				if (typeof col_inner_elements !== 'string') {
+					col_inner_elements = $(col_inner_elements);
+					if (col_inner_elements.length > 0) {
+						for (k = 0; k < col_inner_elements.length; k++) {
+							switch (columnObj.html_data_type) {
+							case "text":
+								col_inner_data = $(col_inner_elements[k]).text();
+								break;
+							case "value":
+								col_inner_data = $(col_inner_elements[k]).val();
+								break;
+							case "id":
+								col_inner_data = col_inner_elements[k].id;
+								break;
+							case "selector":
+								col_inner_data = $(col_inner_elements[k]).find(columnObj.html_data_selector).text();
+								break;
+							}
 						}
+					} else {
+						col_inner_data = col_inner_elements.selector;
 					}
 				} else {
-					col_inner_data = col_inner_elements.selector;
+					col_inner_data = col_inner_elements;
 				}
 				if ($.trim(col_inner_data) !== '' && !(col_filter_array.hasOwnProperty(col_inner_data))) {
 					col_filter_array[col_inner_data] = col_inner_data;
