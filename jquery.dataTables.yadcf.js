@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.12 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.13 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1594,20 +1594,8 @@ var yadcf = (function ($) {
 			datepickerObj.useCurrent = false;
             $fromInput.datetimepicker(datepickerObj);
             $toInput.datetimepicker(datepickerObj);
-			if (datepickerObj.format.toLowerCase() !== 'hh:mm') {
-				$fromInput.on("dp.change", function (e) {
-					$toInput.data("DateTimePicker").minDate(e.date);
-				});
-				$toInput.on("dp.change", function (e) {
-					$fromInput.data("DateTimePicker").maxDate(e.date);
-				});
-				if (columnObj.externally_triggered !== true) {
-					$fromInput.add($toInput).on('dp.change', dateSelect);
-				}
-			} else {
-				if (columnObj.externally_triggered !== true) {
-					$fromInput.add($toInput).on('dp.hide', dateSelect);
-				}
+			if (columnObj.externally_triggered !== true) {
+				$fromInput.add($toInput).on('dp.hide', dateSelect);
 			}
         } else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 			//$fromInput.datepicker({});

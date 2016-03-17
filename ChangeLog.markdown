@@ -5,6 +5,7 @@
 * Fixed autocomplete with dt in ajax source https://github.com/vedmack/yadcf/issues/282
 * New option, omit_default_label - Prevent yadcf from adding "default_label" (Select value / Select values)
 * Fixed destroy for multiple tables https://github.com/vedmack/yadcf/issues/293
+* Allow selecting date and time (without closing filter) in date filtering https://github.com/vedmack/yadcf/issues/296
 
 
 ## 0.8.9
