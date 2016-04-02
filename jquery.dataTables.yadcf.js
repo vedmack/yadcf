@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.13 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.14 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -263,6 +263,12 @@
 									table data after filtering) only, unlike the normal behaviour in which the options of the filters are from all the table data
 
 
+* filters_tr_index
+				Required:			false
+				Type:				integer
+				Default value:		undefined
+				Description:		Allow to control the index of the <tr> inside the thead of the table, e.g when one <tr> is used for headers/sort and
+									another <tr> is used for filters
 *
 *
 *
@@ -1342,7 +1348,7 @@ var yadcf = (function ($) {
 		filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
 		filter_selector_string_tmp = filter_selector_string;
 
-		$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-inner-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter-wrapper-inner\"></div>");
+		$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-inner-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter-wrapper-inner" + " -" + table_selector_jq_friendly + "-" + column_number + "\"></div>");
 		filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper-inner";
 
 		filterActionStr = 'onkeyup="yadcf.rangeNumberKeyUP(\'' + table_selector_jq_friendly + '\',event);"';
@@ -1695,17 +1701,30 @@ var yadcf = (function ($) {
 	}
 
 	function rangeNumberSldierDrawTips(min_tip_val, max_tip_val, min_tip_id, max_tip_id, table_selector_jq_friendly, column_number) {
-		var first_handle = $("#yadcf-filter-wrapper-inner-" + table_selector_jq_friendly + "-" + column_number + " .ui-slider-handle:first"),
-			last_handle = $("#yadcf-filter-wrapper-inner-" + table_selector_jq_friendly + "-" + column_number + " .ui-slider-handle:last"),
+		var first_handle = $(".yadcf-number-slider-filter-wrapper-inner.-" + table_selector_jq_friendly + "-" + column_number),// + " .ui-slider-handle:first"),
+			last_handle = $(".yadcf-number-slider-filter-wrapper-inner.-" + table_selector_jq_friendly + "-" + column_number),// + " .ui-slider-handle:last"),
 			min_tip_inner,
 			max_tip_inner;
 
 		min_tip_inner = "<div id=\"" + min_tip_id + "\" class=\"yadcf-filter-range-number-slider-min-tip-inner\">" + min_tip_val + "</div>";
 		max_tip_inner = "<div id=\"" + max_tip_id + "\" class=\"yadcf-filter-range-number-slider-max-tip-inner\">" + max_tip_val + "</div>";
 
-		$(first_handle).addClass("yadcf-filter-range-number-slider-min-tip").html(min_tip_inner);
-		$(last_handle).addClass("yadcf-filter-range-number-slider-max-tip").html(max_tip_inner);
+		if (first_handle.length === 1) {
+			first_handle = $(".yadcf-number-slider-filter-wrapper-inner.-" + table_selector_jq_friendly + "-" + column_number + " .ui-slider-handle:first");
+			$(first_handle).addClass("yadcf-filter-range-number-slider-min-tip").html(min_tip_inner);
+
+			last_handle = $(".yadcf-number-slider-filter-wrapper-inner.-" + table_selector_jq_friendly + "-" + column_number + " .ui-slider-handle:last");
+			$(last_handle).addClass("yadcf-filter-range-number-slider-max-tip").html(max_tip_inner);
+		} else {
+			//migth happen when scrollX is used or when filter row is being duplicated by DT
+			$($(first_handle)[0]).find('.ui-slider-handle:first').addClass("yadcf-filter-range-number-slider-min-tip").html(min_tip_inner);
+			$($(last_handle)[0]).find('.ui-slider-handle:last').addClass("yadcf-filter-range-number-slider-max-tip").html(max_tip_inner);
+
+			$($(first_handle)[1]).find('.ui-slider-handle:first').addClass("yadcf-filter-range-number-slider-min-tip").html(min_tip_inner);
+			$($(last_handle)[1]).find('.ui-slider-handle:last').addClass("yadcf-filter-range-number-slider-max-tip").html(max_tip_inner);
+		}
 	}
+
 
 	function rangeNumberSliderChange(table_selector_jq_friendly, event, ui) {
 		event = eventTargetFixUp(event);
@@ -1836,7 +1855,7 @@ var yadcf = (function ($) {
 			filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
 			filter_selector_string_tmp = filter_selector_string;
 
-			$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-inner-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-number-slider-filter-wrapper-inner\"></div>");
+			$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-inner-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-number-slider-filter-wrapper-inner" + " -" + table_selector_jq_friendly + "-" + column_number + "\"></div>");
 			filter_selector_string = filter_selector_string + " div.yadcf-number-slider-filter-wrapper-inner";
 
 			$(filter_selector_string).append("<div id=\"" + sliderId + "\" class=\"yadcf-filter-range-number-slider\"></div>");
@@ -2406,7 +2425,11 @@ var yadcf = (function ($) {
 							filter_selector_string = table_selector + ' ' + filters_position + ' th:eq(' + $(unique_th[column_position]).index() + ')';
 						}
 					} else {
-						filter_selector_string = table_selector + ' ' + filters_position + ' tr:eq(' + $(unique_th[column_position]).parent().index() + ') th:eq(' + $(unique_th[column_position]).index() + ')';
+						if (columnObj.filters_tr_index === undefined) {
+							filter_selector_string = table_selector + ' ' + filters_position + ' tr:eq(' + $(unique_th[column_position]).parent().index() + ') th:eq(' + $(unique_th[column_position]).index() + ')';
+						} else {
+							filter_selector_string = table_selector + ' ' + filters_position + ' tr:eq(' + columnObj.filters_tr_index + ') th:eq(' + $(unique_th[column_position]).index() + ')';
+						}
 					}
 					$filter_selector = $(filter_selector_string).find(".yadcf-filter");
 				} else {
