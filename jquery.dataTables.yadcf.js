@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.14 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.15 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -704,6 +704,10 @@ var yadcf = (function ($) {
 	function yadcfMatchFilterString(table_arg, column_number, selected_value, filter_match_mode, multiple, exclude) {
 		var case_insensitive = yadcf.getOptions(table_arg.selector)[column_number].case_insensitive,
 			ret_val;
+
+		if (selected_value === '') {
+			return '';
+		}
 
 		table_arg.fnSettings().aoPreSearchCols[column_number].bSmart = false;
 		table_arg.fnSettings().aoPreSearchCols[column_number].bRegex = true;
