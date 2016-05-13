@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.16 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.17 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1827,17 +1827,26 @@ var yadcf = (function ($) {
 				min: min_val,
 				max: max_val
 			},
-			settingsDt;
+			settingsDt,
+			currSliderMin = $("#" + sliderId).slider("option", "min"),
+			currSliderMax = $("#" + sliderId).slider("option", "max"),
+			redrawTable;
 
 		filter_wrapper_id = "yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number;
 
-		if ($("#" + filter_wrapper_id).length > 0) {
+		if ($("#" + filter_wrapper_id).length > 0 && (currSliderMin === min_val && currSliderMax === max_val)) {
 			return;
 		}
 
 		$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 		oTable = oTables[table_selector_jq_friendly];
 		settingsDt = settingsMap[generateTableSelectorJQFriendly2(oTable)];
+
+		if ($("#" + filter_wrapper_id).length > 0) {
+			$("#" + sliderId).slider("destroy");
+			$("#" + filter_wrapper_id).remove();
+			redrawTable = true;
+		}
 
 		columnObj = getOptions(oTable.selector)[column_number];
 
@@ -1931,6 +1940,9 @@ var yadcf = (function ($) {
 
 		if (settingsDt.oFeatures.bServerSide !== true) {
 			addRangeNumberAndSliderFilterCapability(table_selector_jq_friendly, min_tip_id, max_tip_id, column_number, ignore_char, sliderMaxMin);
+		}
+		if (redrawTable === true) {
+			oTable.fnDraw(false);
 		}
 	}
 

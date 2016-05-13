@@ -7,7 +7,7 @@
 * Fixed destroy for multiple tables https://github.com/vedmack/yadcf/issues/293
 * Allow selecting date and time (without closing filter) in date filtering https://github.com/vedmack/yadcf/issues/296
 * Added global property - filters_tr_index: Allow to control the index of the <tr> inside the thead of the table, e.g when one <tr> is used for headers/sort and another <tr> is used for filters https://github.com/vedmack/yadcf/issues/297
-* Some of additional closed issues https://github.com/vedmack/yadcf/issues/295 / 
+* Some of additional closed issues https://github.com/vedmack/yadcf/issues/295 / https://github.com/vedmack/yadcf/issues/308
 
 
 ## 0.8.9
