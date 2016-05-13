@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
+<link href="jquery.datatables.yadcf.css" rel="stylesheet" type="text/css" />
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+<script src="jquery.dataTables.yadcf.js"></script>
+
+<style>
+.label {
+padding: 0px 10px 0px 10px;
+border: 1px solid #ccc;
+-moz-border-radius: 1em; /* for mozilla-based browsers */
+-webkit-border-radius: 1em; /* for webkit-based browsers */
+border-radius: 1em; /* theoretically for *all* browsers*/
+}
+
+.label.lightblue {
+background-color: #99CCFF;
+}
+
+#external_filter_container_wrapper {
+margin-bottom: 20px;
+}
+
+#external_filter_container {
+display: inline-block;
+}
+</style>  
+
+<script>
+$(document).ready(function(){
+$('#example').dataTable().yadcf([
+{column_number : 0},
+{column_number : 1,  filter_type: "range_number_to", filter_container_id: "external_filter_container"},
+{column_number : 2, data: ["Yes", "No"], filter_default_label: "Select Yes/No"},
+{column_number : 3, text_data_delimiter: ",", filter_type: "auto_complete"},
+{column_number : 4, column_data_type: "html", html_data_type: "text", filter_default_label: "Select tag"}]);
+});
+</script>
+<meta charset=utf-8 />
+<title>yadcf - Yet Another DataTables Column Filter</title>
+</head>
+<body id="yadcf_example">
+<div id="container">
+<h1>Yet Another DataTables Column Filter - (yadcf) example</h1>
+<div id="external_filter_container_wrapper">
+<label>External filter for "Numbers" column :</label>
+<div id="external_filter_container"></div>
+</div>
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+<thead>
+<tr>
+<th>Some Data</th>
+<th>Numbers</th>
+<th>Yes / No</th>
+<th>Values</th>
+<th>Tags</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd gradeX">
+<td>Some Data 1</td>
+<td>1000</td>
+<td>Yes</td>
+<td>a_value,b_value</td>
+<td><span class="label lightblue">Tag1</span><span class="label lightblue">Tag2</span></td>
+</tr>
+<tr class="even gradeC">
+<td>Some Data 2</td>
+<td>22</td>
+<td>No</td>
+<td>b_value,c_value</td>
+<td><span class="label lightblue">Tag1</span><span class="label lightblue">Tag3</span></td>
+</tr>
+<tr class="odd gradeA">
+<td>Some Data 3</td>
+<td>33</td>
+<td>Yes</td>
+<td>a_value</td>
+<td><span class="label lightblue">Tag2</span><span class="label lightblue">Tag3</span></td>
+</tr>
+<tr class="even gradeA">
+<td>Some Data 4</td>
+<td>44</td>
+<td>No</td>
+<td>b_value</td>
+<td><span class="label lightblue">Tag2</span></td>
+</tr>
+<tr class="odd gradeA">
+<td>Some Data 5</td>
+<td>55</td>
+<td>Yes</td>
+<td>a_value,b_value</td>
+<td><span class="label lightblue">Tag1</span><span class="label lightblue">Tag2</span></td>
+</tr>
+<tr class="even gradeA">
+<td>Some Data 1</td>
+<td>111</td>
+<td>No</td>
+<td>c_value,d_value</td>
+<td><span class="label lightblue">Tag2</span></td>
+</tr>
+<tr class="gradeA">
+<td>Some Data 2</td>
+<td>22</td>
+<td>Yes</td>
+<td>e_value,f_value</td>
+<td><span class="label lightblue">Tag3</span><span class="label lightblue">Tag4</span><span class="label lightblue">Tag5</span></td>
+</tr>
+<tr class="gradeA">
+<td>Some Data 3</td>
+<td>33</td>
+<td>No</td>
+<td>a_value,bb_value</td>
+<td><span class="label lightblue">Tag5</span></td>
+</tr>
+<tr class="gradeA">
+<td>Some Data 4</td>
+<td>44</td>
+<td>Yes</td>
+<td>a_value,f_value</td>
+<td><span class="label lightblue">Tag4</span></td>
+</tr>
+<tr class="gradeA">
+<td>Some Data 5</td>
+<td>55</td>
+<td>No</td>
+<td>a_value,c_value</td>
+<td><span class="label lightblue">Tag1</span><span class="label lightblue">Tag2</span></td>
+</tr>
+<tr class="gradeA">
+<td>Some Data 1</td>
+<td>10</td>
+<td>Yes</td>
+<td>a_value,b_value</td>
+<td><span class="label lightblue">Tag1</span><span class="label lightblue">Tag3</span></td>
+</tr>
+<tr class="gradeA">
+<td>Some Data 2</td>
+<td>22</td>
+<td>No</td>
+<td>d_value,aa_value</td>
+<td><span class="label lightblue">Tag1</span></td>
+</tr>
+<tr class="gradeA">
+<td>Some Data 3</td>
+<td>33</td>
+<td>Yes</td>
+<td>a_value,c_value</td>
+<td><span class="label lightblue">Tag1</span><span class="label lightblue">Tag2</span></td>
+</tr>
+<tr class="gradeA">
+<td>Some Data 4</td>
+<td>44</td>
+<td>No</td>
+<td>a_value,bb_value</td>
+<td><span class="label lightblue">Tag1</span><span class="label lightblue">Tag2</span></td>
+</tr>
+<tr class="gradeA">
+<td>Some Data 5</td>
+<td>55</td>
+<td>Yes</td>
+<td>c_value,e_value</td>
+<td><span class="label lightblue">Tag2</span></td>
+</tr>
+<tr class="gradeA">
+<td>Some Data 1</td>
+<td>101</td>
+<td>No</td>
+<td>a_value,e_value</td>
+<td><span class="label lightblue">Tag1</span></td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</body>
+</html>
