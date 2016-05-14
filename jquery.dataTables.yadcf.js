@@ -2045,15 +2045,18 @@ var yadcf = (function ($) {
 			aN,
 			bN;
 
+		if (typeof a === 'object' && typeof a.label === 'string') {
+			a = a.label;
+		}
+		if (typeof b === 'object' && typeof b.label === 'string') {
+			b = b.label;
+		}
+
 		if (typeof a === 'string') {
 			aA = a.replace(reA, '');
-		} else if (typeof a === 'object' && typeof a.label === 'string') {
-			aA = a.label.replace(reA, '');
 		}
 		if (typeof b === 'string') {
 			bA = b.replace(reA, '');
-		} else if (typeof b === 'object' && typeof b.label === 'string') {
-			bA = b.label.replace(reA, '');
 		}
 
 		if (aA === bA) {
