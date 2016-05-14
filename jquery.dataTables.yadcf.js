@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.17 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.18 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2040,10 +2040,22 @@ var yadcf = (function ($) {
 	}
 
 	function sortAlphaNum(a, b) {
-		var aA = a.replace(reA, ""),
-			bA = b.replace(reA, ""),
+		var aA,
+			bA,
 			aN,
 			bN;
+
+		if (typeof a === 'string') {
+			aA = a.replace(reA, '');
+		} else if (typeof a === 'object' && typeof a.label === 'string') {
+			aA = a.label.replace(reA, '');
+		}
+		if (typeof b === 'string') {
+			bA = b.replace(reA, '');
+		} else if (typeof b === 'object' && typeof b.label === 'string') {
+			bA = b.label.replace(reA, '');
+		}
+
 		if (aA === bA) {
 			aN = parseInt(a.replace(reN, ""), 10);
 			bN = parseInt(b.replace(reN, ""), 10);
