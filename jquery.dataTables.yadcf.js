@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.18 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.19 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2497,19 +2497,19 @@ var yadcf = (function ($) {
 						if (columnObj.append_data_to_table_data === undefined) {
 							if (typeof column_data[0] === 'object') {
 								for (ii = 0; ii < column_data.length; ii++) {
-									options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
+									options_tmp += "<option value=\"" + column_data[ii].value.replace(/"/g, '&quot;') + "\">" + column_data[ii].label + "</option>";
 								}
 							} else {
 								for (ii = 0; ii < column_data.length; ii++) {
-									options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
+									options_tmp += "<option value=\"" + column_data[ii].replace(/"/g, '&quot;') + "\">" + column_data[ii] + "</option>";
 								}
 							}
 						} else {
 							for (ii = 0; ii < column_data.length; ii++) {
 								if (typeof column_data[ii] === 'object') {
-									options_tmp += "<option value=\"" + column_data[ii].value + "\">" + column_data[ii].label + "</option>";
+									options_tmp += "<option value=\"" + column_data[ii].value.replace(/"/g, '&quot;') + "\">" + column_data[ii].label + "</option>";
 								} else {
-									options_tmp += "<option value=\"" + column_data[ii] + "\">" + column_data[ii] + "</option>";
+									options_tmp += "<option value=\"" + column_data[ii].replace(/"/g, '&quot;') + "\">" + column_data[ii] + "</option>";
 								}
 							}
 						}
@@ -2970,6 +2970,8 @@ var yadcf = (function ($) {
 				max =   document.getElementById(toId).value;
 				min = document.getElementById(fromId).value;
 			}
+
+			//moment(min, "YYYY-MM-DD hh:mm:ss").toDate() typeof Date
 
 			try {
 				if (min.length === (date_format.length + 2)) {
