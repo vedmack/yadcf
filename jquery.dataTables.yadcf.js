@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.20 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.21 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -249,6 +249,12 @@
 				Description:		You can choose datapicker library from defined in special notes
 				Special notes:		Currently supported only jQueryUI datepicker (datepicker) and Bootstrap datepicker (eonasdan-bootstrap-datetimepicker)
 				                    Bootstrap datepicker depends moment library. This plugin depends moment too.
+									
+* style_class
+                Required:			false
+				Type:				string
+				Description:		Allows adding additional class/classes to filter - available for the following filters: 
+									select / multi_select / text / custom_func / multi_select_custom_func
 
 * Global Parameters (per table rather than per column)
 *
