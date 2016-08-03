@@ -256,6 +256,11 @@
 				Description:		Allows adding additional class/classes to filter - available for the following filters: 
 									select / multi_select / text / custom_func / multi_select_custom_func
 
+* style_button_class
+                Required:			false
+				Type:				string
+				Description:		Allows adding additional class/classes to button
+
 * Global Parameters (per table rather than per column)
 *
 * Usage example yadcf.init(oTable,[{column_number : 0}, {column_number: 3}],{cumulative_filtering: true});
@@ -545,6 +550,7 @@ var yadcf = (function ($) {
 				html_data_type: 'text',
 				exclude_label: 'exclude',
 				style_class: '',
+				style_button_class: '',
                 datepicker_type: 'jquery-ui',
 				range_data_type: 'single',
 				range_data_type_delim: '-',
@@ -1381,7 +1387,7 @@ var yadcf = (function ($) {
 
 		if (filter_reset_button_text !== false) {
 			$(filter_selector_string_tmp).append("<button type=\"button\" onmousedown=\"yadcf.stopPropagation(event);\" " +
-				"onclick=\"yadcf.stopPropagation(event);yadcf.rangeClear('" + table_selector_jq_friendly + "',event," + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">" + filter_reset_button_text + "</button>");
+				"onclick=\"yadcf.stopPropagation(event);yadcf.rangeClear('" + table_selector_jq_friendly + "',event," + column_number + "); return false;\" class=\"yadcf-filter-reset-button " + columnObj.style_button_class + "\">" + filter_reset_button_text + "</button>");
 		}
 
 		if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
@@ -1588,7 +1594,7 @@ var yadcf = (function ($) {
 
 		if (filter_reset_button_text !== false) {
 			$(filter_selector_string_tmp).append("<button type=\"button\" onmousedown=\"yadcf.stopPropagation(event);\" " +
-				"onclick=\"yadcf.stopPropagation(event);yadcf.rangeClear('" + table_selector_jq_friendly + "',event," + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">" + filter_reset_button_text + "</button>");
+				"onclick=\"yadcf.stopPropagation(event);yadcf.rangeClear('" + table_selector_jq_friendly + "',event," + column_number + "); return false;\" class=\"yadcf-filter-reset-button " + columnObj.style_button_class + "\">" + filter_reset_button_text + "</button>");
 		}
 
         if (columnObj.datepicker_type === 'jquery-ui') {
@@ -1665,7 +1671,7 @@ var yadcf = (function ($) {
 		columnObj = getOptions(oTable.selector)[column_number];
 
 		//add a wrapper to hold both filter and reset button
-		$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper\"></div>");
+		$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\" id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper\"></div>");
 		filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
 		filter_selector_string_tmp = filter_selector_string;
 
@@ -1678,7 +1684,7 @@ var yadcf = (function ($) {
 
 		if (filter_reset_button_text !== false) {
 			$(filter_selector_string_tmp).append('<button type="button" id="' + dateId + '-reset" ' + 'onmousedown="yadcf.stopPropagation(event);" ' +
-				'onclick="yadcf.stopPropagation(event);yadcf.dateSelectSingle(\'' + table_selector_jq_friendly + '\',yadcf.eventTargetFixUp(event).target, \'clear\'); return false;" class="yadcf-filter-reset-button">' + filter_reset_button_text + '</button>');
+				'onclick="yadcf.stopPropagation(event);yadcf.dateSelectSingle(\'' + table_selector_jq_friendly + '\',yadcf.eventTargetFixUp(event).target, \'clear\'); return false;" class="yadcf-filter-reset-button ' + columnObj.style_button_class + '">' + filter_reset_button_text + '</button>');
 		}
 
 	    if (columnObj.datepicker_type === 'jquery-ui') {
@@ -1931,7 +1937,7 @@ var yadcf = (function ($) {
 
 			if (filter_reset_button_text !== false) {
 				$(filter_selector_string_tmp).append("<button type=\"button\" onmousedown=\"yadcf.stopPropagation(event);\" " +
-					"onclick=\"yadcf.stopPropagation(event);yadcf.rangeNumberSliderClear('" + table_selector_jq_friendly + "',event); return false;\" class=\"yadcf-filter-reset-button range-number-slider-reset-button\">" + filter_reset_button_text + "</button>");
+					"onclick=\"yadcf.stopPropagation(event);yadcf.rangeNumberSliderClear('" + table_selector_jq_friendly + "',event); return false;\" class=\"yadcf-filter-reset-button range-number-slider-reset-button " + columnObj.style_button_class + "\">" + filter_reset_button_text + "</button>");
 			}
 		}
 
@@ -2596,7 +2602,7 @@ var yadcf = (function ($) {
 								filterActionStr + " onkeydown=\"yadcf.preventDefaultForEnter(event);\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);'>" + column_data + "</select>");
 							if (filter_reset_button_text !== false) {
 								$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " +
-									"id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">" + filter_reset_button_text + "</button>");
+									"id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button " + columnObj.style_button_class + "\">" + filter_reset_button_text + "</button>");
 							}
 						} else {
 							filterActionStr = 'onchange="yadcf.doFilterCustomDateFunc(this, \'' + table_selector_jq_friendly  + '\', ' +  column_number + ');"';
@@ -2607,7 +2613,7 @@ var yadcf = (function ($) {
 								filterActionStr	+ " onkeydown=\"yadcf.preventDefaultForEnter(event);\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);'>" + column_data + "</select>");
 							if (filter_reset_button_text !== false) {
 								$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" onmousedown=\"yadcf.stopPropagation(event);\" " +
-									"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterCustomDateFunc('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">" + filter_reset_button_text + "</button>");
+									"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterCustomDateFunc('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button " + columnObj.style_button_class + "\">" + filter_reset_button_text + "</button>");
 							}
 
 							if (settingsDt.oFeatures.bStateSave === true && settingsDt.oLoadedState) {
@@ -2651,7 +2657,7 @@ var yadcf = (function ($) {
 
 							if (filter_reset_button_text !== false) {
 								$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" onmousedown=\"yadcf.stopPropagation(event);\" " +
-									"onclick=\"yadcf.stopPropagation(event);yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">" + filter_reset_button_text + "</button>");
+									"onclick=\"yadcf.stopPropagation(event);yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button " + columnObj.style_button_class + "\">" + filter_reset_button_text + "</button>");
 							}
 
 							if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
@@ -2671,7 +2677,7 @@ var yadcf = (function ($) {
 
 							if (filter_reset_button_text !== false) {
 								$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" onmousedown=\"yadcf.stopPropagation(event);\" " +
-									"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterCustomDateFunc('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">" + filter_reset_button_text + "</button>");
+									"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterCustomDateFunc('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button " + columnObj.style_button_class + "\">" + filter_reset_button_text + "</button>");
 							}
 
 							if (settingsDt.oFeatures.bStateSave === true && settingsDt.oLoadedState) {
@@ -2716,7 +2722,7 @@ var yadcf = (function ($) {
 
 						if (filter_reset_button_text !== false) {
 							$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" onmousedown=\"yadcf.stopPropagation(event);\" " +
-								"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterAutocomplete('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button\">" + filter_reset_button_text + "</button>");
+								"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterAutocomplete('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button " + columnObj.style_button_class + "\">" + filter_reset_button_text + "</button>");
 						}
 
 					} else if (columnObj.filter_type === "text") {
@@ -2746,7 +2752,7 @@ var yadcf = (function ($) {
 
 						if (filter_reset_button_text !== false) {
 							$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" " +
-								"onclick=\"yadcf.stopPropagation(event);yadcf.textKeyUP(event,'" + table_selector_jq_friendly + "', '" + column_number + "', 'clear'); return false;\" class=\"yadcf-filter-reset-button\">" + filter_reset_button_text + "</button>");
+								"onclick=\"yadcf.stopPropagation(event);yadcf.textKeyUP(event,'" + table_selector_jq_friendly + "', '" + column_number + "', 'clear'); return false;\" class=\"yadcf-filter-reset-button " + columnObj.style_button_class + "\">" + filter_reset_button_text + "</button>");
 						}
 
 						if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
@@ -3665,7 +3671,7 @@ var yadcf = (function ($) {
 				+ "' placeholder='" + filterOptions.filter_default_label + "'" + " onkeyup=\"yadcf.textKeyUpMultiTables('" + tablesSelectors + "',event,'" + column_number_str + "');\"></input>");
 			if (filterOptions.filter_reset_button_text !== false) {
 				$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" " +
-					"onclick=\"yadcf.stopPropagation(event);yadcf.textKeyUpMultiTables('" + tablesSelectors + "', event,'" + column_number_str + "','clear'); return false;\" class=\"yadcf-filter-reset-button\">" + filterOptions.filter_reset_button_text + "</button>");
+					"onclick=\"yadcf.stopPropagation(event);yadcf.textKeyUpMultiTables('" + tablesSelectors + "', event,'" + column_number_str + "','clear'); return false;\" class=\"yadcf-filter-reset-button " + columnObj.style_button_class + "\">" + filterOptions.filter_reset_button_text + "</button>");
 			}
 			if (tablesArray[0].table !== undefined) {
 				tableTmp = $('#' + tablesArray[0].table().node().id).dataTable();
@@ -3770,12 +3776,12 @@ var yadcf = (function ($) {
 			if (filterOptions.filter_type === 'select') {
 				if (filterOptions.filter_reset_button_text !== false) {
 					$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly  + '-' + column_number_str + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" " +
-						"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterMultiTables('" + tablesSelectors + "', event,'" + column_number_str + "','clear'); return false;\" class=\"yadcf-filter-reset-button\">" + filterOptions.filter_reset_button_text + "</button>");
+						"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterMultiTables('" + tablesSelectors + "', event,'" + column_number_str + "','clear'); return false;\" class=\"yadcf-filter-reset-button " + columnObj.style_button_class + "\">" + filterOptions.filter_reset_button_text + "</button>");
 				}
 			} else if (filterOptions.filter_type === 'multi_select') {
 				if (filterOptions.filter_reset_button_text !== false) {
 					$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" " +
-						"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterMultiTablesMultiSelect('" + tablesSelectors + "', event,'" + column_number_str + "','clear'); return false;\" class=\"yadcf-filter-reset-button\">" + filterOptions.filter_reset_button_text + "</button>");
+						"onclick=\"yadcf.stopPropagation(event);yadcf.doFilterMultiTablesMultiSelect('" + tablesSelectors + "', event,'" + column_number_str + "','clear'); return false;\" class=\"yadcf-filter-reset-button " + columnObj.style_button_class + "\">" + filterOptions.filter_reset_button_text + "</button>");
 				}
 			}
 
