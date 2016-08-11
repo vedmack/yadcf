@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.23 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.24 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -925,10 +925,7 @@ var yadcf = (function ($) {
 				selected_values_trimmed.push($.trim(selected_values[i]));
 			}
 			if (selected_values_trimmed.length !== 0) {
-				if (filter_match_mode === "regex") {
-					stringForSearch = selected_values_trimmed.join('|');
-					oTable.fnFilter(stringForSearch, column_number_filter, true, false, true);
-				} else {
+				if (filter_match_mode !== "regex") {
 					stringForSearch = selected_values_trimmed.join('narutouzomaki');
 					stringForSearch = stringForSearch.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 					stringForSearch = stringForSearch.split('narutouzomaki').join('|');
@@ -939,6 +936,9 @@ var yadcf = (function ($) {
 					} else if (filter_match_mode === "startsWith") {
 						oTable.fnFilter("^(" + stringForSearch + ")", column_number_filter, true, false, true);
 					}
+				} else {
+					stringForSearch = selected_values_trimmed.join('|');
+					oTable.fnFilter(stringForSearch, column_number_filter, true, false, true);
 				}
 			} else {
 				oTable.fnFilter("", column_number_filter);
