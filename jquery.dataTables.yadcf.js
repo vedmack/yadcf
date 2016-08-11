@@ -925,17 +925,20 @@ var yadcf = (function ($) {
 				selected_values_trimmed.push($.trim(selected_values[i]));
 			}
 			if (selected_values_trimmed.length !== 0) {
-				stringForSearch = selected_values_trimmed.join('narutouzomaki');
-				stringForSearch = stringForSearch.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-				stringForSearch = stringForSearch.split('narutouzomaki').join('|');
-				if (filter_match_mode === "contains") {
+				if (filter_match_mode === "regex") {
+					stringForSearch = selected_values_trimmed.join('|');
 					oTable.fnFilter(stringForSearch, column_number_filter, true, false, true);
-				} else if (filter_match_mode === "exact") {
-					oTable.fnFilter("^(" + stringForSearch + ")$", column_number_filter, true, false, true);
-				} else if (filter_match_mode === "startsWith") {
-					oTable.fnFilter("^(" + stringForSearch + ")", column_number_filter, true, false, true);
-				} else if (filter_match_mode === "regex") {
-					oTable.fnFilter(stringForSearch, column_number_filter, true, false, true);
+				} else {
+					stringForSearch = selected_values_trimmed.join('narutouzomaki');
+					stringForSearch = stringForSearch.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+					stringForSearch = stringForSearch.split('narutouzomaki').join('|');
+					if (filter_match_mode === "contains") {
+						oTable.fnFilter(stringForSearch, column_number_filter, true, false, true);
+					} else if (filter_match_mode === "exact") {
+						oTable.fnFilter("^(" + stringForSearch + ")$", column_number_filter, true, false, true);
+					} else if (filter_match_mode === "startsWith") {
+						oTable.fnFilter("^(" + stringForSearch + ")", column_number_filter, true, false, true);
+					}
 				}
 			} else {
 				oTable.fnFilter("", column_number_filter);
