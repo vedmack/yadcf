@@ -3605,6 +3605,13 @@ var yadcf = (function ($) {
 			tmpParams,
 			tableSelector = '#' + oTable.table().node().id;
 
+	    /*
+        instance.selector will be undefined even though it is needed; set instance.selector to tableSelector.
+        */
+		if (typeof instance.selector === 'undefined' || instance.selector === null) {
+		    instance.selector = tableSelector;
+		}
+
 		if (params === undefined) {
 			params = {};
 		}
