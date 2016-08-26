@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.24 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.25 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -3605,10 +3605,10 @@ var yadcf = (function ($) {
 			tmpParams,
 			tableSelector = '#' + oTable.table().node().id;
 
-	    /*
-        instance.selector will be undefined even though it is needed; set instance.selector to tableSelector.
-        */
-		if (typeof instance.selector === 'undefined' || instance.selector === null) {
+	    
+        //in case that instance.selector will be undefined (jQuery 3)
+
+		if (instance.selector === undefined) {
 		    instance.selector = tableSelector;
 		}
 
