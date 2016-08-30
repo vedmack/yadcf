@@ -10,6 +10,7 @@
 * Fixed values with quotation marks filtered incorrectly by filter_type select https://github.com/vedmack/yadcf/issues/317
 * Added moment_date_format for better parsing when using datepicker_type: 'bootstrap-datetimepicker'
 * Some of additional closed issues https://github.com/vedmack/yadcf/issues/295 / https://github.com/vedmack/yadcf/issues/308 / https://github.com/vedmack/yadcf/issues/314
+  https://github.com/vedmack/yadcf/issues/342 / 
 	
 
 

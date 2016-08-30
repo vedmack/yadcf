@@ -4,7 +4,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0.beta.25 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.0.beta.26 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -637,6 +637,14 @@ var yadcf = (function ($) {
 	function escapeRegExp(string) {
 		return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 	}
+	
+	function escapeRegExpInArray(arr) {
+		var i;
+		for (i = 0; i < arr.length; i++) {
+			arr[i] = arr[i].replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+		}
+		return arr
+	}
 
 	function replaceAll(string, find, replace) {
 		return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
@@ -752,6 +760,9 @@ var yadcf = (function ($) {
 				ret_val = "^((?!" + selected_value + ").)*$";
 			}
 		} else {
+			if (filter_match_mode !== 'regex') {
+				selected_value = escapeRegExpInArray(selected_value);
+			}
 			if (filter_match_mode === "contains") {
 				ret_val = selected_value.join("|");
 			} else if (filter_match_mode === "exact") {
