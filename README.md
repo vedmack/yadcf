@@ -60,7 +60,12 @@ Features:
  - allow addition of classes to filters
 - External API functions:
  - exFilterColumn: Allows to trigger filter/s externally/programmatically (support ALL filter types!!!) , perfect for showing table with pre filtered columns
- - exGetColumnFilterVal: Allows to retreive  column current filtered value (support ALL filter types!!!)	
+ - exGetColumnFilterVal: Allows to retreive  column current filtered value (support ALL filter types!!!)
+ - exResetAllFilters: Allows to reset all filters externally/programmatically (support ALL filter types!!!) , perfect for adding a "reset all" button to your page!
+ - exResetFilters: Allows to reset specific filters externally/programmatically (support ALL filter types!!!) , can be used for resetting one or more filters
+ - initSelectPluginCustomTriggers: Allows to set any select jquery plugin initialize and refresh functions. jQuery selector will be passed to the user defined function to initialize and refresh the plugin.
+                                   Great for integrating any jquey select plugin  (Selectize / MultiSelect / etc)
+ - exFilterExternallyTriggered: Triggers all the available filters, should be used only when the externally_triggered option used
 - Notable datatables API / Features support
  - ColReorder / scrollX / scrollY / stateSave / deferRender / HTML5 data-* attributes / Complex headers
 
@@ -121,17 +126,22 @@ Available parameters - being set per column (detailed explanation inside jquery.
 * filter_type
 * custom_func
 * data
+* data_as_is
 * column_data_type
 * text_data_delimiter
 * html_data_type
+* html_data_selector
 * filter_container_id
+* filter_container_selector
 * filter_default_label
+* omit_default_label
 * filter_reset_button_text
 * enable_auto_complete
 * sort_as
 * sort_order
 * sort_as_custom_func
 * date_format
+* moment_date_format
 * ignore_char
 * filter_match_mode
 * select_type
@@ -140,6 +150,7 @@ Available parameters - being set per column (detailed explanation inside jquery.
 * filter_delay
 * html5_data
 * style_class
+* reset_button_style_class
 * datepicker_type
 * exclude
 * exclude_label
@@ -150,6 +161,8 @@ Available global parameters - being set per table (detailed explanation inside j
 
  * externally_triggered
  * cumulative_filtering
+ * filters_position
+ * filters_tr_index
 
 
 License:

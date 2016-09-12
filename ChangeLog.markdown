@@ -9,6 +9,7 @@
 * Added global property - filters_tr_index: Allow to control the index of the <tr> inside the thead of the table, e.g when one <tr> is used for headers/sort and another <tr> is used for filters https://github.com/vedmack/yadcf/issues/297
 * Fixed values with quotation marks filtered incorrectly by filter_type select https://github.com/vedmack/yadcf/issues/317
 * Added moment_date_format for better parsing when using datepicker_type: 'bootstrap-datetimepicker'
+* Support jQuery 3 https://github.com/vedmack/yadcf/issues/336
 * Some of additional closed issues https://github.com/vedmack/yadcf/issues/295 / https://github.com/vedmack/yadcf/issues/308 / https://github.com/vedmack/yadcf/issues/314
   https://github.com/vedmack/yadcf/issues/342 / 
 	
