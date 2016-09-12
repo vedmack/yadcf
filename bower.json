@@ -16,11 +16,12 @@
 		"jquery": ">=1.7.0"
 	},
 	"keywords": [
-		"jquery",
-		"datatables",
 		"filter",
-		"column",
-		"plugin"
+		"datatables",
+		"jQuery",
+		"jquery-plugin",
+		"plugin",
+		"column"
 	],
 	"license": "MIT"
 }

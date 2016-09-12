@@ -11,7 +11,7 @@
 * Added moment_date_format for better parsing when using datepicker_type: 'bootstrap-datetimepicker'
 * Support jQuery 3 https://github.com/vedmack/yadcf/issues/336
 * Some of additional closed issues https://github.com/vedmack/yadcf/issues/295 / https://github.com/vedmack/yadcf/issues/308 / https://github.com/vedmack/yadcf/issues/314
-  https://github.com/vedmack/yadcf/issues/342 / 
+  https://github.com/vedmack/yadcf/issues/342 / https://github.com/vedmack/yadcf/issues/351 / https://github.com/vedmack/yadcf/issues/347
 	
 
 
