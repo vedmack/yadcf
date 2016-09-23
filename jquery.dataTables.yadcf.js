@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.0
+* Version:     0.9.1.beta.1 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2799,17 +2799,10 @@ var yadcf = (function ($) {
                     $(filter_selector_string).find(".yadcf-filter").val($(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val"));
                 }
                 if (columnObj.filter_type === "auto_complete") {
-                    if (columnObj.filter_plugin_options !== undefined) {
-                        if (columnObj.filter_plugin_options.source === undefined || columnObj.filter_plugin_options.source.length === 0) {
-                            columnObj.filter_plugin_options.source = $(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number);
-                        }
-                        columnObj.filter_plugin_options.select = autocompleteSelect;
-                    } else {
-                        columnObj.filter_plugin_options = {
-                            source: $(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number),
-                            select: autocompleteSelect
-                        };
-                    }
+					columnObj.filter_plugin_options = {
+						source: $(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number),
+						select: autocompleteSelect
+					};
                     if (columnObj.externally_triggered === true) {
                         delete columnObj.filter_plugin_options.select;
                     }

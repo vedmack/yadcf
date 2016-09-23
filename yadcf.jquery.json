@@ -26,6 +26,7 @@
   "docs": "https://github.com/vedmack/yadcf/blob/master/README.md",
   "download": "https://github.com/vedmack/yadcf/archive/master.zip",
   "dependencies": {
-    "jquery": ">=1.7"
+    "jquery": ">=1.7",
+	"datatables": ">=1.9"
   }
 }
