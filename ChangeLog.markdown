@@ -2,6 +2,7 @@
 
 ## 0.9.1 still in beta (grab latest stable from https://github.com/vedmack/yadcf/releases)
 * Fixed autocomplete in cumulative mode filtering
+* Fixed chosen in cumulative mode filtering https://github.com/vedmack/yadcf/issues/344
 
 
 

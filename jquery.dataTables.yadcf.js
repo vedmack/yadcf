@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.1.beta.1 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.1.beta.2 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2577,7 +2577,9 @@ var yadcf = (function ($) {
                         }
 
                         initializeSelectPlugin(columnObj.select_type, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number), columnObj.select_type_options);
-
+                        if (columnObj.cumulative_filtering === true && columnObj.select_type === 'chosen') {
+							refreshSelectPlugin(columnObj, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number));
+						}
                     } else if (columnObj.filter_type === "auto_complete") {
                         $(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_data);
                     }
@@ -2648,7 +2650,10 @@ var yadcf = (function ($) {
 
                         if (columnObj.select_type !== undefined) {
                             initializeSelectPlugin(columnObj.select_type, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number), columnObj.select_type_options);
-                        }
+							if (columnObj.cumulative_filtering === true && columnObj.select_type === 'chosen') {
+								refreshSelectPlugin(columnObj, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number));
+							}
+						}
 
                     } else if (columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
 
@@ -2713,7 +2718,10 @@ var yadcf = (function ($) {
 
                         if (columnObj.select_type !== undefined) {
                             initializeSelectPlugin(columnObj.select_type, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number), columnObj.select_type_options);
-                        }
+							if (columnObj.cumulative_filtering === true && columnObj.select_type === 'chosen') {
+								refreshSelectPlugin(columnObj, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number));
+							}
+						}
 
                     } else if (columnObj.filter_type === "auto_complete") {
 
@@ -3734,7 +3742,10 @@ var yadcf = (function ($) {
 
                             if (filterOptions.select_type !== undefined) {
                                 initializeSelectPlugin(filterOptions.select_type, $('#' + filterOptions.filter_container_id + ' select'), filterOptions.select_type_options);
-                            }
+								if (filterOptions.cumulative_filtering === true && filterOptions.select_type === 'chosen') {
+									refreshSelectPlugin(filterOptions, $('#' + filterOptions.filter_container_id + ' select'));
+								}
+							}
                         });
                     }
                 }
@@ -3791,7 +3802,10 @@ var yadcf = (function ($) {
 
             if (filterOptions.select_type !== undefined) {
                 initializeSelectPlugin(filterOptions.select_type, $("#yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str), filterOptions.select_type_options);
-            }
+				if (filterOptions.cumulative_filtering === true && filterOptions.select_type === 'chosen') {
+					refreshSelectPlugin(filterOptions, $("#yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str));
+				}
+			}
             break;
         default:
             alert('Filters Multiple Tables does not support ' + filterOptions.filter_type);
