@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.1.beta.2(grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.1.beta.3 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -859,9 +859,9 @@ var yadcf = (function ($) {
 
     function calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly) {
         var column_number_filter;
-        if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined)
-                || settingsDt._colReorder != undefined
-                || (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
+        if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) ||
+			settingsDt._colReorder != undefined ||
+			(plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
             initColReorder2(settingsDt, table_selector_jq_friendly);
             column_number_filter = plugins[table_selector_jq_friendly].ColReorder[column_number];
         } else {
@@ -2527,19 +2527,19 @@ var yadcf = (function ($) {
                         if (columnObj.append_data_to_table_data === undefined) {
                             if (typeof column_data[0] === 'object') {
                                 for (ii = 0; ii < column_data.length; ii++) {
-                                    options_tmp += "<option value=\"" + column_data[ii].value.replace(/"/g, '&quot;') + "\">" + column_data[ii].label + "</option>";
+                                    options_tmp += "<option value=\"" + (column_data[ii].value + '').replace(/"/g, '&quot;') + "\">" + column_data[ii].label + "</option>";
                                 }
                             } else {
                                 for (ii = 0; ii < column_data.length; ii++) {
-                                    options_tmp += "<option value=\"" + column_data[ii].replace(/"/g, '&quot;') + "\">" + column_data[ii] + "</option>";
+                                    options_tmp += "<option value=\"" + (column_data[ii] + '').replace(/"/g, '&quot;') + "\">" + column_data[ii] + "</option>";
                                 }
                             }
                         } else {
                             for (ii = 0; ii < column_data.length; ii++) {
                                 if (typeof column_data[ii] === 'object') {
-                                    options_tmp += "<option value=\"" + column_data[ii].value.replace(/"/g, '&quot;') + "\">" + column_data[ii].label + "</option>";
+                                    options_tmp += "<option value=\"" + (column_data[ii].value + '').replace(/"/g, '&quot;') + "\">" + column_data[ii].label + "</option>";
                                 } else {
-                                    options_tmp += "<option value=\"" + column_data[ii].replace(/"/g, '&quot;') + "\">" + column_data[ii] + "</option>";
+                                    options_tmp += "<option value=\"" + (column_data[ii] + '').replace(/"/g, '&quot;') + "\">" + column_data[ii] + "</option>";
                                 }
                             }
                         }
@@ -2733,8 +2733,8 @@ var yadcf = (function ($) {
                         if (columnObj.externally_triggered === true) {
                             filterActionStr = '';
                         }
-                        $(filter_selector_string).append("<input onkeydown=\"yadcf.preventDefaultForEnter(event);\" id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);"
-                            + "' placeholder='" + filter_default_label + "'" + " filter_match_mode='" + filter_match_mode + "' " + filterActionStr + "></input>");
+                        $(filter_selector_string).append("<input onkeydown=\"yadcf.preventDefaultForEnter(event);\" id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);" +
+						"' placeholder='" + filter_default_label + "'" + " filter_match_mode='" + filter_match_mode + "' " + filterActionStr + "></input>");
                         $(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_data);
 
                         if (filter_reset_button_text !== false) {
@@ -2764,8 +2764,8 @@ var yadcf = (function ($) {
                             }
                         }
 
-                        $(filter_selector_string).append(exclude_str + "<input type=\"text\" onkeydown=\"yadcf.preventDefaultForEnter(event);\" id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter " + columnObj.style_class + "\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);"
-                            + "' placeholder='" + filter_default_label + "'" + " filter_match_mode='" + filter_match_mode + "' " + filterActionStr + "></input>");
+                        $(filter_selector_string).append(exclude_str + "<input type=\"text\" onkeydown=\"yadcf.preventDefaultForEnter(event);\" id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter " + columnObj.style_class + "\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);" +
+						"' placeholder='" + filter_default_label + "'" + " filter_match_mode='" + filter_match_mode + "' " + filterActionStr + "></input>");
 
                         if (filter_reset_button_text !== false) {
                             $(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" " +
@@ -3679,8 +3679,8 @@ var yadcf = (function ($) {
 
         switch (filterOptions.filter_type) {
         case 'text':
-            $(filter_selector_string).append("<input type=\"text\" id=\"yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str + "\" class=\"yadcf-filter\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);"
-                + "' placeholder='" + filterOptions.filter_default_label + "'" + " onkeyup=\"yadcf.textKeyUpMultiTables('" + tablesSelectors + "',event,'" + column_number_str + "');\"></input>");
+            $(filter_selector_string).append("<input type=\"text\" id=\"yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str + "\" class=\"yadcf-filter\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);" +
+			"' placeholder='" + filterOptions.filter_default_label + "'" + " onkeyup=\"yadcf.textKeyUpMultiTables('" + tablesSelectors + "',event,'" + column_number_str + "');\"></input>");
             if (filterOptions.filter_reset_button_text !== false) {
                 $(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" " +
                     "onclick=\"yadcf.stopPropagation(event);yadcf.textKeyUpMultiTables('" + tablesSelectors + "', event,'" + column_number_str + "','clear'); return false;\" class=\"yadcf-filter-reset-button " + filterOptions.reset_button_style_class + "\">" + filterOptions.filter_reset_button_text + "</button>");
@@ -4339,10 +4339,10 @@ var yadcf = (function ($) {
         getOptions : getOptions,
         rangeNumberKeyUP : rangeNumberKeyUP,
         rangeDateKeyUP : rangeDateKeyUP,
-        rangeClear : rangeClear,
+        rangeClear: rangeClear,
         rangeNumberSliderClear : rangeNumberSliderClear,
         stopPropagation : stopPropagation,
-        exFilterColumn : exFilterColumn,
+        exFilterColumn: exFilterColumn,
         exGetColumnFilterVal : exGetColumnFilterVal,
         exResetAllFilters: exResetAllFilters,
         dateKeyUP : dateKeyUP,
