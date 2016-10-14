@@ -404,7 +404,16 @@
                                     filter_container_id: '' (required),
                 Note:               All the usual properties of yadcf should be supported in initMultipleColumns too!
 */
-var yadcf = (function ($) {
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define(['jquery'], factory);
+  } else if (typeof module === 'object' && module.exports) {
+    module.exports = factory(require('jquery'));
+  } else {
+    root.yadcf = factory(root.jQuery);
+  }
+}(this, function($) {
+var yadcf = (function () {
 
     'use strict';
 
@@ -4363,4 +4372,9 @@ var yadcf = (function ($) {
         generateTableSelectorJQFriendly2: generateTableSelectorJQFriendly2
     };
 
-}(jQuery));
+}());
+    if (window) {
+        window.yadcf = yadcf;
+    }
+    return yadcf;
+}));
