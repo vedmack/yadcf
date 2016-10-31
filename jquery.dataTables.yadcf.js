@@ -2858,7 +2858,8 @@
 				settingsDt,
 				column_number_filter,
 				currentFilterValues,
-				columnObj;
+				columnObj,
+				dateRange;
 
 			settingsDt = getSettingsObjFromTable(oTable);
 
@@ -2872,6 +2873,13 @@
 			columnObj = getOptions(oTable.selector)[column_number];
 
 			$(event.target).parent().find(".yadcf-filter-range").val("");
+			dateRange = $(event.target).parent().find(".yadcf-filter-range-date");
+			if (dateRange.length > 1) {
+				if (columnObj.datepicker_type === 'jquery-ui') {
+					$(dateRange[0]).datepicker('option', 'maxDate', null);
+					$(dateRange[1]).datepicker('option', 'minDate', null);
+				}
+			}
 			if ($(event.target).parent().find(".yadcf-filter-range-number").length > 0) {
 				$($(event.target).parent().find(".yadcf-filter-range")[0]).focus();
 			}
