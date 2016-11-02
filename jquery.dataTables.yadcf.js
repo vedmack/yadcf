@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.1.beta.6 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.1
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -575,6 +575,9 @@
 				return;
 			}
 			for (i = 0; i < options_arg.length; i++) {
+				if (options_arg[i].date_format !== undefined && options_arg[i].moment_date_format === undefined) {
+					options_arg[i].moment_date_format = options_arg[i].date_format;
+				}
 				if (options_arg[i].select_type === 'select2') {
 					default_options.select_type_options = {
 						adaptContainerCssClass: adaptContainerCssClassImpl
