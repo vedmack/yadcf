@@ -1,6 +1,12 @@
 # Yet Another DataTables Column Filter (yadcf) Change-log
 
-## 0.9.1 still in beta (grab latest stable from https://github.com/vedmack/yadcf/releases)
+## 0.9.2 still in beta (grab latest stable from https://github.com/vedmack/yadcf/releases)
+
+* Fixed language url / scrollX/Y filters does not load https://github.com/vedmack/yadcf/issues/292
+
+
+## 0.9.1
+
 * Added support to AMD and CommonJS https://github.com/vedmack/yadcf/pull/356
 * Improved filter values alpha numeric sorting, sort_as: "alphaNum"
 * Fixed autocomplete in cumulative mode filtering

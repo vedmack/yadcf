@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.2.beta.1 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.2.beta.2 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2387,6 +2387,9 @@
 			filters_position = $(document).data(table_selector + "_filters_position");
 			if (settingsDt.oScroll.sX !== '' || settingsDt.oScroll.sY !== '') {
 				table_selector = '.yadcf-datatables-table-' + table_selector_jq_friendly;
+				if ($(table_selector).length === 0) {
+					scrollXYHandler(oTable, '#' + getTableId(oTable));
+				}
 			}
 			if (settingsDt.oApi._fnGetUniqueThs !== undefined) {
 				unique_th = settingsDt.oApi._fnGetUniqueThs(settingsDt);
