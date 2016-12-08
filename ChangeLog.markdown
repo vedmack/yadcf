@@ -12,6 +12,7 @@
 * Fixed autocomplete in cumulative mode filtering
 * Fixed chosen in cumulative mode filtering https://github.com/vedmack/yadcf/issues/344
 * Support jQuery 3 (for .dataTable({}).yadcf api) https://github.com/vedmack/yadcf/issues/360
+* Fixed chosen with serverSide: true https://github.com/vedmack/yadcf/issues/374
 * Some of additional fixed issues https://github.com/vedmack/yadcf/issues/346 / https://github.com/vedmack/yadcf/pull/362 / https://github.com/vedmack/yadcf/issues/363
 
 

@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.2.beta.2 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.2.beta.3 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -711,6 +711,10 @@
 			if (selectType === 'chosen') {
 				$selectObject.chosen(select_type_options);
 				$selectObject.next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
+				refreshSelectPlugin({
+					select_type: selectType,
+					select_type_options: select_type_options
+				}, $selectObject);									
 			} else if (selectType === 'select2') {
 				if (!$selectObject.data('select2')) {
 					$selectObject.select2(select_type_options);
