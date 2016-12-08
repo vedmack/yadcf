@@ -3657,7 +3657,7 @@
 				tableSelector = '#' + oTable.table().node().id;
 
 			//in case that instance.selector will be undefined (jQuery 3)
-			if (instance.selector === undefined) {
+			if (! instance.selector ) {
 				instance.selector = tableSelector;
 			}
 
