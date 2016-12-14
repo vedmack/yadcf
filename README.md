@@ -1,6 +1,7 @@
 Yet Another DataTables Column Filter - (yadcf)
 =====
- 
+[![CDNJS](https://img.shields.io/cdnjs/v/yadcf.svg)](https://cdnjs.com/libraries/yadcf)
+
 Description:
 =====
 
