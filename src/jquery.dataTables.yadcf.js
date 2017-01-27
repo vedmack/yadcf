@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.2.beta.3 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.2.beta.4 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2901,7 +2901,7 @@
 			if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 				oTable.fnDraw();
 			} else {
-				oTable.fnFilter('-yadcf_delim-', column_number_filter);
+				oTable.fnFilter('', column_number_filter);
 			}
 
 			if (!oTable.fnSettings().oLoadedState) {

@@ -3,6 +3,7 @@
 ## 0.9.2 still in beta (grab latest stable from https://github.com/vedmack/yadcf/releases)
 
 * Fixed language url / scrollX/Y filters does not load https://github.com/vedmack/yadcf/issues/292
+* Some of additional fixed issues https://github.com/vedmack/yadcf/issues/328
 
 
 ## 0.9.1
