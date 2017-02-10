@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.2.beta.4 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.2.beta.5 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -580,7 +580,7 @@
 				}
 				if (options_arg[i].select_type === 'select2') {
 					default_options.select_type_options = {
-						adaptContainerCssClass: adaptContainerCssClassImpl
+						//adaptContainerCssClass: adaptContainerCssClassImpl
 					};
 				}
 				//no individual reset button for externally_triggered mode
@@ -738,6 +738,7 @@
 					$selectObject.select2(select_type_options);
 				}
 				$selectObject.val(val);
+				$selectObject.trigger('change');
 			} else if (selectType === 'custom_select') {
 				selectElementCustomRefreshFunc($selectObject);
 			}
@@ -2530,6 +2531,9 @@
 							}
 						}
 						$filter_selector = $(filter_selector_string).find(".yadcf-filter");
+						if (columnObj.select_type === 'select2') {
+							$filter_selector = $(filter_selector_string).find("select.yadcf-filter");
+						}
 					} else {
 						if (filter_container_id !== undefined) {
 							columnObj.filter_container_selector = "#" + filter_container_id;
