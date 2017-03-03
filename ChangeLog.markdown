@@ -4,6 +4,7 @@
 
 * Fixed language url / scrollX/Y filters does not load https://github.com/vedmack/yadcf/issues/292
 * Some of additional fixed issues https://github.com/vedmack/yadcf/issues/328
+* New feature - call a callback function after yadcf init is done - onInitComplete (read docs for more info)
 
 
 ## 0.9.1

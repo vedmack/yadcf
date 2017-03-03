@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.2.beta.5 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.2.beta.6 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -296,6 +296,15 @@
                 Default value:      undefined
                 Description:        Allow to control the index of the <tr> inside the thead of the table, e.g when one <tr> is used for headers/sort and
                                     another <tr> is used for filters
+									
+									
+* onInitComplete	
+                Required:           false
+                Type:               function
+                Default value:      undefined
+                Description:        Calls the provided callback function in the end of the yadcf init function
+				Note:               This callback function will run before datatables fires its event such as draw/xhr/etc., migth be usefull for call some
+									third parties init / loading code
 *
 *
 *
@@ -3650,6 +3659,10 @@
 				}
 				$.fn.dataTableExt.iApiIndex = 0;
 			}
+			
+			if (params !== undefined && params.onInitComplete !== undefined) {
+				params.onInitComplete();
+			}
 			return this;
 		};
 
@@ -3701,6 +3714,10 @@
 					initAndBindTable(instance, selector, i, oTable);
 				}
 				$.fn.dataTableExt.iApiIndex = 0;
+			}
+			
+			if (params !== undefined && params.onInitComplete !== undefined) {
+				params.onInitComplete();
 			}
 		}
 
