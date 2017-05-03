@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.2.beta.7  (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.2.beta.8 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2901,16 +2901,6 @@
 
 			$(event.target).parent().find(".yadcf-filter-range").val("");
 			dateRange = $(event.target).parent().find(".yadcf-filter-range-date");
-			if (dateRange.length > 1) {
-				if (columnObj.datepicker_type === 'jquery-ui') {
-					if (columnObj.filter_plugin_options.maxDate) {
-						$(dateRange[0]).datepicker('option', 'maxDate', columnObj.filter_plugin_options.maxDate);
-					}
-					if (columnObj.filter_plugin_options.minDate) {
-						$(dateRange[1]).datepicker('option', 'minDate', columnObj.filter_plugin_options.minDate);
-					}
-				}
-			}
 			if ($(event.target).parent().find(".yadcf-filter-range-number").length > 0) {
 				$($(event.target).parent().find(".yadcf-filter-range")[0]).focus();
 			}
