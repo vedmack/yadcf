@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.2.beta.8 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.2.beta.9 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -965,6 +965,7 @@
 					selected_values_trimmed.push($.trim(selected_values[i]));
 				}
 				if (selected_values_trimmed.length !== 0) {
+					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass("inuse");
 					if (filter_match_mode !== "regex") {
 						stringForSearch = selected_values_trimmed.join('narutouzomaki');
 						stringForSearch = stringForSearch.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
@@ -981,9 +982,11 @@
 						oTable.fnFilter(stringForSearch, column_number_filter, true, false, true);
 					}
 				} else {
+					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).removeClass("inuse");
 					oTable.fnFilter("", column_number_filter);
 				}
 			} else {
+				$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).removeClass("inuse");
 				oTable.fnFilter("", column_number_filter);
 			}
 			resetIApiIndex();
