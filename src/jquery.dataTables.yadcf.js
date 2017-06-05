@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.2.beta.9 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.2.beta.10 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -252,7 +252,7 @@
                 Required:           false
                 Type:               String
                 Description:        Allows adding additional class/classes to filter - available for the following filters:
-                                    select / multi_select / text / custom_func / multi_select_custom_func
+                                    select / multi_select / text / custom_func / multi_select_custom_func / range_number / range_number_slider / range_date
 
 * reset_button_style_class
                 Required:           false
@@ -1416,7 +1416,7 @@
 			columnObj = getOptions(oTable.selector)[column_number];
 
 			//add a wrapper to hold both filter and reset button
-			$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper\"></div>");
+			$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper " + columnObj.style_class + "\"></div>");
 			filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
 			filter_selector_string_tmp = filter_selector_string;
 
@@ -1619,7 +1619,7 @@
 				innerWrapperAdditionalClass = 'input-daterange';
 			}
 			//add a wrapper to hold both filter and reset button
-			$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper\"></div>");
+			$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper " + columnObj.style_class + "\"></div>");
 			filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
 			filter_selector_string_tmp = filter_selector_string;
 
@@ -1930,7 +1930,7 @@
 			if (isFinite(min_val) && isFinite(max_val) && isFinite(min_state_val) && isFinite(max_state_val)) {
 
 				//add a wrapper to hold both filter and reset button
-				$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper\"></div>");
+				$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper " + columnObj.style_class + "\"></div>");
 				filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
 				filter_selector_string_tmp = filter_selector_string;
 
