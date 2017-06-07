@@ -419,9 +419,9 @@
 	} else if (typeof module === 'object' && module.exports) {
 		module.exports = factory(require('jquery'));
 	} else {
-		root.yadcf = factory(root.jQuery);
+		root.yadcf = factory(root.jQuery, root.moment);
 	}
-}(this, function($) {
+}(this, function($, moment) {
 	var yadcf = (function () {
 
 		'use strict';
@@ -723,7 +723,7 @@
 				refreshSelectPlugin({
 					select_type: selectType,
 					select_type_options: select_type_options
-				}, $selectObject);									
+				}, $selectObject);
 			} else if (selectType === 'select2') {
 				if (!$selectObject.data('select2')) {
 					$selectObject.select2(select_type_options);
@@ -2104,7 +2104,7 @@
 			}
 			destroyThirdPartyPlugins(oTable);
 		}
-		
+
 		/* alphanum.js (C) Brian Huisman
 		   Based on the Alphanum Algorithm by David Koelle
 		   The Alphanum Algorithm is discussed at http://www.DaveKoelle.com
@@ -2131,7 +2131,7 @@
 			if (typeof b === 'object' && typeof b.label === 'string') {
 				b = b.label;
 			}
-			
+
 			var aa = chunkify(a.toLowerCase());
 			var bb = chunkify(b.toLowerCase());
 
@@ -3700,6 +3700,8 @@
 			}
 			$(document).data(instance.selector + "_filters_position", params.filters_position);
 
+            loadMomentIfNeeded(options_arg);
+
 			if ($(instance.selector).length === 1) {
 				setOptions(instance.selector, options_arg, params);
 				initAndBindTable(instance, instance.selector, 0, oTable);
@@ -4431,6 +4433,25 @@
 		};
 
 	}());
+
+	function loadMomentIfNeeded(options_arg) {
+        for (var i = 0; i < options_arg.length && !needMoment; i++) {
+	        var filter_type = options_arg[i].filter_type;
+	        if (filter_type === 'date' || filter_type === 'range_date') {
+                // momentjs is loaded when needed
+	            loadMoment();
+	            return;
+            }
+        }
+
+        function loadMoment() {
+            if (!moment && ((typeof define === 'function' && define.amd) || (typeof module === 'object' && module.exports))) {
+                // AMD or Commonjs context
+                moment = require('moment');
+            }
+        }
+    }
+
 	if (window) {
 		window.yadcf = yadcf;
 	}
