@@ -20,6 +20,7 @@
 	padding-left: 4px;
 	padding-bottom: 3px;
 	padding-top: 3px;
+	width: 90%;
 }
 
 .yadcf-filter > option{
@@ -37,6 +38,7 @@
 	display: inline-block;
 	white-space: nowrap;
 	margin-left: 2px;
+	min-width: 84%;
 }
 
 .yadcf-filter-range-number {
@@ -49,12 +51,14 @@
 }
 
 .yadcf-filter-range-date {
-	width: 80px;
+	width: 45%;
+	float: left;
 }
 
 .yadcf-filter-range-date-seperator {
 	margin-left: 10px;
 	margin-right: 10px;
+	float: left;
 }
 
 .yadcf-filter-wrapper-inner {
@@ -120,4 +124,7 @@
 }
 .yadcf-label.small {
 	font-size: 10px;
+}
+.dataTables_scrollHead {
+	overflow: visible !important;
 }
