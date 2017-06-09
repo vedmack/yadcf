@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.2.beta.10 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.2.beta.12 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -746,7 +746,9 @@
 				if (!$selectObject.data('select2')) {
 					$selectObject.select2(select_type_options);
 				}
-				$selectObject.val(val);
+				if (val !== undefined) {
+					$selectObject.val(val);
+				}
 				$selectObject.trigger('change');
 			} else if (selectType === 'custom_select') {
 				selectElementCustomRefreshFunc($selectObject);
@@ -764,7 +766,7 @@
 			var case_insensitive = yadcf.getOptions(table_arg.selector)[column_number].case_insensitive,
 				ret_val;
 
-			if (selected_value === '') {
+			if (!selected_value) {
 				return '';
 			}
 
@@ -790,6 +792,9 @@
 				}
 			} else {
 				if (filter_match_mode !== 'regex') {
+					if (!(selected_value instanceof Array)) {
+						selected_value = [selected_value];
+					}
 					selected_value = escapeRegExpInArray(selected_value);
 				}
 				if (filter_match_mode === "contains") {
@@ -4020,7 +4025,7 @@
 						tmpStr = yadcfMatchFilterString(table_arg, column_position, filter_value, optionsObj.filter_match_mode, false);
 						table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = tmpStr;
 						if (optionsObj.select_type !== undefined) {
-							refreshSelectPlugin(optionsObj, $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number), '-1');
+							refreshSelectPlugin(optionsObj, $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number));
 						}
 						break;
 					case 'multi_select':
@@ -4028,7 +4033,7 @@
 						tmpStr = yadcfMatchFilterString(table_arg, column_position, filter_value, optionsObj.filter_match_mode, true);
 						table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = tmpStr;
 						if (optionsObj.select_type !== undefined) {
-							refreshSelectPlugin(optionsObj, $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number), '-1');
+							refreshSelectPlugin(optionsObj, $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number));
 						}
 						break;
 					case 'range_date':
