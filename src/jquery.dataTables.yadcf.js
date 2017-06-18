@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.2.beta.12 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.2.beta.13 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -32,11 +32,11 @@
                 Required:           false
                 Type:               String
                 Default value:      'select'
-                Possible values:    select / multi_select / auto_complete / text / date / range_number / range_number_slider / range_date / custom_func / multi_select_custom_func
+                Possible values:    select / multi_select / auto_complete / text / date / range_number / range_number_slider / range_date / custom_func / multi_select_custom_func / date_custom_func
                 Description:        The type of the filter to be used in the column
 
 * custom_func
-                Required:           true (when filter_type is custom_func / multi_select_custom_func)
+                Required:           true (when filter_type is custom_func / multi_select_custom_func / date_custom_func)
                 Type:               function
                 Default value:      undefined
                 Description:        should be pointing to a function with the following signature myCustomFilterFunction(filterVal, columnVal, rowValues, stateVal) , where `filterVal` is the value from the select box,
@@ -1502,7 +1502,11 @@
 			column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
 
 			if (clear === undefined) {
-				oTable.fnFilter(date, column_number_filter);
+				if (columnObj.filter_type !== 'date_custom_func') {
+					oTable.fnFilter(date, column_number_filter);
+				} else {
+					doFilterCustomDateFunc({value: date}, table_selector_jq_friendly, column_number);
+				}
 				$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass("inuse");
 			} else if (clear === 'clear') {
 				if (exGetColumnFilterVal(oTable, column_number) === '') {
@@ -1711,7 +1715,8 @@
 				oTable,
 				columnObj,
 				datepickerObj = {},
-				filterActionStr;
+				filterActionStr,
+				settingsDt;
 
 			filter_wrapper_id = "yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number;
 
@@ -1771,6 +1776,13 @@
 
 			if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
 				$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(oTable.fnSettings().aoPreSearchCols[column_number].sSearch).addClass("inuse");
+			}
+			
+			if (columnObj.filter_type === 'date_custom_func') {
+				settingsDt = getSettingsObjFromTable(oTable);
+				if (settingsDt.oFeatures.bServerSide !== true) {
+					addCustomFunctionFilterCapability(table_selector_jq_friendly, "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_number);
+				}
 			}
 
 			resetIApiIndex();
@@ -2484,7 +2496,7 @@
 							filter_default_label = placeholderLang.filter;
 						} else if (columnObj.filter_type === "range_number" || columnObj.filter_type === "range_date") {
 							filter_default_label = placeholderLang.range;
-						} else if (columnObj.filter_type === "date") {
+						} else if (columnObj.filter_type === "date" || columnObj.filter_type === 'date_custom_func') {
 							filter_default_label = placeholderLang.date;
 						}
 						columnObj.filter_default_label = filter_default_label;
@@ -2841,7 +2853,7 @@
 								$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
 							}
 
-						} else if (columnObj.filter_type === "date") {
+						} else if (columnObj.filter_type === "date" || columnObj.filter_type === 'date_custom_func') {
 
 							addDateFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, filter_default_label, date_format);
 
@@ -3009,8 +3021,12 @@
 
 			if (date instanceof Date || moment(date, columnObj.date_format).isValid()) {
 				$("#" + dateId).addClass('inuse');
-				oTable.fnFilter(document.getElementById(dateId).value, column_number);
-				resetIApiIndex();
+				if (columnObj.filter_type !== 'date_custom_func') {
+					oTable.fnFilter(document.getElementById(dateId).value, column_number);
+					resetIApiIndex();
+				} else {
+					doFilterCustomDateFunc({value: date}, table_selector_jq_friendly, column_number);
+				}
 			} else if (date === "" || $.trim(event.target.value) === '') {
 				$("#" + dateId).removeClass('inuse');
 				$('#' + event.target.id).removeClass('inuse');
