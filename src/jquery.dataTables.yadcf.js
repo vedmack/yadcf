@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.2.beta.13 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.2.beta.15 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1512,6 +1512,31 @@
 				if (exGetColumnFilterVal(oTable, column_number) === '') {
 					return;
 				}
+				if (columnObj.filter_type == 'date_custom_func') {
+					//handle state saving
+					if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
+						if (!oTable.fnSettings().oLoadedState) {
+							oTable.fnSettings().oLoadedState = {};
+							oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
+						}
+						if (oTable.fnSettings().oFeatures.bStateSave === true) {
+							if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
+								oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
+									{
+										'from' : ""
+									};
+							} else {
+								yadcfState = {};
+								yadcfState[table_selector_jq_friendly] = [];
+								yadcfState[table_selector_jq_friendly][column_number] = {
+									'from' : ""
+								};
+								oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+							}
+							oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
+						}
+					}
+				}
 				oTable.fnFilter('', column_number_filter);
 				$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val('').removeClass("inuse");
 			}
@@ -1780,6 +1805,16 @@
 			
 			if (columnObj.filter_type === 'date_custom_func') {
 				settingsDt = getSettingsObjFromTable(oTable);
+				
+				if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
+					if (oTable.fnSettings().oLoadedState.yadcfState && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
+						$('#' + dateId).val(oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from);
+						if (oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from !== "") {
+							$('#' + dateId).addClass("inuse");
+						}
+					}
+				}
+			
 				if (settingsDt.oFeatures.bServerSide !== true) {
 					addCustomFunctionFilterCapability(table_selector_jq_friendly, "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_number);
 				}
@@ -4185,6 +4220,7 @@
 			case 'auto_complete':
 			case 'text':
 			case 'date':
+			case 'date_custom_func':
 				retVal = $filterElement.val();
 				if ($filterElement.prev().hasClass('yadcf-exclude-wrapper') && $filterElement.prev().find('input').prop('checked') === true) {
 					retVal = '_exclude_' + retVal;
