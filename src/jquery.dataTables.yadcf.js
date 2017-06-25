@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.2.beta.15 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.2.beta.16 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -686,8 +686,10 @@
 				tmpStr = obj.oInstance.selector;
 			} else if (obj.selector !== undefined) {
 				tmpStr = obj.selector;
-			} else {
+			} else if (obj.table !== undefined) {
 				tmpStr = obj.table().node().id;
+			} else {
+				return '';
 			}
 			tmpStr = replaceAll(tmpStr, ".", "-");
 			tmpStr = replaceAll(tmpStr, ' ', '');

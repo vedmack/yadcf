@@ -8,7 +8,7 @@
 * New feature - call a callback function after yadcf init is done - onInitComplete (read docs for more info)
 * Add support for style_class attribute to range filters https://github.com/vedmack/yadcf/issues/405
 * Misc bug fixed issues https://github.com/vedmack/yadcf/issues/399 / https://github.com/vedmack/yadcf/issues/389 / https://github.com/vedmack/yadcf/issues/404
-  https://github.com/vedmack/yadcf/issues/406
+  https://github.com/vedmack/yadcf/issues/406 / https://github.com/vedmack/yadcf/issues/411
 
 
 ## 0.9.1
