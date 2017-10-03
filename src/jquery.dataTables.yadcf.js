@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.2.beta.16 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.2.beta.17 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -3450,25 +3450,30 @@
 			columnObj = getOptions(oTable.selector)[column_number];
 
 			keyUp = function (table_selector_jq_friendly, column_number, clear) {
+				var fixedPrefix = '';
+				if (settingsDt._fixedHeader !== undefined && $('.fixedHeader-floating').is(":visible")) {
+					fixedPrefix = '.fixedHeader-floating ';
+				}
 				$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 
-				if (clear === 'clear' || $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val() === '') {
+				if (clear === 'clear' || $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val() === '') {
 					if (clear === 'clear' && exGetColumnFilterVal(oTable, column_number) === '') {
 						return;
 					}
-					$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
-					$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
+					
+					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
+					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
 					oTable.fnFilter("", column_number_filter);
 					resetIApiIndex();
 					return;
 				}
 
 				if (columnObj.exclude === true) {
-					exclude = $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).closest('.yadcf-filter-wrapper').find('.yadcf-exclude-wrapper :checkbox').prop('checked');
+					exclude = $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).closest('.yadcf-filter-wrapper').find('.yadcf-exclude-wrapper :checkbox').prop('checked');
 				}
-				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
+				$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
 
-				yadcfMatchFilter(oTable, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val(), columnObj.filter_match_mode, column_number_filter, exclude);
+				yadcfMatchFilter(oTable, $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val(), columnObj.filter_match_mode, column_number_filter, exclude);
 
 				resetIApiIndex();
 			};
