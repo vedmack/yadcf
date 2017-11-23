@@ -3680,10 +3680,14 @@
 				initAndBindTable(instance, instance.selector, 0, oTable);
 			} else {
 				for (i; i < $(instance.selector).length; i++) {
-					$.fn.dataTableExt.iApiIndex = i;
-					selector = instance.selector + ":eq(" + i + ")";
-					setOptions(instance.selector, options_arg, params);
-					initAndBindTable(instance, selector, i, oTable);
+					if(instance.fnSettings() !== undefined)
+					{
+                        			$.fn.dataTableExt.iApiIndex = i;
+                        			selector = instance.selector + ":eq(" + i + ")";
+                        			setOptions(instance.selector, options_arg, params);
+
+                        			initAndBindTable(instance, selector, i, oTable);
+					}
 				}
 				$.fn.dataTableExt.iApiIndex = 0;
 			}
