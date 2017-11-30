@@ -296,9 +296,9 @@
                 Default value:      undefined
                 Description:        Allow to control the index of the <tr> inside the thead of the table, e.g when one <tr> is used for headers/sort and
                                     another <tr> is used for filters
-									
-									
-* onInitComplete	
+
+
+* onInitComplete
                 Required:           false
                 Type:               function
                 Default value:      undefined
@@ -725,7 +725,7 @@
 				refreshSelectPlugin({
 					select_type: selectType,
 					select_type_options: select_type_options
-				}, $selectObject);									
+				}, $selectObject);
 			} else if (selectType === 'select2') {
 				if (!$selectObject.data('select2')) {
 					$selectObject.select2(select_type_options);
@@ -1667,10 +1667,9 @@
 				filterActionStr = '';
 			}
 
-			$(filter_selector_string).append("<input onkeydown=\"yadcf.preventDefaultForEnter(event);\" placeholder=\"" + filter_default_label[0] + "\" id=\"" + fromId + "\" class=\"yadcf-filter-range-date yadcf-filter-range\" " + filterActionStr + "></input>");
-			$(filter_selector_string).append("<span class=\"yadcf-filter-range-date-seperator\" >" +
-				"</span>");
-			$(filter_selector_string).append("<input onkeydown=\"yadcf.preventDefaultForEnter(event);\" placeholder=\"" + filter_default_label[1] + "\" id=\"" + toId + "\" class=\"yadcf-filter-range-date yadcf-filter-range\" " + filterActionStr + "></input>");
+			$(filter_selector_string).append("<input onkeydown=\"yadcf.preventDefaultForEnter(event);\" placeholder=\"" + filter_default_label[0] + "\" id=\"" + fromId + "\" class=\"yadcf-filter-range-date yadcf-filter-range yadcf-filter-range-start\" " + filterActionStr + "></input>");
+			$(filter_selector_string).append("<span class=\"yadcf-filter-range-date-seperator\" >" + "</span>");
+			$(filter_selector_string).append("<input onkeydown=\"yadcf.preventDefaultForEnter(event);\" placeholder=\"" + filter_default_label[1] + "\" id=\"" + toId + "\" class=\"yadcf-filter-range-date yadcf-filter-range yadcf-filter-range-end\" " + filterActionStr + "></input>");
 
 			$fromInput = $("#" + fromId);
 			$toInput = $("#" + toId);
@@ -1804,10 +1803,10 @@
 			if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
 				$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(oTable.fnSettings().aoPreSearchCols[column_number].sSearch).addClass("inuse");
 			}
-			
+
 			if (columnObj.filter_type === 'date_custom_func') {
 				settingsDt = getSettingsObjFromTable(oTable);
-				
+
 				if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
 					if (oTable.fnSettings().oLoadedState.yadcfState && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
 						$('#' + dateId).val(oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from);
@@ -1816,7 +1815,7 @@
 						}
 					}
 				}
-			
+
 				if (settingsDt.oFeatures.bServerSide !== true) {
 					addCustomFunctionFilterCapability(table_selector_jq_friendly, "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_number);
 				}
@@ -2158,7 +2157,7 @@
 			}
 			destroyThirdPartyPlugins(oTable);
 		}
-		
+
 		/* alphanum.js (C) Brian Huisman
 		   Based on the Alphanum Algorithm by David Koelle
 		   The Alphanum Algorithm is discussed at http://www.DaveKoelle.com
@@ -2185,7 +2184,7 @@
 			if (typeof b === 'object' && typeof b.label === 'string') {
 				b = b.label;
 			}
-			
+
 			var aa = chunkify(a.toLowerCase());
 			var bb = chunkify(b.toLowerCase());
 
@@ -3719,7 +3718,7 @@
 				}
 				$.fn.dataTableExt.iApiIndex = 0;
 			}
-			
+
 			if (params !== undefined && params.onInitComplete !== undefined) {
 				params.onInitComplete();
 			}
@@ -3775,7 +3774,7 @@
 				}
 				$.fn.dataTableExt.iApiIndex = 0;
 			}
-			
+
 			if (params !== undefined && params.onInitComplete !== undefined) {
 				params.onInitComplete();
 			}
