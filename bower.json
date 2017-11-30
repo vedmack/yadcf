@@ -2,7 +2,7 @@
 	"author": "Daniel Reznick",
 	"name": "yadcf",
 	"description": "This jQuery plug-in allows the user to easily add filter components to table columns, the plug-in works on top of the DataTables jQuery plug-in",
-	"version": "0.9.1",
+	"version": "0.9.2",
 	"homepage": "http://yadcf-showcase.appspot.com/",
 	"repository": {
 		"type": "git",

@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.1
+* Version:     0.9.2
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -32,11 +32,11 @@
                 Required:           false
                 Type:               String
                 Default value:      'select'
-                Possible values:    select / multi_select / auto_complete / text / date / range_number / range_number_slider / range_date / custom_func / multi_select_custom_func
+                Possible values:    select / multi_select / auto_complete / text / date / range_number / range_number_slider / range_date / custom_func / multi_select_custom_func / date_custom_func
                 Description:        The type of the filter to be used in the column
 
 * custom_func
-                Required:           true (when filter_type is custom_func / multi_select_custom_func)
+                Required:           true (when filter_type is custom_func / multi_select_custom_func / date_custom_func)
                 Type:               function
                 Default value:      undefined
                 Description:        should be pointing to a function with the following signature myCustomFilterFunction(filterVal, columnVal, rowValues, stateVal) , where `filterVal` is the value from the select box,
@@ -252,7 +252,7 @@
                 Required:           false
                 Type:               String
                 Description:        Allows adding additional class/classes to filter - available for the following filters:
-                                    select / multi_select / text / custom_func / multi_select_custom_func
+                                    select / multi_select / text / custom_func / multi_select_custom_func / range_number / range_number_slider / range_date
 
 * reset_button_style_class
                 Required:           false
@@ -296,6 +296,15 @@
                 Default value:      undefined
                 Description:        Allow to control the index of the <tr> inside the thead of the table, e.g when one <tr> is used for headers/sort and
                                     another <tr> is used for filters
+									
+									
+* onInitComplete	
+                Required:           false
+                Type:               function
+                Default value:      undefined
+                Description:        Calls the provided callback function in the end of the yadcf init function
+				Note:               This callback function will run before datatables fires its event such as draw/xhr/etc., migth be usefull for call some
+									third parties init / loading code
 *
 *
 *
@@ -580,7 +589,7 @@
 				}
 				if (options_arg[i].select_type === 'select2') {
 					default_options.select_type_options = {
-						adaptContainerCssClass: adaptContainerCssClassImpl
+						//adaptContainerCssClass: adaptContainerCssClassImpl
 					};
 				}
 				//no individual reset button for externally_triggered mode
@@ -677,8 +686,10 @@
 				tmpStr = obj.oInstance.selector;
 			} else if (obj.selector !== undefined) {
 				tmpStr = obj.selector;
-			} else {
+			} else if (obj.table !== undefined) {
 				tmpStr = obj.table().node().id;
+			} else {
+				return '';
 			}
 			tmpStr = replaceAll(tmpStr, ".", "-");
 			tmpStr = replaceAll(tmpStr, ' ', '');
@@ -711,8 +722,14 @@
 			if (selectType === 'chosen') {
 				$selectObject.chosen(select_type_options);
 				$selectObject.next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
+				refreshSelectPlugin({
+					select_type: selectType,
+					select_type_options: select_type_options
+				}, $selectObject);									
 			} else if (selectType === 'select2') {
-				$selectObject.select2(select_type_options);
+				if (!$selectObject.data('select2')) {
+					$selectObject.select2(select_type_options);
+				}
 				if ($selectObject.next().hasClass('select2-container')) {
 					$selectObject.next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
 				}
@@ -728,8 +745,13 @@
 			if (selectType === 'chosen') {
 				$selectObject.trigger("chosen:updated");
 			} else if (selectType === 'select2') {
-				$selectObject.select2(select_type_options);
-				$selectObject.val(val);
+				if (!$selectObject.data('select2')) {
+					$selectObject.select2(select_type_options);
+				}
+				if (val !== undefined) {
+					$selectObject.val(val);
+				}
+				$selectObject.trigger('change');
 			} else if (selectType === 'custom_select') {
 				selectElementCustomRefreshFunc($selectObject);
 			}
@@ -746,7 +768,7 @@
 			var case_insensitive = yadcf.getOptions(table_arg.selector)[column_number].case_insensitive,
 				ret_val;
 
-			if (selected_value === '') {
+			if (!selected_value) {
 				return '';
 			}
 
@@ -772,6 +794,9 @@
 				}
 			} else {
 				if (filter_match_mode !== 'regex') {
+					if (!(selected_value instanceof Array)) {
+						selected_value = [selected_value];
+					}
 					selected_value = escapeRegExpInArray(selected_value);
 				}
 				if (filter_match_mode === "contains") {
@@ -947,6 +972,7 @@
 					selected_values_trimmed.push($.trim(selected_values[i]));
 				}
 				if (selected_values_trimmed.length !== 0) {
+					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass("inuse");
 					if (filter_match_mode !== "regex") {
 						stringForSearch = selected_values_trimmed.join('narutouzomaki');
 						stringForSearch = stringForSearch.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
@@ -963,9 +989,11 @@
 						oTable.fnFilter(stringForSearch, column_number_filter, true, false, true);
 					}
 				} else {
+					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).removeClass("inuse");
 					oTable.fnFilter("", column_number_filter);
 				}
 			} else {
+				$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).removeClass("inuse");
 				oTable.fnFilter("", column_number_filter);
 			}
 			resetIApiIndex();
@@ -1395,7 +1423,7 @@
 			columnObj = getOptions(oTable.selector)[column_number];
 
 			//add a wrapper to hold both filter and reset button
-			$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper\"></div>");
+			$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper " + columnObj.style_class + "\"></div>");
 			filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
 			filter_selector_string_tmp = filter_selector_string;
 
@@ -1476,11 +1504,40 @@
 			column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
 
 			if (clear === undefined) {
-				oTable.fnFilter(date, column_number_filter);
+				if (columnObj.filter_type !== 'date_custom_func') {
+					oTable.fnFilter(date, column_number_filter);
+				} else {
+					doFilterCustomDateFunc({value: date}, table_selector_jq_friendly, column_number);
+				}
 				$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass("inuse");
 			} else if (clear === 'clear') {
 				if (exGetColumnFilterVal(oTable, column_number) === '') {
 					return;
+				}
+				if (columnObj.filter_type == 'date_custom_func') {
+					//handle state saving
+					if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
+						if (!oTable.fnSettings().oLoadedState) {
+							oTable.fnSettings().oLoadedState = {};
+							oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
+						}
+						if (oTable.fnSettings().oFeatures.bStateSave === true) {
+							if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
+								oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
+									{
+										'from' : ""
+									};
+							} else {
+								yadcfState = {};
+								yadcfState[table_selector_jq_friendly] = [];
+								yadcfState[table_selector_jq_friendly][column_number] = {
+									'from' : ""
+								};
+								oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+							}
+							oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
+						}
+					}
 				}
 				oTable.fnFilter('', column_number_filter);
 				$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val('').removeClass("inuse");
@@ -1598,7 +1655,7 @@
 				innerWrapperAdditionalClass = 'input-daterange';
 			}
 			//add a wrapper to hold both filter and reset button
-			$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper\"></div>");
+			$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper " + columnObj.style_class + "\"></div>");
 			filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
 			filter_selector_string_tmp = filter_selector_string;
 
@@ -1685,7 +1742,8 @@
 				oTable,
 				columnObj,
 				datepickerObj = {},
-				filterActionStr;
+				filterActionStr,
+				settingsDt;
 
 			filter_wrapper_id = "yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number;
 
@@ -1745,6 +1803,23 @@
 
 			if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
 				$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(oTable.fnSettings().aoPreSearchCols[column_number].sSearch).addClass("inuse");
+			}
+			
+			if (columnObj.filter_type === 'date_custom_func') {
+				settingsDt = getSettingsObjFromTable(oTable);
+				
+				if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
+					if (oTable.fnSettings().oLoadedState.yadcfState && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
+						$('#' + dateId).val(oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from);
+						if (oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from !== "") {
+							$('#' + dateId).addClass("inuse");
+						}
+					}
+				}
+			
+				if (settingsDt.oFeatures.bServerSide !== true) {
+					addCustomFunctionFilterCapability(table_selector_jq_friendly, "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_number);
+				}
 			}
 
 			resetIApiIndex();
@@ -1909,7 +1984,7 @@
 			if (isFinite(min_val) && isFinite(max_val) && isFinite(min_state_val) && isFinite(max_state_val)) {
 
 				//add a wrapper to hold both filter and reset button
-				$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper\"></div>");
+				$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper " + columnObj.style_class + "\"></div>");
 				filter_selector_string = filter_selector_string + " div.yadcf-filter-wrapper";
 				filter_selector_string_tmp = filter_selector_string;
 
@@ -2383,6 +2458,9 @@
 			filters_position = $(document).data(table_selector + "_filters_position");
 			if (settingsDt.oScroll.sX !== '' || settingsDt.oScroll.sY !== '') {
 				table_selector = '.yadcf-datatables-table-' + table_selector_jq_friendly;
+				if ($(table_selector).length === 0) {
+					scrollXYHandler(oTable, '#' + getTableId(oTable));
+				}
 			}
 			if (settingsDt.oApi._fnGetUniqueThs !== undefined) {
 				unique_th = settingsDt.oApi._fnGetUniqueThs(settingsDt);
@@ -2455,7 +2533,7 @@
 							filter_default_label = placeholderLang.filter;
 						} else if (columnObj.filter_type === "range_number" || columnObj.filter_type === "range_date") {
 							filter_default_label = placeholderLang.range;
-						} else if (columnObj.filter_type === "date") {
+						} else if (columnObj.filter_type === "date" || columnObj.filter_type === 'date_custom_func') {
 							filter_default_label = placeholderLang.date;
 						}
 						columnObj.filter_default_label = filter_default_label;
@@ -2519,6 +2597,9 @@
 							}
 						}
 						$filter_selector = $(filter_selector_string).find(".yadcf-filter");
+						if (columnObj.select_type === 'select2') {
+							$filter_selector = $(filter_selector_string).find("select.yadcf-filter");
+						}
 					} else {
 						if (filter_container_id !== undefined) {
 							columnObj.filter_container_selector = "#" + filter_container_id;
@@ -2809,7 +2890,7 @@
 								$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
 							}
 
-						} else if (columnObj.filter_type === "date") {
+						} else if (columnObj.filter_type === "date" || columnObj.filter_type === 'date_custom_func') {
 
 							addDateFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, filter_default_label, date_format);
 
@@ -2877,12 +2958,6 @@
 
 			$(event.target).parent().find(".yadcf-filter-range").val("");
 			dateRange = $(event.target).parent().find(".yadcf-filter-range-date");
-			if (dateRange.length > 1) {
-				if (columnObj.datepicker_type === 'jquery-ui') {
-					$(dateRange[0]).datepicker('option', 'maxDate', null);
-					$(dateRange[1]).datepicker('option', 'minDate', null);
-				}
-			}
 			if ($(event.target).parent().find(".yadcf-filter-range-number").length > 0) {
 				$($(event.target).parent().find(".yadcf-filter-range")[0]).focus();
 			}
@@ -2890,7 +2965,7 @@
 			if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 				oTable.fnDraw();
 			} else {
-				oTable.fnFilter('-yadcf_delim-', column_number_filter);
+				oTable.fnFilter('', column_number_filter);
 			}
 
 			if (!oTable.fnSettings().oLoadedState) {
@@ -2983,8 +3058,12 @@
 
 			if (date instanceof Date || moment(date, columnObj.date_format).isValid()) {
 				$("#" + dateId).addClass('inuse');
-				oTable.fnFilter(document.getElementById(dateId).value, column_number);
-				resetIApiIndex();
+				if (columnObj.filter_type !== 'date_custom_func') {
+					oTable.fnFilter(document.getElementById(dateId).value, column_number);
+					resetIApiIndex();
+				} else {
+					doFilterCustomDateFunc({value: date}, table_selector_jq_friendly, column_number);
+				}
 			} else if (date === "" || $.trim(event.target.value) === '') {
 				$("#" + dateId).removeClass('inuse');
 				$('#' + event.target.id).removeClass('inuse');
@@ -3371,25 +3450,30 @@
 			columnObj = getOptions(oTable.selector)[column_number];
 
 			keyUp = function (table_selector_jq_friendly, column_number, clear) {
+				var fixedPrefix = '';
+				if (settingsDt._fixedHeader !== undefined && $('.fixedHeader-floating').is(":visible")) {
+					fixedPrefix = '.fixedHeader-floating ';
+				}
 				$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 
-				if (clear === 'clear' || $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val() === '') {
+				if (clear === 'clear' || $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val() === '') {
 					if (clear === 'clear' && exGetColumnFilterVal(oTable, column_number) === '') {
 						return;
 					}
-					$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
-					$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
+					
+					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
+					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
 					oTable.fnFilter("", column_number_filter);
 					resetIApiIndex();
 					return;
 				}
 
 				if (columnObj.exclude === true) {
-					exclude = $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).closest('.yadcf-filter-wrapper').find('.yadcf-exclude-wrapper :checkbox').prop('checked');
+					exclude = $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).closest('.yadcf-filter-wrapper').find('.yadcf-exclude-wrapper :checkbox').prop('checked');
 				}
-				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
+				$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
 
-				yadcfMatchFilter(oTable, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val(), columnObj.filter_match_mode, column_number_filter, exclude);
+				yadcfMatchFilter(oTable, $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val(), columnObj.filter_match_mode, column_number_filter, exclude);
 
 				resetIApiIndex();
 			};
@@ -3635,6 +3719,10 @@
 				}
 				$.fn.dataTableExt.iApiIndex = 0;
 			}
+			
+			if (params !== undefined && params.onInitComplete !== undefined) {
+				params.onInitComplete();
+			}
 			return this;
 		};
 
@@ -3646,7 +3734,7 @@
 				tableSelector = '#' + oTable.table().node().id;
 
 			//in case that instance.selector will be undefined (jQuery 3)
-			if (instance.selector === undefined) {
+			if (! instance.selector ) {
 				instance.selector = tableSelector;
 			}
 
@@ -3686,6 +3774,10 @@
 					initAndBindTable(instance, selector, i, oTable);
 				}
 				$.fn.dataTableExt.iApiIndex = 0;
+			}
+			
+			if (params !== undefined && params.onInitComplete !== undefined) {
+				params.onInitComplete();
 			}
 		}
 
@@ -3991,7 +4083,7 @@
 						tmpStr = yadcfMatchFilterString(table_arg, column_position, filter_value, optionsObj.filter_match_mode, false);
 						table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = tmpStr;
 						if (optionsObj.select_type !== undefined) {
-							refreshSelectPlugin(optionsObj, $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number), '-1');
+							refreshSelectPlugin(optionsObj, $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number));
 						}
 						break;
 					case 'multi_select':
@@ -3999,7 +4091,7 @@
 						tmpStr = yadcfMatchFilterString(table_arg, column_position, filter_value, optionsObj.filter_match_mode, true);
 						table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = tmpStr;
 						if (optionsObj.select_type !== undefined) {
-							refreshSelectPlugin(optionsObj, $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number), '-1');
+							refreshSelectPlugin(optionsObj, $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number));
 						}
 						break;
 					case 'range_date':
@@ -4135,6 +4227,7 @@
 			case 'auto_complete':
 			case 'text':
 			case 'date':
+			case 'date_custom_func':
 				retVal = $filterElement.val();
 				if ($filterElement.prev().hasClass('yadcf-exclude-wrapper') && $filterElement.prev().find('input').prop('checked') === true) {
 					retVal = '_exclude_' + retVal;

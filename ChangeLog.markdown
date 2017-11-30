@@ -1,6 +1,6 @@
 # Yet Another DataTables Column Filter (yadcf) Change-log
 
-## 0.9.2 still in beta (grab latest stable from https://github.com/vedmack/yadcf/releases)
+## 0.9.2
 
 * New filter type: date date custom, a date filter based on custom function, filter_type: "date_custom_func", https://github.com/vedmack/yadcf/issues/409
 * Fixed language url / scrollX/Y filters does not load https://github.com/vedmack/yadcf/issues/292
@@ -8,7 +8,7 @@
 * New feature - call a callback function after yadcf init is done - onInitComplete (read docs for more info)
 * Add support for style_class attribute to range filters https://github.com/vedmack/yadcf/issues/405
 * Misc bug fixed issues https://github.com/vedmack/yadcf/issues/399 / https://github.com/vedmack/yadcf/issues/389 / https://github.com/vedmack/yadcf/issues/404
-  https://github.com/vedmack/yadcf/issues/406 / https://github.com/vedmack/yadcf/issues/411
+  https://github.com/vedmack/yadcf/issues/406 / https://github.com/vedmack/yadcf/issues/411 / https://github.com/vedmack/yadcf/issues/417
 
 
 ## 0.9.1
