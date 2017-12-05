@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.2.beta.17 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.3.beta.1 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2313,7 +2313,11 @@
 							}
 						}
 					} else {
-						col_inner_data = col_inner_elements.selector;
+						if (col_inner_elements.selector) {
+							col_inner_data = col_inner_elements.selector;
+						} else {
+							col_inner_data = data[j]._aData[column_number_filter];
+						}
 						if ($.trim(col_inner_data) !== '' && !(col_filter_array.hasOwnProperty(col_inner_data))) {
 							col_filter_array[col_inner_data] = col_inner_data;
 							column_data.push(col_inner_data);

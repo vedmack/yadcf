@@ -1,5 +1,14 @@
 # Yet Another DataTables Column Filter (yadcf) Change-log
 
+
+
+## 0.9.3 is in beta (grab latest stable from https://github.com/vedmack/yadcf/releases)
+
+* Misc bug fixed issues :
+	https://github.com/vedmack/yadcf/issues/422 - column_data_type html doesn't fallback to text
+
+
+
 ## 0.9.2
 
 * New filter type: date date custom, a date filter based on custom function, filter_type: "date_custom_func", https://github.com/vedmack/yadcf/issues/409
