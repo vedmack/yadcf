@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.3.beta.1 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.3.beta.2 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -297,8 +297,8 @@
                 Description:        Allow to control the index of the <tr> inside the thead of the table, e.g when one <tr> is used for headers/sort and
                                     another <tr> is used for filters
 
-
-* onInitComplete
+									
+* onInitComplete	
                 Required:           false
                 Type:               function
                 Default value:      undefined
@@ -1803,10 +1803,10 @@
 			if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
 				$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(oTable.fnSettings().aoPreSearchCols[column_number].sSearch).addClass("inuse");
 			}
-
+			
 			if (columnObj.filter_type === 'date_custom_func') {
 				settingsDt = getSettingsObjFromTable(oTable);
-
+				
 				if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
 					if (oTable.fnSettings().oLoadedState.yadcfState && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
 						$('#' + dateId).val(oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from);
@@ -1815,7 +1815,7 @@
 						}
 					}
 				}
-
+			
 				if (settingsDt.oFeatures.bServerSide !== true) {
 					addCustomFunctionFilterCapability(table_selector_jq_friendly, "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_number);
 				}
@@ -2157,7 +2157,7 @@
 			}
 			destroyThirdPartyPlugins(oTable);
 		}
-
+		
 		/* alphanum.js (C) Brian Huisman
 		   Based on the Alphanum Algorithm by David Koelle
 		   The Alphanum Algorithm is discussed at http://www.DaveKoelle.com
@@ -2184,7 +2184,7 @@
 			if (typeof b === 'object' && typeof b.label === 'string') {
 				b = b.label;
 			}
-
+			
 			var aa = chunkify(a.toLowerCase());
 			var bb = chunkify(b.toLowerCase());
 
@@ -2249,6 +2249,7 @@
 		function parseTableColumn(pTable, columnObj, table_selector_jq_friendly, pSettings) {
 			var col_inner_elements,
 				col_inner_data,
+				col_inner_data_helper,
 				j,
 				k,
 				col_filter_array = {},
@@ -2303,13 +2304,28 @@
 								col_inner_data = col_inner_elements[k].id;
 								break;
 							case "selector":
-								col_inner_data = $(col_inner_elements[k]).find(columnObj.html_data_selector).text();
+								if ($(col_inner_elements[k]).find(columnObj.html_data_selector).length === 1) {
+									col_inner_data = $(col_inner_elements[k]).find(columnObj.html_data_selector).text();
+								} else if ($(col_inner_elements[k]).find(columnObj.html_data_selector).length > 1) {
+									col_inner_data_helper = $(col_inner_elements[k]).find(columnObj.html_data_selector);
+								}
 								break;
 							}
 
-							if ($.trim(col_inner_data) !== '' && !(col_filter_array.hasOwnProperty(col_inner_data))) {
-								col_filter_array[col_inner_data] = col_inner_data;
-								column_data.push(col_inner_data);
+							if (!col_inner_data_helper) {
+								if ($.trim(col_inner_data) !== '' && !(col_filter_array.hasOwnProperty(col_inner_data))) {
+									col_filter_array[col_inner_data] = col_inner_data;
+									column_data.push(col_inner_data);
+								}
+							} else {
+								col_inner_data = col_inner_data_helper;
+								col_inner_data_helper.each(function (index) {
+									var elm = $(col_inner_data[index]).text();
+									if ($.trim(elm) !== '' && !(col_filter_array.hasOwnProperty(elm))) {
+										col_filter_array[elm] = elm;
+										column_data.push(elm);
+									}
+								});
 							}
 						}
 					} else {
