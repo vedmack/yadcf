@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.3.beta.2 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.3.beta.3 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2361,6 +2361,8 @@
 							if (typeof col_inner_data === 'object') {
 								if (columnObj.html5_data !== undefined) {
 									col_inner_data = col_inner_data['@' + columnObj.html5_data];
+								} else if (col_inner_data && col_inner_data.display) {
+									col_inner_data = col_inner_data.display;
 								} else {
 									console.log('Warning: Looks like you have forgot to define the html5_data attribute for the ' + columnObj.column_number + ' column');
 									return;

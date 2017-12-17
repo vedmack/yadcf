@@ -7,6 +7,7 @@
 * Misc bug fixed issues :
 	https://github.com/vedmack/yadcf/issues/422 - column_data_type html doesn't fallback to text
 	https://github.com/vedmack/yadcf/issues/424 - Parsing html-lists in table-cells for use in filter
+	https://github.com/vedmack/yadcf/issues/425 - Filter fails when using data-*
 
 
 
