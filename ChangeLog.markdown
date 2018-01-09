@@ -4,12 +4,12 @@
 
 ## 0.9.3 is in beta (grab latest stable from https://github.com/vedmack/yadcf/releases)
 
-* Misc bug fixed issues :
+* Added support for col reorder in range filters - https://github.com/vedmack/yadcf/issues/429
+* Misc bug fixed issues:
 	https://github.com/vedmack/yadcf/issues/422 - column_data_type html doesn't fallback to text
 	https://github.com/vedmack/yadcf/issues/424 - Parsing html-lists in table-cells for use in filter
 	https://github.com/vedmack/yadcf/issues/425 - Filter fails when using data-*
-	https://github.com/vedmack/yadcf/issues/426 - Bug in column_inner_data_helper, related to #424
-
+	https://github.com/vedmack/yadcf/issues/426 - Bug in column_inner_data_helper, related to
 
 
 ## 0.9.2

@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.3.beta.4 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.3.beta.5 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -495,7 +495,7 @@
 		}
 
 		function initColReorder2(settingsDt, table_selector_jq_friendly) {
-			if (settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) {
+			if (settingsDt.oSavedState && settingsDt.oSavedState.ColReorder !== undefined) {
 				if (plugins[table_selector_jq_friendly] === undefined) {
 					plugins[table_selector_jq_friendly] = {};
 					plugins[table_selector_jq_friendly].ColReorder = arraySwapValueWithIndex(settingsDt.oSavedState.ColReorder);
@@ -896,8 +896,8 @@
 
 		function calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly) {
 			var column_number_filter;
-			if ((settingsDt.oSavedState != undefined && settingsDt.oSavedState.ColReorder !== undefined) ||
-				settingsDt._colReorder != undefined ||
+			if ((settingsDt.oSavedState && settingsDt.oSavedState.ColReorder !== undefined) ||
+				settingsDt._colReorder ||
 				(plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
 				initColReorder2(settingsDt, table_selector_jq_friendly);
 				column_number_filter = plugins[table_selector_jq_friendly].ColReorder[column_number];
@@ -1556,7 +1556,9 @@
 				to,
 				date,
 				event,
-				columnObj;
+				columnObj,
+				column_number_filter,
+				settingsDt;
 
 			if (pDate.type === 'dp') {
 				event = pDate.target;
@@ -1570,10 +1572,14 @@
 			table_selector_jq_friendly = column_number.substring(0, dashIndex);
 
 			column_number = column_number.substring(dashIndex + 1);
+			
+
+			oTable = oTables[table_selector_jq_friendly];
+			settingsDt = getSettingsObjFromTable(oTable);
+			column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
 
 			$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 
-			oTable = oTables[table_selector_jq_friendly];
 			columnObj = getOptions(oTable.selector)[column_number];
 
 			if (pDate.type === 'dp') {
@@ -1600,7 +1606,7 @@
 			if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 				oTable.fnDraw();
 			} else {
-				oTable.fnFilter(from + '-yadcf_delim-' + to, column_number);
+				oTable.fnFilter(from + '-yadcf_delim-' + to, column_number_filter);
 			}
 
 			if (!oTable.fnSettings().oLoadedState) {
@@ -1858,9 +1864,14 @@
 				yadcfState,
 				column_number = $(event.target).attr('id').replace("yadcf-filter-", "").replace(table_selector_jq_friendly, "").replace("-slider-", ""),
 				columnObj,
-				keyUp;
+				keyUp,
+				settingsDt,
+				column_number_filter;
 
 			oTable = oTables[table_selector_jq_friendly];
+			settingsDt = getSettingsObjFromTable(oTable);
+			column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
+
 			columnObj = getOptions(oTable.selector)[column_number];
 
 			keyUp = function () {
@@ -1870,7 +1881,7 @@
 				if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 					oTable.fnDraw();
 				} else {
-					oTable.fnFilter(ui.values[0] + '-yadcf_delim-' + ui.values[1], column_number);
+					oTable.fnFilter(ui.values[0] + '-yadcf_delim-' + ui.values[1], column_number_filter);
 				}
 				min_val = +$($(event.target).parent().find(".yadcf-filter-range-number-slider-min-tip-hidden")).text();
 				max_val = +$($(event.target).parent().find(".yadcf-filter-range-number-slider-max-tip-hidden")).text();
@@ -3203,10 +3214,14 @@
 				yadcfState,
 				column_number,
 				options,
-				keyUp;
+				keyUp,
+				settingsDt,
+				column_number_filter;
 
 			column_number = parseInt($(event.target).attr("id").replace('-from-', '').replace('-to-', '').replace('yadcf-filter-' + table_selector_jq_friendly, ''), 10);
 			options = getOptions(oTable.selector)[column_number];
+			settingsDt = getSettingsObjFromTable(oTable);
+			column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
 
 			keyUp = function () {
 
@@ -3232,7 +3247,7 @@
 					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 						oTable.fnDraw();
 					} else {
-						oTable.fnFilter(min + '-yadcf_delim-' + max, column_number);
+						oTable.fnFilter(min + '-yadcf_delim-' + max, column_number_filter);
 					}
 					if (document.getElementById(fromId).value !== "") {
 						$("#" + fromId).addClass("inuse");
@@ -3631,7 +3646,7 @@
 					if (state === true && settings._oFixedColumns === undefined) {
 						if ((plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined)) {
 							col_num = plugins[table_selector_jq_friendly].ColReorder[col_num];
-						} else if (settings.oSavedState != undefined && settings.oSavedState.ColReorder !== undefined) {
+						} else if (settings.oSavedState && settings.oSavedState.ColReorder !== undefined) {
 							col_num = settings.oSavedState.ColReorder[col_num];
 						}
 						obj[col_num] = yadcf.getOptions(settings.oInstance.selector)[col_num];
