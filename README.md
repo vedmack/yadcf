@@ -79,7 +79,7 @@ Examples:
 
 [DOM source with select2](http://yadcf-showcase.appspot.com/DOM_source_select2.html)
 
-[DOM / Multiple columns and tables 1.10.0] (http://yadcf-showcase.appspot.com/dom_multi_columns_tables_1.10.html)
+[DOM / Multiple columns and tables 1.10.0](http://yadcf-showcase.appspot.com/dom_multi_columns_tables_1.10.html)
 
 [AJAX source](http://yadcf-showcase.appspot.com/ajax_source.html)
 
