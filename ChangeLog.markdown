@@ -5,6 +5,8 @@
 ## 0.9.3 is in beta (grab latest stable from https://github.com/vedmack/yadcf/releases)
 
 * Added support for col reorder in range filters - https://github.com/vedmack/yadcf/issues/429
+* Added new datepicker_type: 'bootstrap-datepicker', (use it with moment library) make sure you set separate date format for the plugin and for moment library -
+	see example is the github issue, https://github.com/vedmack/yadcf/issues/435
 * Misc bug fixed issues:
 	https://github.com/vedmack/yadcf/issues/422 - column_data_type html doesn't fallback to text
 	https://github.com/vedmack/yadcf/issues/424 - Parsing html-lists in table-cells for use in filter

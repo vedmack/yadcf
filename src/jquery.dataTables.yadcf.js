@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.3.beta.5 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.3.beta.6 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -243,7 +243,7 @@
                 Required:           false
                 Type:               String
                 Default value:      'jquery-ui'
-                Possible values:    'jquery-ui' / 'bootstrap-datetimepicker'
+                Possible values:    'jquery-ui' / 'bootstrap-datetimepicker' / bootstrap-datepicker
                 Description:        You can choose datapicker library from defined in special notes
                 Special notes:      Currently supported only jQueryUI datepicker (datepicker) and Bootstrap datepicker (eonasdan-bootstrap-datetimepicker)
                                     Bootstrap datepicker depends moment library. This plugin depends moment too.
@@ -1340,19 +1340,23 @@
 						return false;
 					}
 					try {
-						if (min.length === (date_format.length + 2) || columnObj.datepicker_type === 'bootstrap-datetimepicker') {
+						if (min.length === (date_format.length + 2) || columnObj.datepicker_type.indexOf('bootstrap') !== -1) {
 							if (columnObj.datepicker_type === 'jquery-ui') {
 								min = (min !== "") ? $.datepicker.parseDate(date_format, min) : min;
 							} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
+								min = (min !== "") ? moment(min, columnObj.moment_date_format).toDate() : min;
+							} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 								min = (min !== "") ? moment(min, columnObj.moment_date_format).toDate() : min;
 							}
 						}
 					} catch (err1) {}
 					try {
-						if (max.length === (date_format.length + 2) || columnObj.datepicker_type === 'bootstrap-datetimepicker') {
+						if (max.length === (date_format.length + 2) || columnObj.datepicker_type.indexOf('bootstrap') !== -1) {
 							if (columnObj.datepicker_type === 'jquery-ui') {
 								max = (max !== "") ? $.datepicker.parseDate(date_format, max) : max;
 							} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
+								max = (max !== "") ? moment(max, columnObj.moment_date_format).toDate() : max;
+							} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 								max = (max !== "") ? moment(max, columnObj.moment_date_format).toDate() : max;
 							}
 						}
@@ -1361,6 +1365,8 @@
 						if (columnObj.datepicker_type === 'jquery-ui') {
 							val = (val !== "") ? $.datepicker.parseDate(date_format, val) : val;
 						} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
+							val = (val !== "") ? moment(val, columnObj.moment_date_format).toDate() : val;
+						} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 							val = (val !== "") ? moment(val, columnObj.moment_date_format).toDate() : val;
 						}
 					} catch (err3) {}
@@ -1562,6 +1568,8 @@
 
 			if (pDate.type === 'dp') {
 				event = pDate.target;
+			} else if (pDate.type === 'changeDate') {
+				event = pDate.currentTarget;
 			} else {
 				date = pDate;
 				event = pEvent;
@@ -1716,8 +1724,18 @@
 					$fromInput.add($toInput).on('dp.hide', dateSelect);
 				}
 			} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
-				//$fromInput.datepicker({});
-				//$toInput.datepicker({});
+				$fromInput.datepicker({
+					format: date_format
+				}).on('changeDate', function(e) {
+					dateSelect(e);
+					$(this).datepicker('hide');
+				});
+				$toInput.datepicker({
+					format: date_format
+				}).on('changeDate', function(e) {
+					dateSelect(e);
+					$(this).datepicker('hide');
+				});
 			}
 
 			if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
