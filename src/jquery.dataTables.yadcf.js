@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.3.beta.6 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.3.beta.7 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1484,10 +1484,13 @@
 
 			if (pDate.type === 'dp') {
 				event = pDate.target;
+			} else if (pDate.type === 'changeDate') {
+				event = pDate.currentTarget;
 			} else {
 				date = pDate;
 				event = pEvent;
-			}
+			}	
+
 			column_number = $(event).attr('id').replace('yadcf-filter-', '').replace('-date', '').replace('-reset', '');
 			dashIndex = column_number.lastIndexOf("-");
 			table_selector_jq_friendly = column_number.substring(0, dashIndex);
@@ -1724,15 +1727,14 @@
 					$fromInput.add($toInput).on('dp.hide', dateSelect);
 				}
 			} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
-				$fromInput.datepicker({
-					format: date_format
-				}).on('changeDate', function(e) {
+				if (date_format) {
+					$.extend(datepickerObj, {format: date_format});
+				}
+				$fromInput.datepicker(datepickerObj).on('changeDate', function(e) {
 					dateSelect(e);
 					$(this).datepicker('hide');
 				});
-				$toInput.datepicker({
-					format: date_format
-				}).on('changeDate', function(e) {
+				$toInput.datepicker(datepickerObj).on('changeDate', function(e) {
 					dateSelect(e);
 					$(this).datepicker('hide');
 				});
@@ -1821,7 +1823,10 @@
 					}
 				}
 			} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
-				$("#" + dateId).datepicker({});
+				$("#" + dateId).datepicker(datepickerObj).on('changeDate', function(e) {
+					dateSelectSingle(e);
+					$(this).datepicker('hide');
+				});
 			}
 
 			if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
@@ -2193,7 +2198,7 @@
 		*/
 		function sortAlphaNum(a, b) {
 			function chunkify(t) {
-				var tz = new Array();
+				var tz = [];
 				var x = 0, y = -1, n = 0, i, j;
 
 				while (i = (j = t.charAt(x++)).charCodeAt(0)) {
