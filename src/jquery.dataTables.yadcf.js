@@ -1,5 +1,5 @@
 /*!
-* Yet Another DataTables Column Filter - (yadcf)
+* Yet Another DataTables Column Filter - (yadcf) 
 *
 * File:        jquery.dataTables.yadcf.js
 * Version:     0.9.3.beta.7 (grab latest stable from https://github.com/vedmack/yadcf/releases)
