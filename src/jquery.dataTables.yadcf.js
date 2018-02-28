@@ -1,8 +1,8 @@
 /*!
-* Yet Another DataTables Column Filter - (yadcf) 
+* Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.3.beta.7 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.3.beta.8 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -3513,6 +3513,9 @@
 				var fixedPrefix = '';
 				if (settingsDt._fixedHeader !== undefined && $('.fixedHeader-floating').is(":visible")) {
 					fixedPrefix = '.fixedHeader-floating ';
+				}
+				if (columnObj.filters_position === 'tfoot' && settingsDt.nScrollFoot) {
+					fixedPrefix = '.' + settingsDt.nScrollFoot.className + ' ';
 				}
 				$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 
