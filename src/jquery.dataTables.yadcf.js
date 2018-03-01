@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.3.beta.8 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.3.beta.9 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1283,13 +1283,16 @@
 						column_number_filter,
 						min_time,
 						max_time,
-						dataRenderFunc;
+						dataRenderFunc,
+						dpg;
 
 					if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
 						return true;
 					}
 					columnObj = getOptions(settingsDt.oInstance.selector)[col_num];
-
+					if (columnObj.datepicker_type === 'bootstrap-datepicker') {
+						dpg = $.fn.datepicker.DPGlobal;
+					}
 					column_number_filter = calcColumnNumberFilter(settingsDt, col_num, table_selector_jq_friendly);
 					if (typeof columnObj.column_number_data === 'function' || typeof columnObj.column_number_render === 'function') {
 						dataRenderFunc = true;
@@ -1346,7 +1349,7 @@
 							} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
 								min = (min !== "") ? moment(min, columnObj.moment_date_format).toDate() : min;
 							} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
-								min = (min !== "") ? moment(min, columnObj.moment_date_format).toDate() : min;
+								min = (min !== "") ? dpg.parseDate(min, dpg.parseFormat(columnObj.date_format)) : min;
 							}
 						}
 					} catch (err1) {}
@@ -1357,7 +1360,7 @@
 							} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
 								max = (max !== "") ? moment(max, columnObj.moment_date_format).toDate() : max;
 							} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
-								max = (max !== "") ? moment(max, columnObj.moment_date_format).toDate() : max;
+								max = (max !== "") ? dpg.parseDate(max, dpg.parseFormat(columnObj.date_format)) : max;
 							}
 						}
 					} catch (err2) {}
@@ -1367,7 +1370,7 @@
 						} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
 							val = (val !== "") ? moment(val, columnObj.moment_date_format).toDate() : val;
 						} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
-							val = (val !== "") ? moment(val, columnObj.moment_date_format).toDate() : val;
+							val = (val !== "") ? dpg.parseDate(val, dpg.parseFormat(columnObj.date_format)) : val;
 						}
 					} catch (err3) {}
 
@@ -1508,6 +1511,10 @@
 					clear = 'clear';
 				}
 				$(event).blur();
+			} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
+				if (pDate.dates) {
+					date = pDate.format(0, columnObj.date_format);
+				}
 			}
 
 			column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
@@ -1550,6 +1557,9 @@
 				}
 				oTable.fnFilter('', column_number_filter);
 				$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val('').removeClass("inuse");
+				if (columnObj.datepicker_type === 'bootstrap-datepicker') {
+					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).datepicker('update');
+				}
 			}
 
 			resetIApiIndex();
@@ -1798,7 +1808,7 @@
 
 			if (columnObj.datepicker_type === 'jquery-ui') {
 				datepickerObj.dateFormat = date_format;
-			} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
+			} else if (columnObj.datepicker_type.indexOf('bootstrap') !== -1) {
 				datepickerObj.format = date_format;
 			}
 
@@ -3140,13 +3150,18 @@
 				columnObj,
 				keyUp,
 				settingsDt,
-				column_number_filter;
+				column_number_filter,
+				dpg;
 
 			column_number = parseInt($(event.target).attr("id").replace('-from-date-', '').replace('-to-date-', '').replace('yadcf-filter-' + table_selector_jq_friendly, ''), 10);
 			columnObj = getOptions(oTable.selector)[column_number];
 			settingsDt = getSettingsObjFromTable(oTable);
 			column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
 
+			if (columnObj.datepicker_type === 'bootstrap-datepicker') {
+				dpg = $.fn.datepicker.DPGlobal;
+			}
+					
 			keyUp = function () {
 				if (event.target.id.indexOf("-from-") !== -1) {
 					fromId = event.target.id;
@@ -3169,25 +3184,38 @@
 						if (min.length === (date_format.length + 2)) {
 							min = (min !== "") ? $.datepicker.parseDate(date_format, min) : min;
 						}
-					} catch (err1) {}
+					} catch (err) {}
 					try {
 						if (max.length === (date_format.length + 2)) {
 							max = (max !== "") ? $.datepicker.parseDate(date_format, max) : max;
 						}
-					} catch (err2) {}
+					} catch (err) {}
 				} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
 					try {
 						min = moment(min, columnObj.moment_date_format).toDate();
 						if (isNaN(min.getTime())) {
 							min = '';
 						}
-					} catch (err3) {}
+					} catch (err) {}
 					try {
 						max = moment(max, columnObj.moment_date_format).toDate();
 						if (isNaN(max.getTime())) {
 							max = '';
 						}
-					} catch (err4) {}
+					} catch (err) {}
+				} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
+					try {
+						min = dpg.parseDate(min, dpg.parseFormat(columnObj.date_format));
+						if (isNaN(min.getTime())) {
+							min = '';
+						}
+					} catch (err) {}
+					try {
+						max = dpg.parseDate(max, dpg.parseFormat(columnObj.date_format));
+						if (isNaN(max.getTime())) {
+							max = '';
+						}
+					} catch (err) {}
 				}
 
 				if (((max instanceof Date) && (min instanceof Date) && (max >= min)) || min === "" || max === "") {

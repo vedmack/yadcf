@@ -12,6 +12,7 @@
 	https://github.com/vedmack/yadcf/issues/424 - Parsing html-lists in table-cells for use in filter
 	https://github.com/vedmack/yadcf/issues/425 - Filter fails when using data-*
 	https://github.com/vedmack/yadcf/issues/426 - Bug in column_inner_data_helper, related to
+	https://github.com/vedmack/yadcf/issues/441 - Continue stabilzing integration with 'bootstrap-datepicker'
 
 
 ## 0.9.2
