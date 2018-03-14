@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.3.beta.10 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.3.beta.11 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -3029,6 +3029,7 @@
 			}
 
 			if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+				saveStateSave(oTable, column_number, table_selector_jq_friendly, null, null);
 				oTable.fnDraw();
 			} else {
 				oTable.fnFilter('', column_number_filter);
@@ -3221,6 +3222,7 @@
 				if (((max instanceof Date) && (min instanceof Date) && (max >= min)) || !min || !max) {
 
 					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+						saveStateSave(oTable, column_number, table_selector_jq_friendly, !min ? null : min , !max ? null : max);
 						oTable.fnDraw();
 					} else {
 						oTable.fnFilter(document.getElementById(fromId).value + '-yadcf_delim-' + document.getElementById(toId).value, column_number_filter);
