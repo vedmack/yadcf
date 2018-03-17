@@ -297,8 +297,8 @@
                 Description:        Allow to control the index of the <tr> inside the thead of the table, e.g when one <tr> is used for headers/sort and
                                     another <tr> is used for filters
 
-									
-* onInitComplete	
+
+* onInitComplete
                 Required:           false
                 Type:               function
                 Default value:      undefined
@@ -413,15 +413,37 @@
                                     filter_container_id: '' (required),
                 Note:               All the usual properties of yadcf should be supported in initMultipleColumns too!
 */
-(function (root, factory) {
-	if (typeof define === 'function' && define.amd) {
-		define(['jquery'], factory);
-	} else if (typeof module === 'object' && module.exports) {
-		module.exports = factory(require('jquery'));
-	} else {
-		root.yadcf = factory(root.jQuery);
-	}
-}(this, function($) {
+(function(factory) {
+  'use strict';
+
+  if (typeof define === 'function' && define.amd) {
+    // AMD
+    define(['jquery'], function($) {
+      return factory($, window, document);
+    });
+  } else if (typeof module === 'object') {
+    // CommonJS
+    module.exports = function(root, $) {
+      if (!root) {
+        // CommonJS environments without a window global must pass a
+        // root. This will give an error otherwise
+        root = window;
+      }
+
+      if (!$) {
+        $ = typeof window !== 'undefined' ? // jQuery's factory checks for a global window
+          require('jquery') :
+          require('jquery')(root);
+      }
+
+      return factory($, root, root.document);
+    };
+  } else {
+    // Browser
+    factory(jQuery, window, document);
+  }
+}
+(function($, window, document, undefined) {
 	var yadcf = (function () {
 
 		'use strict';
@@ -1492,7 +1514,7 @@
 			} else {
 				date = pDate;
 				event = pEvent;
-			}	
+			}
 
 			column_number = $(event).attr('id').replace('yadcf-filter-', '').replace('-date', '').replace('-reset', '');
 			dashIndex = column_number.lastIndexOf("-");
@@ -1593,7 +1615,7 @@
 			table_selector_jq_friendly = column_number.substring(0, dashIndex);
 
 			column_number = column_number.substring(dashIndex + 1);
-			
+
 
 			oTable = oTables[table_selector_jq_friendly];
 			settingsDt = getSettingsObjFromTable(oTable);
@@ -1842,10 +1864,10 @@
 			if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
 				$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(oTable.fnSettings().aoPreSearchCols[column_number].sSearch).addClass("inuse");
 			}
-			
+
 			if (columnObj.filter_type === 'date_custom_func') {
 				settingsDt = getSettingsObjFromTable(oTable);
-				
+
 				if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
 					if (oTable.fnSettings().oLoadedState.yadcfState && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
 						$('#' + dateId).val(oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from);
@@ -1854,7 +1876,7 @@
 						}
 					}
 				}
-			
+
 				if (settingsDt.oFeatures.bServerSide !== true) {
 					addCustomFunctionFilterCapability(table_selector_jq_friendly, "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_number);
 				}
@@ -2201,7 +2223,7 @@
 			}
 			destroyThirdPartyPlugins(oTable);
 		}
-		
+
 		/* alphanum.js (C) Brian Huisman
 		   Based on the Alphanum Algorithm by David Koelle
 		   The Alphanum Algorithm is discussed at http://www.DaveKoelle.com
@@ -2228,7 +2250,7 @@
 			if (typeof b === 'object' && typeof b.label === 'string') {
 				b = b.label;
 			}
-			
+
 			var aa = chunkify(a.toLowerCase());
 			var bb = chunkify(b.toLowerCase());
 
@@ -3172,7 +3194,7 @@
 			if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 				dpg = $.fn.datepicker.DPGlobal;
 			}
-					
+
 			keyUp = function () {
 				if (event.target.id.indexOf("-from-") !== -1) {
 					fromId = event.target.id;
@@ -3563,7 +3585,7 @@
 					if (clear === 'clear' && exGetColumnFilterVal(oTable, column_number) === '') {
 						return;
 					}
-					
+
 					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
 					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
 					oTable.fnFilter("", column_number_filter);
