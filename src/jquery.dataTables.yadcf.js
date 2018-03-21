@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.3.beta.12 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.3.beta.13 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -3184,7 +3184,9 @@
 				keyUp,
 				settingsDt,
 				column_number_filter,
-				dpg;
+				dpg,
+				minTmp,
+				maxTmp;
 
 			column_number = parseInt($(event.target).attr("id").replace('-from-date-', '').replace('-to-date-', '').replace('yadcf-filter-' + table_selector_jq_friendly, ''), 10);
 			columnObj = getOptions(oTable.selector)[column_number];
@@ -3199,19 +3201,14 @@
 				if (event.target.id.indexOf("-from-") !== -1) {
 					fromId = event.target.id;
 					toId = event.target.id.replace("-from-", "-to-");
-
-					min = document.getElementById(fromId).value;
-					max = document.getElementById(toId).value;
 				} else {
 					toId = event.target.id;
 					fromId = event.target.id.replace("-to-", "-from-");
-
-					max =   document.getElementById(toId).value;
-					min = document.getElementById(fromId).value;
 				}
 
-				//moment(min, "YYYY-MM-DD hh:mm:ss").toDate() typeof Date
-
+				min = document.getElementById(fromId).value;
+				max = document.getElementById(toId).value;
+					
 				if (columnObj.datepicker_type === 'jquery-ui') {
 					try {
 						if (min.length === (date_format.length + 2)) {
@@ -3254,7 +3251,9 @@
 				if (((max instanceof Date) && (min instanceof Date) && (max >= min)) || !min || !max) {
 
 					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
-						saveStateSave(oTable, column_number, table_selector_jq_friendly, !min ? '' : min , !max ? '' : max);
+						minTmp = document.getElementById(fromId).value;
+						maxTmp = document.getElementById(toId).value;
+						saveStateSave(oTable, column_number, table_selector_jq_friendly, !min ? '' : minTmp , !max ? '' : maxTmp);
 						oTable.fnDraw();
 					} else {
 						oTable.fnFilter(document.getElementById(fromId).value + '-yadcf_delim-' + document.getElementById(toId).value, column_number_filter);
