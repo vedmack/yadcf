@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.3.beta.13 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.3.beta.14 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -553,6 +553,10 @@
 
 		function getOptions(selector) {
 			return options[selector];
+		}
+
+		function getAllOptions() {
+			return options;
 		}
 
 		function eventTargetFixUp(pEvent) {
@@ -4125,7 +4129,32 @@
 			initMultipleTables(tablesArray, filtersOptions);
 		}
 
+		function closeOpenDatePickersIfAny(evt) {
+			var closeBootstrapDatepicker = false,
+				closeBootstrapDatepickerRange = false;
+			Object.entries(getAllOptions()).some(function ([tableSelector, tableOptions]) {
+				Object.entries(tableOptions).some(function ([key, value]) {
+					if (value.datepicker_type === 'bootstrap-datepicker') {
+						if (value.filter_type === 'range_date') {
+							closeBootstrapDatepickerRange = true;
+						} else {
+							closeBootstrapDatepicker = true;	
+						}
+					}
+					return closeBootstrapDatepicker && closeBootstrapDatepickerRange;
+				});
+				return closeBootstrapDatepicker && closeBootstrapDatepickerRange;
+			});
+			if (closeBootstrapDatepickerRange) {
+				$('.yadcf-filter-range-date').not($(evt.target)).datepicker('hide');
+			}
+			if (closeBootstrapDatepicker) {
+				$('.yadcf-filter-date').not($(evt.target)).datepicker('hide');
+			}
+		}
+		
 		function stopPropagation(evt) {
+			closeOpenDatePickersIfAny(evt);
 			if (evt.stopPropagation !== undefined) {
 				evt.stopPropagation();
 			} else {

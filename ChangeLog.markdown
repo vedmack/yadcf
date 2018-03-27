@@ -13,6 +13,7 @@
 	https://github.com/vedmack/yadcf/issues/425 - Filter fails when using data-*
 	https://github.com/vedmack/yadcf/issues/426 - Bug in column_inner_data_helper, related to
 	https://github.com/vedmack/yadcf/issues/441 - Continue stabilzing integration with 'bootstrap-datepicker'
+	https://github.com/vedmack/yadcf/issues/442 - Date picker is still shown on click of another input filed
 
 
 ## 0.9.2
