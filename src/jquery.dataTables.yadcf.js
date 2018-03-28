@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.3.beta.14 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.3.beta.15 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -413,7 +413,7 @@
                                     filter_container_id: '' (required),
                 Note:               All the usual properties of yadcf should be supported in initMultipleColumns too!
 */
-(function(factory) {
+(function (factory) {
   'use strict';
 
   if (typeof define === 'function' && define.amd) {
@@ -423,7 +423,7 @@
     });
   } else if (typeof module === 'object') {
     // CommonJS
-    module.exports = function(root, $) {
+    module.exports = function (root, $) {
       if (!root) {
         // CommonJS environments without a window global must pass a
         // root. This will give an error otherwise
@@ -461,13 +461,17 @@
 			selectElementCustomRefreshFunc,
 			selectElementCustomDestroyFunc,
 			placeholderLang = {
-				'select': 'Select value',
-				'select_multi': 'Select values',
-				'filter': 'Type to filter',
-				'range': ['From', 'To'],
-				'date': 'Select a date'
+				select: 'Select value',
+				select_multi: 'Select values',
+				filter: 'Type to filter',
+				range: ['From', 'To'],
+				date: 'Select a date'
 			},
 			settingsMap = {};
+			
+		let closeBootstrapDatepicker = false;
+		let	closeBootstrapDatepickerRange = false;
+		let	closeSelect2 = false;
 
 		//From ColReorder (SpryMedia Ltd (www.sprymedia.co.uk))
 		function getSettingsObjFromTable(dt) {
@@ -477,7 +481,7 @@
 			} else if (dt.fnSettings) {// 1.9 compatibility
 				// DataTables object, convert to the settings object
 				oDTSettings = dt.fnSettings();
-			} else if (typeof dt === 'string') {// jQuery selector
+			} else if (typeof dt === 'string') { // jQuery selector
 				if ($.fn.dataTable.fnIsDataTable($(dt)[0])) {
 					oDTSettings = $(dt).eq(0).dataTable().fnSettings();
 				}
@@ -578,19 +582,18 @@
 		function setOptions(selector_arg, options_arg, params) {
 			var tmpOptions = {},
 				i,
-				j,
 				col_num_as_int,
 				default_options = {
-					filter_type : "select",
-					enable_auto_complete : false,
-					sort_as : "alpha",
-					sort_order : "asc",
-					date_format : "mm/dd/yyyy",
-					ignore_char : undefined,
-					filter_match_mode : "contains",
-					select_type : undefined,
-					select_type_options : {},
-					case_insensitive : true,
+					filter_type: "select",
+					enable_auto_complete: false,
+					sort_as: "alpha",
+					sort_order: "asc",
+					date_format: "mm/dd/yyyy",
+					ignore_char: undefined,
+					filter_match_mode: "contains",
+					select_type: undefined,
+					select_type_options: {},
+					case_insensitive: true,
 					column_data_type: 'text',
 					html_data_type: 'text',
 					exclude_label: 'exclude',
@@ -600,8 +603,8 @@
 					range_data_type: 'single',
 					range_data_type_delim: '-',
 					omit_default_label: false
-				},
-				adaptContainerCssClassImpl = function (dummy) { return ''; };
+				};
+				//adaptContainerCssClassImpl = function (dummy) { return ''; };
 
 			$.extend(true, default_options, params);
 
@@ -637,8 +640,26 @@
 				}
 			}
 			options[selector_arg] = tmpOptions;
+			
+			check3rdPPluginsNeededClose();
 		}
 
+		function check3rdPPluginsNeededClose() {
+			Object.entries(getAllOptions()).forEach(([tableSelector, tableOptions]) => {
+				Object.entries(tableOptions).forEach(([key, value]) => {					
+					if (value.datepicker_type === 'bootstrap-datepicker') {
+						if (value.filter_type === 'range_date') {
+							closeBootstrapDatepickerRange = true;
+						} else {
+							closeBootstrapDatepicker = true;	
+						}
+					} else if (value.select_type === 'select2') {
+						closeSelect2 = true;
+					}
+				});
+			});
+		}
+		
 		//taken and modified from DataTables 1.10.0-beta.2 source
 		function yadcfVersionCheck(version) {
 			var aThis = $.fn.dataTable.ext.sVersion.split('.'),
@@ -662,17 +683,6 @@
 			}
 
 			return true;
-		}
-
-		function calculateColumnNumber(column_number, pTable) {
-			var col_num_visible_iter,
-				col_num_visible = column_number;
-			for (col_num_visible_iter = 0; col_num_visible_iter < pTable.fnSettings().aoColumns.length && col_num_visible_iter < column_number; col_num_visible_iter++) {
-				if (pTable.fnSettings().aoColumns[col_num_visible_iter].bVisible === false) {
-					col_num_visible++;
-				}
-			}
-			return col_num_visible;
 		}
 
 		function resetIApiIndex() {
@@ -904,13 +914,13 @@
 				if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
 					oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
 						{
-							'from' : arg.value
+							from: arg.value
 						};
 				} else {
 					yadcfState = {};
 					yadcfState[table_selector_jq_friendly] = [];
 					yadcfState[table_selector_jq_friendly][column_number] = {
-						'from' : arg.value
+						from: arg.value
 					};
 					oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
 				}
@@ -1556,7 +1566,7 @@
 				if (exGetColumnFilterVal(oTable, column_number) === '') {
 					return;
 				}
-				if (columnObj.filter_type == 'date_custom_func') {
+				if (columnObj.filter_type === 'date_custom_func') {
 					//handle state saving
 					if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
 						if (!oTable.fnSettings().oLoadedState) {
@@ -1567,13 +1577,13 @@
 							if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
 								oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
 									{
-										'from' : ""
+										from: ""
 									};
 							} else {
 								yadcfState = {};
 								yadcfState[table_selector_jq_friendly] = [];
 								yadcfState[table_selector_jq_friendly][column_number] = {
-									'from' : ""
+									from: ""
 								};
 								oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
 							}
@@ -1664,15 +1674,15 @@
 				if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
 					oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
 						{
-							'from' : from,
-							'to' : to
+							from: from,
+							to: to
 						};
 				} else {
 					yadcfState = {};
 					yadcfState[table_selector_jq_friendly] = [];
 					yadcfState[table_selector_jq_friendly][column_number] = {
-						'from' : from,
-						'to' : to
+						from: from,
+						to: to
 					};
 					oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
 				}
@@ -1972,15 +1982,15 @@
 					if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
 						oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
 							{
-								'from' : ui.values[0],
-								'to' : ui.values[1]
+								from: ui.values[0],
+								to: ui.values[1]
 							};
 					} else {
 						yadcfState = {};
 						yadcfState[table_selector_jq_friendly] = [];
 						yadcfState[table_selector_jq_friendly][column_number] = {
-							'from' : ui.values[0],
-							'to' : ui.values[1]
+							from: ui.values[0],
+							to: ui.values[1]
 						};
 						oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
 					}
@@ -2213,7 +2223,7 @@
 			}
 		}
 
-		function removeFilters(oTable, args, table_selector) {
+		function removeFilters(oTable) {
 			var tableId = getTableId(oTable);
 			$('#' + tableId + ' .yadcf-filter-wrapper').remove();
 			if (yadcfVersionCheck('1.10')) {
@@ -2270,8 +2280,6 @@
 		}
 
 		function sortColumnData(column_data, columnObj) {
-			var numArray = [],
-				alphaArray = [];
 			if (columnObj.filter_type === "select" || columnObj.filter_type === "auto_complete" || columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func' || columnObj.filter_type === "custom_func") {
 				if (columnObj.sort_as === "alpha") {
 					if (columnObj.sort_order === "asc") {
@@ -2304,9 +2312,9 @@
 				data = [],
 				i;
 			if (yadcfVersionCheck('1.10')) {
-				dataTmp = table._('tr', {filter: 'applied' });
+				dataTmp = table._('tr', { filter: 'applied' });
 			} else {
-				dataTmp = table.rows({filter: 'applied'}).data().toArray();
+				dataTmp = table.rows({ filter: 'applied'}).data().toArray();
 			}
 			for (i = 0; i < dataTmp.length; i++) {
 				data.push({
@@ -2487,7 +2495,6 @@
 		}
 
 		function appendFilters(oTable, args, table_selector, pSettings) {
-
 			var i = 0,
 				$filter_selector,
 				filter_selector_string,
@@ -3073,15 +3080,15 @@
 				if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
 					oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
 						{
-							'from' : '',
-							'to' : ''
+							from: '',
+							to: ''
 						};
 				} else {
 					yadcfState = {};
 					yadcfState[table_selector_jq_friendly] = [];
 					yadcfState[table_selector_jq_friendly][column_number] = {
-						'from' : '',
-						'to' : ''
+						from: '',
+						to: ''
 					};
 					oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
 				}
@@ -3176,9 +3183,7 @@
 		}
 
 		function rangeDateKeyUP(table_selector_jq_friendly, date_format, event) {
-			event = eventTargetFixUp(event);
-			$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
-			var oTable = oTables[table_selector_jq_friendly],
+			var oTable,
 				min,
 				max,
 				fromId,
@@ -3191,6 +3196,11 @@
 				dpg,
 				minTmp,
 				maxTmp;
+
+			event = eventTargetFixUp(event);
+			$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
+
+			oTable = oTables[table_selector_jq_friendly];
 
 			column_number = parseInt($(event.target).attr("id").replace('-from-date-', '').replace('-to-date-', '').replace('yadcf-filter-' + table_selector_jq_friendly, ''), 10);
 			columnObj = getOptions(oTable.selector)[column_number];
@@ -3355,15 +3365,15 @@
 						if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
 							oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
 								{
-									'from' : min,
-									'to' : max
+									from: min,
+									to: max
 								};
 						} else {
 							yadcfState = {};
 							yadcfState[table_selector_jq_friendly] = [];
 							yadcfState[table_selector_jq_friendly][column_number] = {
-								'from' : min,
-								'to' : max
+								from: min,
+								to: max
 							};
 							oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
 						}
@@ -4074,7 +4084,7 @@
 			var i,
 				tablesSelectors = '',
 				default_options = {
-					filter_type : "text",
+					filter_type: "text",
 					filter_container_id: '',
 					filter_reset_button_text: 'x',
 					case_insensitive: true
@@ -4129,32 +4139,28 @@
 			initMultipleTables(tablesArray, filtersOptions);
 		}
 
-		function closeOpenDatePickersIfAny(evt) {
-			var closeBootstrapDatepicker = false,
-				closeBootstrapDatepickerRange = false;
-			Object.entries(getAllOptions()).some(function ([tableSelector, tableOptions]) {
-				Object.entries(tableOptions).some(function ([key, value]) {
-					if (value.datepicker_type === 'bootstrap-datepicker') {
-						if (value.filter_type === 'range_date') {
-							closeBootstrapDatepickerRange = true;
-						} else {
-							closeBootstrapDatepicker = true;	
-						}
-					}
-					return closeBootstrapDatepicker && closeBootstrapDatepickerRange;
-				});
-				return closeBootstrapDatepicker && closeBootstrapDatepickerRange;
-			});
+		function close3rdPPluginsNeededClose(evt) {
 			if (closeBootstrapDatepickerRange) {
 				$('.yadcf-filter-range-date').not($(evt.target)).datepicker('hide');
 			}
 			if (closeBootstrapDatepicker) {
 				$('.yadcf-filter-date').not($(evt.target)).datepicker('hide');
 			}
+			if (closeSelect2) {
+				let currentSelect2;
+				if (evt.target.className.indexOf('yadcf-filter-reset-button') !== -1) {
+					$('select.yadcf-filter').select2('close');
+				} else {
+					currentSelect2 = $($(evt.target).closest('.yadcf-filter-wrapper').find('select'));
+					if (currentSelect2) {
+						$('select.yadcf-filter').not(currentSelect2).select2('close');
+					}
+				}
+			}
 		}
 		
 		function stopPropagation(evt) {
-			closeOpenDatePickersIfAny(evt);
+			close3rdPPluginsNeededClose(evt);
 			if (evt.stopPropagation !== undefined) {
 				evt.stopPropagation();
 			} else {
@@ -4450,15 +4456,15 @@
 				}
 				if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
 					oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] = {
-						'from' : from,
-						'to' : to
+						from: from,
+						to: to
 					};
 				} else {
 					yadcfState = {};
 					yadcfState[table_selector_jq_friendly] = [];
 					yadcfState[table_selector_jq_friendly][column_number] = {
-						'from' : from,
-						'to' : to
+						from: from,
+						to: to
 					};
 					oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
 				}
@@ -4615,25 +4621,25 @@
 		}
 
 		return {
-			init : init,
-			doFilter : doFilter,
-			doFilterMultiSelect : doFilterMultiSelect,
-			doFilterAutocomplete : doFilterAutocomplete,
-			autocompleteKeyUP : autocompleteKeyUP,
-			getOptions : getOptions,
-			rangeNumberKeyUP : rangeNumberKeyUP,
-			rangeDateKeyUP : rangeDateKeyUP,
+			init: init,
+			doFilter: doFilter,
+			doFilterMultiSelect: doFilterMultiSelect,
+			doFilterAutocomplete: doFilterAutocomplete,
+			autocompleteKeyUP: autocompleteKeyUP,
+			getOptions: getOptions,
+			rangeNumberKeyUP: rangeNumberKeyUP,
+			rangeDateKeyUP: rangeDateKeyUP,
 			rangeClear: rangeClear,
-			rangeNumberSliderClear : rangeNumberSliderClear,
-			stopPropagation : stopPropagation,
+			rangeNumberSliderClear: rangeNumberSliderClear,
+			stopPropagation: stopPropagation,
 			exFilterColumn: exFilterColumn,
-			exGetColumnFilterVal : exGetColumnFilterVal,
+			exGetColumnFilterVal: exGetColumnFilterVal,
 			exResetAllFilters: exResetAllFilters,
-			dateKeyUP : dateKeyUP,
-			dateSelectSingle : dateSelectSingle,
-			textKeyUP : textKeyUP,
-			doFilterCustomDateFunc : doFilterCustomDateFunc,
-			eventTargetFixUp : eventTargetFixUp,
+			dateKeyUP: dateKeyUP,
+			dateSelectSingle: dateSelectSingle,
+			textKeyUP: textKeyUP,
+			doFilterCustomDateFunc: doFilterCustomDateFunc,
+			eventTargetFixUp: eventTargetFixUp,
 			initMultipleTables: initMultipleTables,
 			initMultipleColumns: initMultipleColumns,
 			textKeyUpMultiTables: textKeyUpMultiTables,
