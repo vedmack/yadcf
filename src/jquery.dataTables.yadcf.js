@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.3.beta.15 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.3.beta.16 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -351,7 +351,7 @@
                 Arguments:          initFunc  : function which will initialize the plugin
                                     refreshFunc : function that will refresh the plugin.
                                     destroyFunc : function that will destroy the plugin (upon table destroy even trigger).
-                Usage example:      yadcf.initSelectPluginCustomTriggers(function($filterSelector){$filterSelector.multiselect({});}, function($filterSelector){$filterSelector.multiselect("refresh")}, , function($filterSelector){$filterSelector.multiselect("destroy")});
+                Usage example:      yadcf.initSelectPluginCustomTriggers(function ($filterSelector){$filterSelector.multiselect({});}, function ($filterSelector){$filterSelector.multiselect("refresh")}, , function ($filterSelector){$filterSelector.multiselect("destroy")});
 
 * exFilterExternallyTriggered
                 Description:        Triggers all the available filters, should be used only when the externally_triggered option used
@@ -418,7 +418,7 @@
 
   if (typeof define === 'function' && define.amd) {
     // AMD
-    define(['jquery'], function($) {
+    define(['jquery'], function ($) {
       return factory($, window, document);
     });
   } else if (typeof module === 'object') {
@@ -443,9 +443,8 @@
     factory(jQuery, window, document);
   }
 }
-(function($, window, document, undefined) {
+(function ($, window, document, undefined) {
 	var yadcf = (function () {
-
 		'use strict';
 
 		var tablesDT = {},
@@ -455,8 +454,6 @@
 			plugins = {},
 			exFilterColumnQueue = [],
 			yadcfDelay,
-			reA = /[^a-zA-Z]/g,
-			reN = /[^0-9]/g,
 			selectElementCustomInitFunc,
 			selectElementCustomRefreshFunc,
 			selectElementCustomDestroyFunc,
@@ -478,7 +475,7 @@
 			var oDTSettings;
 			if ($.fn.dataTable.Api) {
 				oDTSettings = new $.fn.dataTable.Api(dt).settings()[0];
-			} else if (dt.fnSettings) {// 1.9 compatibility
+			} else if (dt.fnSettings) { // 1.9 compatibility
 				// DataTables object, convert to the settings object
 				oDTSettings = dt.fnSettings();
 			} else if (typeof dt === 'string') { // jQuery selector
@@ -645,15 +642,15 @@
 		}
 
 		function check3rdPPluginsNeededClose() {
-			Object.entries(getAllOptions()).forEach(([tableSelector, tableOptions]) => {
-				Object.entries(tableOptions).forEach(([key, value]) => {					
-					if (value.datepicker_type === 'bootstrap-datepicker') {
-						if (value.filter_type === 'range_date') {
+			Object.entries(getAllOptions()).forEach((tableEntry) => {
+				Object.entries(tableEntry[1]).forEach((columnEntry) => {					
+					if (columnEntry[1].datepicker_type === 'bootstrap-datepicker') {
+						if (columnEntry[1].filter_type === 'range_date') {
 							closeBootstrapDatepickerRange = true;
 						} else {
 							closeBootstrapDatepicker = true;	
 						}
-					} else if (value.select_type === 'select2') {
+					} else if (columnEntry[1].select_type === 'select2') {
 						closeSelect2 = true;
 					}
 				});
@@ -1153,8 +1150,6 @@
 						ignore_char_local = ignore_char,
 						column_data_type,
 						html_data_type,
-						i,
-						columnObjKey,
 						columnObj,
 						column_number_filter,
 						valFrom,
@@ -1313,8 +1308,6 @@
 						current_table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly2(settingsDt),
 						column_data_type,
 						html_data_type,
-						i,
-						columnObjKey,
 						columnObj,
 						column_number_filter,
 						min_time,
@@ -1367,13 +1360,12 @@
 								break;
 							}
 						}
-					} else {
-						if (typeof val === 'object') {
-							if (columnObj.html5_data !== undefined) {
-								val = val['@' + columnObj.html5_data];
-							}
+					} else if (typeof val === 'object') {
+						if (columnObj.html5_data !== undefined) {
+							val = val['@' + columnObj.html5_data];
 						}
 					}
+					
 					//omit empty rows when filtering
 					if (val === '' && (min !== '' || max !== '')) {
 						return false;
@@ -1559,7 +1551,7 @@
 				if (columnObj.filter_type !== 'date_custom_func') {
 					oTable.fnFilter(date, column_number_filter);
 				} else {
-					doFilterCustomDateFunc({value: date}, table_selector_jq_friendly, column_number);
+					doFilterCustomDateFunc({ value: date }, table_selector_jq_friendly, column_number);
 				}
 				$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass("inuse");
 			} else if (clear === 'clear') {
@@ -1701,7 +1693,6 @@
 				columnObj,
 				datepickerObj = {},
 				filterActionStr,
-				filterClass = '',
 				$fromInput,
 				$toInput,
 				innerWrapperAdditionalClass = '';
@@ -1774,13 +1765,13 @@
 				}
 			} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 				if (date_format) {
-					$.extend(datepickerObj, {format: date_format});
+					$.extend(datepickerObj, { format: date_format });
 				}
-				$fromInput.datepicker(datepickerObj).on('changeDate', function(e) {
+				$fromInput.datepicker(datepickerObj).on('changeDate', function (e) {
 					dateSelect(e);
 					$(this).datepicker('hide');
 				});
-				$toInput.datepicker(datepickerObj).on('changeDate', function(e) {
+				$toInput.datepicker(datepickerObj).on('changeDate', function (e) {
 					dateSelect(e);
 					$(this).datepicker('hide');
 				});
@@ -1869,7 +1860,7 @@
 					}
 				}
 			} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
-				$("#" + dateId).datepicker(datepickerObj).on('changeDate', function(e) {
+				$("#" + dateId).datepicker(datepickerObj).on('changeDate', function (e) {
 					dateSelectSingle(e);
 					$(this).datepicker('hide');
 				});
@@ -1900,8 +1891,8 @@
 		}
 
 		function rangeNumberSldierDrawTips(min_tip_val, max_tip_val, min_tip_id, max_tip_id, table_selector_jq_friendly, column_number) {
-			var first_handle = $(".yadcf-number-slider-filter-wrapper-inner.-" + table_selector_jq_friendly + "-" + column_number),// + " .ui-slider-handle:first"),
-				last_handle = $(".yadcf-number-slider-filter-wrapper-inner.-" + table_selector_jq_friendly + "-" + column_number),// + " .ui-slider-handle:last"),
+			var first_handle = $(".yadcf-number-slider-filter-wrapper-inner.-" + table_selector_jq_friendly + "-" + column_number), // + " .ui-slider-handle:first"),
+				last_handle = $(".yadcf-number-slider-filter-wrapper-inner.-" + table_selector_jq_friendly + "-" + column_number), // + " .ui-slider-handle:last"),
 				min_tip_inner,
 				max_tip_inner;
 
@@ -2149,7 +2140,6 @@
 
 			var tableOptions,
 				table_selector_jq_friendly,
-				settingsDt,
 				columnObjKey,
 				column_number,
 				optionsObj,
@@ -2162,7 +2152,6 @@
 			}
 			tableOptions = getOptions(table_arg.selector);
 			table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly2(table_arg);
-			settingsDt = getSettingsObjFromTable(table_arg);
 
 			for (columnObjKey in tableOptions) {
 				if (tableOptions.hasOwnProperty(columnObjKey)) {
@@ -2504,26 +2493,15 @@
 				column_number_data,
 				column_number,
 				column_position,
-				column_data_type,
-				html_data_type,
-				text_data_delimiter,
 				filter_default_label,
 				filter_reset_button_text,
 				enable_auto_complete,
-				sort_as,
-				sort_order,
 				date_format,
 				ignore_char,
 				filter_match_mode,
-
 				column_data,
 				column_data_temp,
 				options_tmp,
-				j,
-				k,
-				data_length,
-				col_inner_elements,
-				col_inner_data,
 				ii,
 				table_selector_jq_friendly,
 				min_val,
@@ -2538,9 +2516,7 @@
 				settingsDt,
 				filterActionStr,
 				custom_func_filter_value_holder,
-				exclude_str,
-				tableDT,
-				columnFilterVal;
+				exclude_str;
 
 			if (pSettings === undefined) {
 				settingsDt = getSettingsObjFromTable(oTable);
@@ -2550,7 +2526,6 @@
 			settingsMap[generateTableSelectorJQFriendly2(oTable)] = settingsDt;
 
 			table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly2(oTable);
-			tableDT = tablesDT[table_selector_jq_friendly];
 
 			initColReorder2(settingsDt, table_selector_jq_friendly);
 
@@ -2591,14 +2566,9 @@
 					if (isNaN(settingsDt.aoColumns[column_position].mRender) && typeof settingsDt.aoColumns[column_position].mRender !== 'object') {
 						columnObj.column_number_render = settingsDt.aoColumns[column_position].mRender;
 					}
-					column_data_type = columnObj.column_data_type;
-					html_data_type = columnObj.html_data_type;
-					text_data_delimiter = columnObj.text_data_delimiter;
 					filter_default_label = columnObj.filter_default_label;
 					filter_reset_button_text = columnObj.filter_reset_button_text;
 					enable_auto_complete = columnObj.enable_auto_complete;
-					sort_as = columnObj.sort_as;
-					sort_order = columnObj.sort_order;
 					date_format = columnObj.date_format;
 					if (columnObj.datepicker_type === 'jquery-ui') {
 						date_format = date_format.replace("yyyy", "yy");
@@ -3172,7 +3142,7 @@
 					oTable.fnFilter(document.getElementById(dateId).value, column_number);
 					resetIApiIndex();
 				} else {
-					doFilterCustomDateFunc({value: date}, table_selector_jq_friendly, column_number);
+					doFilterCustomDateFunc({ value: date }, table_selector_jq_friendly, column_number);
 				}
 			} else if (date === "" || $.trim(event.target.value) === '') {
 				$("#" + dateId).removeClass('inuse');
@@ -3322,7 +3292,6 @@
 			column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
 
 			keyUp = function () {
-
 				if (event.target.id.indexOf("-from-") !== -1) {
 					fromId = event.target.id;
 					toId = event.target.id.replace("-from-", "-to-");
@@ -3333,7 +3302,7 @@
 					toId = event.target.id;
 					fromId = event.target.id.replace("-to-", "-from-");
 
-					max =   document.getElementById(toId).value;
+					max = document.getElementById(toId).value;
 					min = document.getElementById(fromId).value;
 				}
 
@@ -3872,7 +3841,7 @@
 				tableSelector = '#' + oTable.table().node().id;
 
 			//in case that instance.selector will be undefined (jQuery 3)
-			if (! instance.selector ) {
+			if (!instance.selector) {
 				instance.selector = tableSelector;
 			}
 
@@ -3921,7 +3890,6 @@
 
 		function appendFiltersMultipleTables(tablesArray, tablesSelectors, colObjDummy) {
 			var filter_selector_string = "#" + colObjDummy.filter_container_id,
-				$filter_selector = $(filter_selector_string).find(".yadcf-filter"),
 				table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendlyNew(tablesSelectors),
 				options_tmp,
 				ii,
@@ -4152,9 +4120,7 @@
 					$('select.yadcf-filter').select2('close');
 				} else {
 					currentSelect2 = $($(evt.target).closest('.yadcf-filter-wrapper').find('select'));
-					if (currentSelect2) {
-						$('select.yadcf-filter').not(currentSelect2).select2('close');
-					}
+					$('select.yadcf-filter').not(currentSelect2).select2('close');
 				}
 			}
 		}
