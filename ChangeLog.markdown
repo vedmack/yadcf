@@ -15,7 +15,7 @@
 	https://github.com/vedmack/yadcf/issues/441 - Continue stabilzing integration with 'bootstrap-datepicker'
 	https://github.com/vedmack/yadcf/issues/442 - Date picker is still shown on click of another input filed
 	https://github.com/vedmack/yadcf/issues/450 - Select2 stay opened when clicking on another field
-
+	https://github.com/vedmack/yadcf/issues/456 - beta 16 error Uncaught TypeError: Object.entries is not a function
 
 ## 0.9.2
 
