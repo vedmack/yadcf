@@ -2373,10 +2373,14 @@
 								col_inner_data = col_inner_elements[k].id;
 								break;
 							case "selector":
-								if ($(col_inner_elements[k]).find(columnObj.html_data_selector).length === 1) {
+								var l = $(col_inner_elements[k]).find(columnObj.html_data_selector).length;
+								if (l === 1) {
 									col_inner_data = $(col_inner_elements[k]).find(columnObj.html_data_selector).text();
-								} else if ($(col_inner_elements[k]).find(columnObj.html_data_selector).length > 1) {
+								} else if (l > 1) {
 									col_inner_data_helper = $(col_inner_elements[k]).find(columnObj.html_data_selector);
+								} else if (l===0) {
+									col_inner_data = null; //to prevent re-adding col_inner_data to the column_data
+									// col_inner_data_helper is already reset in line 2402.
 								}
 								break;
 							}
@@ -2394,8 +2398,8 @@
 										col_filter_array[elm] = elm;
 										column_data.push(elm);
 									}
-									col_inner_data_helper = null; //reset col_inner_data_helper
 								});
+								col_inner_data_helper = null; //reset col_inner_data_helper
 							}
 						}
 					} else {
