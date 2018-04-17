@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.3.beta.17 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.3.beta.18 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2362,44 +2362,46 @@
 					}
 					if (col_inner_elements.length > 0) {
 						for (k = 0; k < col_inner_elements.length; k++) {
+							col_inner_data = null;
+							col_inner_data_helper = null;
+
 							switch (columnObj.html_data_type) {
-							case "text":
-								col_inner_data = $(col_inner_elements[k]).text();
-								break;
-							case "value":
-								col_inner_data = $(col_inner_elements[k]).val();
-								break;
-							case "id":
-								col_inner_data = col_inner_elements[k].id;
-								break;
-							case "selector":
-								var l = $(col_inner_elements[k]).find(columnObj.html_data_selector).length;
-								if (l === 1) {
-									col_inner_data = $(col_inner_elements[k]).find(columnObj.html_data_selector).text();
-								} else if (l > 1) {
-									col_inner_data_helper = $(col_inner_elements[k]).find(columnObj.html_data_selector);
-								} else if (l===0) {
-									col_inner_data = null; //to prevent re-adding col_inner_data to the column_data
-									// col_inner_data_helper is already reset in line 2402.
+								case "text":
+									col_inner_data = $(col_inner_elements[k]).text();
+									break;
+								case "value":
+									col_inner_data = $(col_inner_elements[k]).val();
+									break;
+								case "id":
+									col_inner_data = col_inner_elements[k].id;
+									break;
+								case "selector": {
+									const len = $(col_inner_elements[k]).find(columnObj.html_data_selector).length;
+									if (len === 1) {
+										col_inner_data = $(col_inner_elements[k]).find(columnObj.html_data_selector).text();
+									} else if (len > 1) {
+										col_inner_data_helper = $(col_inner_elements[k]).find(columnObj.html_data_selector);
+									}
+									break;
 								}
-								break;
 							}
 
-							if (!col_inner_data_helper) {
-								if ($.trim(col_inner_data) !== '' && !(col_filter_array.hasOwnProperty(col_inner_data))) {
-									col_filter_array[col_inner_data] = col_inner_data;
-									column_data.push(col_inner_data);
-								}
-							} else {
-								col_inner_data = col_inner_data_helper;
-								col_inner_data_helper.each(function (index) {
-									var elm = $(col_inner_data[index]).text();
-									if ($.trim(elm) !== '' && !(col_filter_array.hasOwnProperty(elm))) {
-										col_filter_array[elm] = elm;
-										column_data.push(elm);
+							if (col_inner_data || col_inner_data_helper) {
+								if (!col_inner_data_helper) {
+									if ($.trim(col_inner_data) !== '' && !(col_filter_array.hasOwnProperty(col_inner_data))) {
+										col_filter_array[col_inner_data] = col_inner_data;
+										column_data.push(col_inner_data);
 									}
-								});
-								col_inner_data_helper = null; //reset col_inner_data_helper
+								} else {
+									col_inner_data = col_inner_data_helper;
+									col_inner_data_helper.each(function (index) {
+										var elm = $(col_inner_data[index]).text();
+										if ($.trim(elm) !== '' && !(col_filter_array.hasOwnProperty(elm))) {
+											col_filter_array[elm] = elm;
+											column_data.push(elm);
+										}
+									});
+								}
 							}
 						}
 					} else {
