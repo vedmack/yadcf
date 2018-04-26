@@ -17,6 +17,8 @@
 	https://github.com/vedmack/yadcf/issues/450 - Select2 stay opened when clicking on another field
 	https://github.com/vedmack/yadcf/issues/456 - beta 16 error Uncaught TypeError: Object.entries is not a function
 	https://github.com/vedmack/yadcf/issues/459 - Empty lists with type 'selector' re-add previous list as object
+	https://github.com/vedmack/yadcf/issues/455 - Data is hidden when initialising a range_number_slider on a fully data empty column
+	https://github.com/vedmack/yadcf/issues/461 - Problem with ColReorder and column without filter
 
 ## 0.9.2
 

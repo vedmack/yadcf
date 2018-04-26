@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.3.beta.18 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.3.beta.20 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -413,6 +413,26 @@
                                     filter_container_id: '' (required),
                 Note:               All the usual properties of yadcf should be supported in initMultipleColumns too!
 */
+//Polyfills
+if (window.NodeList && !NodeList.prototype.forEach) {
+    NodeList.prototype.forEach = function (callback, thisArg) {
+        thisArg = thisArg || window;
+        for (var i = 0; i < this.length; i++) {
+            callback.call(thisArg, this[i], i, this);
+        }
+    };
+}
+if (!Object.entries) {
+  Object.entries = function(obj) {
+    var ownProps = Object.keys(obj),
+      i = ownProps.length,
+      resArray = new Array(i); // preallocate the Array
+    while (i--)
+      resArray[i] = [ownProps[i], obj[ownProps[i]]];
+
+    return resArray;
+  };
+}
 (function (factory) {
   'use strict';
 
@@ -845,8 +865,8 @@
 			return ret_val;
 		}
 
-		function yadcfMatchFilter(oTable, selected_value, filter_match_mode, column_number, exclude) {
-			var case_insensitive = yadcf.getOptions(oTable.selector)[column_number].case_insensitive;
+		function yadcfMatchFilter(oTable, selected_value, filter_match_mode, column_number, exclude, original_column_number) {
+			var case_insensitive = yadcf.getOptions(oTable.selector)[original_column_number].case_insensitive;
 			if (exclude !== true) {
 				if (filter_match_mode === "contains") {
 					oTable.fnFilter(selected_value, column_number, false, true, true, case_insensitive);
@@ -973,7 +993,7 @@
 			selected_value = $.trim($(arg).find('option:selected').val());
 
 			if (arg.value !== "-1") {
-				yadcfMatchFilter(oTable, selected_value, filter_match_mode, column_number_filter);
+				yadcfMatchFilter(oTable, selected_value, filter_match_mode, column_number_filter, false, column_number);
 			} else {
 				oTable.fnFilter("", column_number_filter);
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
@@ -1072,18 +1092,25 @@
 
 			$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", arg.value);
 
-			yadcfMatchFilter(oTable, arg.value, filter_match_mode, column_number_filter);
+			yadcfMatchFilter(oTable, arg.value, filter_match_mode, column_number_filter, false, column_number);
 
 			resetIApiIndex();
 		}
 
 		function autocompleteSelect(event, ui) {
+			var table_column,
+				dashIndex,
+				table_selector_jq_friendly,
+				col_num,
+				filter_match_mode;
+
 			event = eventTargetFixUp(event);
-			var table_column = event.target.id.replace("yadcf-filter-", ""),
-				dashIndex = table_column.lastIndexOf("-"),
-				table_selector_jq_friendly = table_column.substring(0, dashIndex),
-				col_num = parseInt(table_column.substring(dashIndex + 1), 10),
-				filter_match_mode = $(event.target).attr("filter_match_mode");
+			table_column = event.target.id.replace("yadcf-filter-", "");
+			dashIndex = table_column.lastIndexOf("-");
+			table_selector_jq_friendly = table_column.substring(0, dashIndex);
+			col_num = parseInt(table_column.substring(dashIndex + 1), 10);
+			filter_match_mode = $(event.target).attr("filter_match_mode");
+
 			doFilterAutocomplete(ui.item, table_selector_jq_friendly, col_num, filter_match_mode);
 		}
 
@@ -1096,7 +1123,10 @@
 		}
 
 		function findMinInArray(array, columnObj) {
-			var narray = [], i, num;
+			var narray = [], 
+				i,
+				num,
+				min;
 			for (i = 0; i < array.length; i++) {
 				if (array[i] !== null) {
 					if (columnObj.ignore_char !== undefined) {
@@ -1113,11 +1143,25 @@
 					}
 				}
 			}
-			return Math.min.apply(Math, narray);
+			min = Math.min.apply(Math, narray);
+			if (!isFinite(min)) {
+				min = 0;
+			} else if (min !== 0) {
+				if (min > 0) {
+					min = Math.floor(min);
+				} else {
+					min = -1 * Math.ceil(min * -1);
+				}
+			}
+			
+			return min;
 		}
 
 		function findMaxInArray(array, columnObj) {
-			var narray = [], i, num;
+			var narray = [],
+				i,
+				num,
+				max;
 			for (i = 0; i < array.length; i++) {
 				if (array[i] !== null) {
 					if (columnObj.ignore_char !== undefined) {
@@ -1134,7 +1178,13 @@
 					}
 				}
 			}
-			return Math.max.apply(Math, narray);
+			max = Math.max.apply(Math, narray);
+			if (!isFinite(max)) {
+				max = 0;
+			} else {
+				max = Math.ceil(max);
+			}
+			return max;
 		}
 
 		function addRangeNumberAndSliderFilterCapability(table_selector_jq_friendly, fromId, toId, col_num, ignore_char, sliderMaxMin) {
@@ -3583,7 +3633,7 @@
 				}
 				$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
 
-				yadcfMatchFilter(oTable, $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val(), columnObj.filter_match_mode, column_number_filter, exclude);
+				yadcfMatchFilter(oTable, $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val(), columnObj.filter_match_mode, column_number_filter, exclude, column_number);
 
 				resetIApiIndex();
 			};
@@ -4628,17 +4678,3 @@
 	}
 	return yadcf;
 }));
-
-
-//Polyfills
-
-if (!Object.entries)
-  Object.entries = function(obj) {
-    var ownProps = Object.keys(obj),
-      i = ownProps.length,
-      resArray = new Array(i); // preallocate the Array
-    while (i--)
-      resArray[i] = [ownProps[i], obj[ownProps[i]]];
-
-    return resArray;
-  };
