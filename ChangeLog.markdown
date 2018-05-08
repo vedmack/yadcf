@@ -19,6 +19,7 @@
 	https://github.com/vedmack/yadcf/issues/459 - Empty lists with type 'selector' re-add previous list as object
 	https://github.com/vedmack/yadcf/issues/455 - Data is hidden when initialising a range_number_slider on a fully data empty column
 	https://github.com/vedmack/yadcf/issues/461 - Problem with ColReorder and column without filter
+	https://github.com/vedmack/yadcf/issues/457 - new div is created every time date selected (date-range) + selection (inuse class) not removed when using clear button bug
 
 ## 0.9.2
 

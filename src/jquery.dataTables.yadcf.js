@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.3.beta.20 (grab latest stable from https://github.com/vedmack/yadcf/releases)
+* Version:     0.9.3.beta.21 (grab latest stable from https://github.com/vedmack/yadcf/releases)
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1651,7 +1651,6 @@ if (!Object.entries) {
 				yadcfState,
 				from,
 				to,
-				date,
 				event,
 				columnObj,
 				column_number_filter,
@@ -1662,7 +1661,6 @@ if (!Object.entries) {
 			} else if (pDate.type === 'changeDate') {
 				event = pDate.currentTarget;
 			} else {
-				date = pDate;
 				event = pEvent;
 			}
 
@@ -1690,6 +1688,12 @@ if (!Object.entries) {
 					$(event).addClass("inuse");
 				}
 				$(event).blur();
+			} else if (pDate.type === 'changeDate') {
+				if (pDate.date !== undefined) {
+					$(event).addClass("inuse");
+				} else {
+					$(event).removeClass("inuse");
+				}
 			} else {
 				$(event).addClass("inuse");
 			}
@@ -2823,7 +2827,7 @@ if (!Object.entries) {
 							if (filter_container_id !== undefined) {
 								columnObj.filter_container_selector = "#" + filter_container_id;
 							}
-							if ($("#yadcf-filter-wrapper-" + columnObj.filter_container_selector).length === 0) {
+							if ($("#yadcf-filter-wrapper-" + generateTableSelectorJQFriendlyNew(columnObj.filter_container_selector)).length === 0) {
 								$(columnObj.filter_container_selector).append("<div id=\"yadcf-filter-wrapper-" + generateTableSelectorJQFriendlyNew(columnObj.filter_container_selector) + "\"></div>");
 							}
 							filter_selector_string = "#yadcf-filter-wrapper-" + generateTableSelectorJQFriendlyNew(columnObj.filter_container_selector);
