@@ -662,8 +662,8 @@ if (!Object.entries) {
 		}
 
 		function check3rdPPluginsNeededClose() {
-			Object.entries(getAllOptions()).forEach((tableEntry) => {
-				Object.entries(tableEntry[1]).forEach((columnEntry) => {					
+			Object.entries(getAllOptions()).forEach(function(tableEntry) {
+				Object.entries(tableEntry[1]).forEach(function(columnEntry) {
 					if (columnEntry[1].datepicker_type === 'bootstrap-datepicker') {
 						if (columnEntry[1].filter_type === 'range_date') {
 							closeBootstrapDatepickerRange = true;
