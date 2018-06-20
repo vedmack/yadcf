@@ -1,7 +1,11 @@
 # Yet Another DataTables Column Filter (yadcf) Change-log
 
-
-
+ 
+## 0.9.4 is in beta (grab latest stable from https://github.com/vedmack/yadcf/releases)
+ 
+* Misc bug fixed issues:
+	https://github.com/vedmack/yadcf/issues/469 - Cannot apply style_class on date filter
+	
 ## 0.9.3
 
 * Added support for col reorder in range filters - https://github.com/vedmack/yadcf/issues/429
