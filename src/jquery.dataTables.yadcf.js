@@ -2267,6 +2267,15 @@ if (!Object.entries) {
 				}
 			}
 		}
+					
+		/**
+		 * Remove a table reference in a `plugins` object
+		 * @param {*} oTable
+		 */
+		function removeTablePlugin(oTable) {
+			var table_selector_jq_friendly = generateTableSelectorJQFriendly2(oTable);
+			plugins[table_selector_jq_friendly] = undefined;
+		}
 
 		function removeFilters(oTable) {
 			var tableId = getTableId(oTable);
@@ -2280,6 +2289,10 @@ if (!Object.entries) {
 				$(document).off('draw', oTable.selector);
 				$(document).off('destroy', oTable.selector);
 			}
+			// we remove a table reference in `plugins` object,
+		 	// this solves the case, when in SPA there might be tables with same selector on different SPA views
+		 	// and yadcf keeps the `plugins` object populated across these views, which can lead to DT mData error
+			removeTablePlugin(oTable);
 			destroyThirdPartyPlugins(oTable);
 		}
 
@@ -3792,8 +3805,7 @@ if (!Object.entries) {
 					}
 				});
 				$(document).off('column-reorder.dt', oTable.selector).on('column-reorder.dt', oTable.selector, function (e, settings, json) {
-					var table_selector_jq_friendly = generateTableSelectorJQFriendly2(oTable);
-					initColReorderFromEvent(table_selector_jq_friendly);
+					removeTablePlugin(oTable);
 				});
 				$(document).off('destroy.dt', oTable.selector).on('destroy.dt', oTable.selector, function (event, ui) {
 					removeFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);
