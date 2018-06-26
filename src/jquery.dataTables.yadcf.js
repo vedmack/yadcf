@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.1
+* Version:     0.9.4.beta.2
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1654,7 +1654,8 @@ if (!Object.entries) {
 				event,
 				columnObj,
 				column_number_filter,
-				settingsDt;
+				settingsDt,
+				keyUp;
 
 			if (pDate.type === 'dp') {
 				event = pDate.target;
@@ -1706,36 +1707,44 @@ if (!Object.entries) {
 				from = document.getElementById($(event).attr("id").replace("-to-", "-from-")).value;
 			}
 
-			if (oTable.fnSettings().oFeatures.bServerSide !== true) {
-				oTable.fnDraw();
-			} else {
-				oTable.fnFilter(from + '-yadcf_delim-' + to, column_number_filter);
-			}
+			keyUp = function () {
+				if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+					oTable.fnDraw();
+				} else {
+					oTable.fnFilter(from + '-yadcf_delim-' + to, column_number_filter);
+				}
 
-			if (!oTable.fnSettings().oLoadedState) {
-				oTable.fnSettings().oLoadedState = {};
-				oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
-			}
-			if (oTable.fnSettings().oFeatures.bStateSave === true) {
-				if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
-					oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
-						{
+				if (!oTable.fnSettings().oLoadedState) {
+					oTable.fnSettings().oLoadedState = {};
+					oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
+				}
+				if (oTable.fnSettings().oFeatures.bStateSave === true) {
+					if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
+						oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
+							{
+								from: from,
+								to: to
+							};
+					} else {
+						yadcfState = {};
+						yadcfState[table_selector_jq_friendly] = [];
+						yadcfState[table_selector_jq_friendly][column_number] = {
 							from: from,
 							to: to
 						};
-				} else {
-					yadcfState = {};
-					yadcfState[table_selector_jq_friendly] = [];
-					yadcfState[table_selector_jq_friendly][column_number] = {
-						from: from,
-						to: to
-					};
-					oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+						oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+					}
+					oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 				}
-				oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
+				resetIApiIndex();
 			}
-
-			resetIApiIndex();
+			if (columnObj.filter_delay === undefined) {
+				keyUp();
+			} else {
+				yadcfDelay(function () {
+					keyUp();
+				}, columnObj.filter_delay);
+			}
 		}
 
 		function addRangeDateFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, filter_default_label, date_format) {
@@ -2267,15 +2276,6 @@ if (!Object.entries) {
 				}
 			}
 		}
-					
-		/**
-		 * Remove a table reference in a `plugins` object
-		 * @param {*} oTable
-		 */
-		function removeTablePlugin(oTable) {
-			var table_selector_jq_friendly = generateTableSelectorJQFriendly2(oTable);
-			plugins[table_selector_jq_friendly] = undefined;
-		}
 
 		function removeFilters(oTable) {
 			var tableId = getTableId(oTable);
@@ -2289,10 +2289,6 @@ if (!Object.entries) {
 				$(document).off('draw', oTable.selector);
 				$(document).off('destroy', oTable.selector);
 			}
-			// we remove a table reference in `plugins` object,
-		 	// this solves the case, when in SPA there might be tables with same selector on different SPA views
-		 	// and yadcf keeps the `plugins` object populated across these views, which can lead to DT mData error
-			removeTablePlugin(oTable);
 			destroyThirdPartyPlugins(oTable);
 		}
 
@@ -3805,7 +3801,8 @@ if (!Object.entries) {
 					}
 				});
 				$(document).off('column-reorder.dt', oTable.selector).on('column-reorder.dt', oTable.selector, function (e, settings, json) {
-					removeTablePlugin(oTable);
+					var table_selector_jq_friendly = generateTableSelectorJQFriendly2(oTable);
+					initColReorderFromEvent(table_selector_jq_friendly);
 				});
 				$(document).off('destroy.dt', oTable.selector).on('destroy.dt', oTable.selector, function (event, ui) {
 					removeFilters(oTable, yadcf.getOptions(ui.oInstance.selector), ui.oInstance.selector);

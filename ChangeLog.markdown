@@ -5,6 +5,7 @@
  
 * Misc bug fixed issues:
 	https://github.com/vedmack/yadcf/issues/469 - Cannot apply style_class on date filter
+	https://github.com/vedmack/yadcf/issues/470 - filter_delay not working on range_date
 	
 ## 0.9.3
 
