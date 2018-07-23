@@ -2748,6 +2748,9 @@ if (!Object.entries) {
 						}
 						filter_selector_string = columnObj.filter_container_selector;
 						$filter_selector = $(filter_selector_string).find(".yadcf-filter");
+						if (columnObj.select_type === 'select2') {
+							$filter_selector = $(filter_selector_string).find("select.yadcf-filter");
+						}
 					}
 
 					if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func' || columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
