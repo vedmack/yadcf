@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.2
+* Version:     0.9.4.beta.3
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -3051,14 +3051,18 @@ if (!Object.entries) {
 						$(filter_selector_string).find(".yadcf-filter").val($(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val"));
 					}
 					if (columnObj.filter_type === "auto_complete") {
-						columnObj.filter_plugin_options = {
+						let autocompleteObj = {
 							source: $(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number),
 							select: autocompleteSelect
 						};
 						if (columnObj.externally_triggered === true) {
-							delete columnObj.filter_plugin_options.select;
+							delete autocompleteObj.select;
 						}
-						$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).autocomplete(columnObj.filter_plugin_options);
+						if (columnObj.filter_plugin_options !== undefined) {
+							$.extend(autocompleteObj, columnObj.filter_plugin_options);
+						}
+		
+						$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).autocomplete(autocompleteObj);
 						if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
 							tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 							tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
