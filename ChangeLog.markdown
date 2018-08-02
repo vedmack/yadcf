@@ -3,10 +3,12 @@
  
 ## 0.9.4 is in beta (grab latest stable from https://github.com/vedmack/yadcf/releases)
  
+* Added babel transpiled version (es5) in /build folder
+* Fixed cumulative filtering issue (not calling proper dt api / version) 
 * Misc bug fixed issues:
 	https://github.com/vedmack/yadcf/issues/469 - Cannot apply style_class on date filter
 	https://github.com/vedmack/yadcf/issues/470 - filter_delay not working on range_date
-	https://github.com/vedmack/yadcf/issues/482 - Autocomplete is not reading filter_plugin_options  
+	https://github.com/vedmack/yadcf/issues/482 - Autocomplete is not reading filter_plugin_options
 	
 ## 0.9.3
 
