@@ -134,6 +134,12 @@
                 Default value:      'x'
                 Description:        The text that will appear inside the reset button next to the select drop down (set this to false (boolean) in order to hide it from that column filter)
 
+* filter_regex_check_text
+                Required:           false
+                Type:               String
+                Default value:      undefined
+                Description:        For text filter only, if set the checkbox with following text will appear next to to reset button, if checked the text filter will accept regex, if unchecked default or initial filter_mode_value is used
+
 * enable_auto_complete (this attribute is deprecated , and will become obsolete in the future , so you better start using filter_type: "auto_complete")
                 Required:           false
                 Type:               boolean
@@ -616,6 +622,7 @@ if (!Object.entries) {
 					exclude_label: 'exclude',
 					style_class: '',
 					reset_button_style_class: '',
+					regex_check_style_class: '',
 					datepicker_type: 'jquery-ui',
 					range_data_type: 'single',
 					range_data_type_delim: '-',
@@ -866,6 +873,11 @@ if (!Object.entries) {
 		}
 
 		function yadcfMatchFilter(oTable, selected_value, filter_match_mode, column_number, exclude, original_column_number) {
+			if ($('#yadcf-filter--' + oTable.selector.split('#')[1] + '-' + original_column_number + '-regex-check') !== undefined &&
+                    		$('#yadcf-filter--' + oTable.selector.split('#')[1] + '-' + original_column_number + '-regex-check').get(0).checked
+               		) {
+                    		filter_match_mode = "regex";
+               		}
 			var case_insensitive = yadcf.getOptions(oTable.selector)[original_column_number].case_insensitive;
 			if (exclude !== true) {
 				if (filter_match_mode === "contains") {
@@ -2564,6 +2576,7 @@ if (!Object.entries) {
 				column_position,
 				filter_default_label,
 				filter_reset_button_text,
+			   	filter_regex_check_text,
 				enable_auto_complete,
 				date_format,
 				ignore_char,
@@ -2637,6 +2650,7 @@ if (!Object.entries) {
 					}
 					filter_default_label = columnObj.filter_default_label;
 					filter_reset_button_text = columnObj.filter_reset_button_text;
+					filter_regex_check_text = columnObj.filter_regex_check_text;
 					enable_auto_complete = columnObj.enable_auto_complete;
 					date_format = columnObj.date_format;
 					if (columnObj.datepicker_type === 'jquery-ui') {
@@ -3015,6 +3029,11 @@ if (!Object.entries) {
 								$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" " +
 									"onclick=\"yadcf.stopPropagation(event);yadcf.textKeyUP(event,'" + table_selector_jq_friendly + "', '" + column_number + "', 'clear'); return false;\" class=\"yadcf-filter-reset-button " + columnObj.reset_button_style_class + "\">" + filter_reset_button_text + "</button>");
 							}
+							
+							if (filter_regex_check_text !== undefined) {
+                                   				$(filter_selector_string).find(filter_reset_button_text !== false ? ".yadcf-filter-reset-button" : ".yadcf-filter").after("<input type=\"checkbox\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-regex-check\" onmousedown=\"yadcf.stopPropagation(event);\" " +
+                                       					"onclick=\"yadcf.stopPropagation(event);yadcf.textKeyUP(event,'" + table_selector_jq_friendly + "', '" + column_number + "', '');\" class=\"yadcf-filter-regex-check " + columnObj.regex_check_style_class + "\">" + filter_regex_check_text + "</input>");
+                                			}
 
 							if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
 								tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
