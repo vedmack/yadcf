@@ -873,6 +873,7 @@ if (!Object.entries) {
 		}
 
 		function yadcfMatchFilter(oTable, selected_value, filter_match_mode, column_number, exclude, original_column_number) {
+			// checks if regex checkbox is present and true(checked), then override filter_match_mode to "regex"
 			if ($('#yadcf-filter--' + oTable.selector.split('#')[1] + '-' + original_column_number + '-regex-check') !== undefined &&
                     		$('#yadcf-filter--' + oTable.selector.split('#')[1] + '-' + original_column_number + '-regex-check').get(0).checked
                		) {
