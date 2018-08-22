@@ -15,6 +15,11 @@
 	top: -6px;	
 }
 
+.yadcf-filter-regex-check {
+    display: inline-block;
+    position: relative;
+}
+
 .yadcf-filter {
 	padding-right: 4px;
 	padding-left: 4px;
