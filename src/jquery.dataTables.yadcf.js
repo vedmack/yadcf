@@ -3033,7 +3033,7 @@ if (!Object.entries) {
 							
 							if (filter_regex_check_text !== undefined) {
                                    				$(filter_selector_string).find(filter_reset_button_text !== false ? ".yadcf-filter-reset-button" : ".yadcf-filter").after("<input type=\"checkbox\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-regex-check\" onmousedown=\"yadcf.stopPropagation(event);\" " +
-                                       					"onclick=\"yadcf.stopPropagation(event);yadcf.textKeyUP(event,'" + table_selector_jq_friendly + "', '" + column_number + "', '');\" class=\"yadcf-filter-regex-check " + columnObj.regex_check_style_class + "\">" + filter_regex_check_text + "</input>");
+                                       					"onclick=\"yadcf.stopPropagation(event);yadcf.textKeyUP(event,'" + table_selector_jq_friendly + "', '" + column_number + "', '');\" class=\"yadcf-filter-regex-check " + columnObj.regex_check_style_class + "\"><label class=\"yadcf-filter-regex-check " + columnObj.regex_check_style_class + "\" for=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-regex-check\">" + filter_regex_check_text + "</label>");
                                 			}
 
 							if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
