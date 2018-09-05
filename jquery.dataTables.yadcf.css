@@ -12,7 +12,7 @@
 
 .yadcf-filter-reset-button.range-number-slider-reset-button{
 	position: relative;
-	top: -6px;	
+	top: -6px;
 }
 
 .yadcf-filter {
@@ -26,11 +26,11 @@
     background: white;
 }
 
-.ui-autocomplete .ui-menu-item { 
+.ui-autocomplete .ui-menu-item {
 	font-size:13px;
 }
 
-#ui-datepicker-div { 
+#ui-datepicker-div {
 	font-size:13px;
 }
 .yadcf-filter-wrapper {
@@ -118,6 +118,13 @@
 	vertical-align: middle;
 	margin-right: 5px;
 }
+
+.yadcf-regex-wrapper {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
 .yadcf-label.small {
 	font-size: 10px;
 }
