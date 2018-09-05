@@ -2821,7 +2821,12 @@ if (!Object.entries) {
 								tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 								if (columnObj.filter_type === "select") {
 									tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
-									$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
+									var filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
+									var optionExists = filter.find("option[value='" + tmpStr + "']").length === 1;
+									// Set the state preselected value only if the option exists in the select dropdown.
+									if (optionExists) {
+										filter.val(tmpStr).addClass("inuse");
+									}
 								} else if (columnObj.filter_type === "multi_select") {
 									tmpStr = yadcfParseMatchFilterMultiSelect(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
 									tmpStr = tmpStr.replace(/\\/g, "");
@@ -2907,7 +2912,12 @@ if (!Object.entries) {
 							if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
 								tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 								tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
-								$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
+								var filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
+								var optionExists = filter.find("option[value='" + tmpStr + "']").length === 1;
+								// Set the state preselected value only if the option exists in the select dropdown.
+								if (optionExists) {
+									filter.val(tmpStr).addClass("inuse");
+								}
 							}
 
 							if (columnObj.select_type !== undefined) {
