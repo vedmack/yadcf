@@ -217,6 +217,13 @@
                 Default value:      'regex'
 				Description:        The label that will appear above the regex checkbox
 
+* checkbox_position_after
+                Required:           false
+                Type:               boolean
+                Default value:      false
+                Description:        Adds checkboxes exclude and regex after input text column
+				Note:               Currently available for the text filter
+
 * select_type
                 Required:           false
                 Type:               String
@@ -628,6 +635,7 @@ if (!Object.entries) {
 					html_data_type: 'text',
 					exclude_label: 'exclude',
 					regex_label: 'regex',
+					checkbox_position_after: false,
 					style_class: '',
 					reset_button_style_class: '',
 					datepicker_type: 'jquery-ui',
@@ -3034,8 +3042,13 @@ if (!Object.entries) {
 								}
 							}
 
-							$(filter_selector_string).append(exclude_str + regex_str + "<input type=\"text\" onkeydown=\"yadcf.preventDefaultForEnter(event);\" id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter " + columnObj.style_class + "\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);" +
-							"' placeholder='" + filter_default_label + "'" + " filter_match_mode='" + filter_match_mode + "' " + filterActionStr + "></input>");
+							var append_input = "<input type=\"text\" onkeydown=\"yadcf.preventDefaultForEnter(event);\" id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter " + columnObj.style_class + "\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);" +
+							"' placeholder='" + filter_default_label + "'" + " filter_match_mode='" + filter_match_mode + "' " + filterActionStr + "></input>";
+
+							var append_checkboxes = columnObj.checkbox_position_after ? append_input + exclude_str.replace("yadcf-exclude-wrapper", "yadcf-exclude-wrapper after") + regex_str.replace("yadcf-regex-wrapper", "yadcf-regex-wrapper after")
+							: exclude_str + regex_str + append_input;
+
+							$(filter_selector_string).append(append_checkboxes);
 
 							if (filter_reset_button_text !== false) {
 								$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" " +
