@@ -3688,7 +3688,8 @@ if (!Object.entries) {
 					resetIApiIndex();
 					return;
 				}
-
+				// delete class on regex checkbox uncheck
+				$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse-regex");
 				var inuseClass = "inuse";
 
 				if (columnObj.exclude === true) {
