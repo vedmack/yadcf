@@ -6,6 +6,14 @@
 	background: #8BBEF0;
 }
 
+.inuse-regex {
+	background: #8BBEF0;
+}
+
+.inuse-exclude {
+	background: #8BBEF0;
+}
+
 .yadcf-filter-reset-button {
 	display: inline-block;
 }
@@ -127,4 +135,8 @@
 
 .yadcf-label.small {
 	font-size: 10px;
+}
+
+.after{
+    margin-left: 10px;
 }
