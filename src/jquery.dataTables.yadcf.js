@@ -3684,20 +3684,23 @@ if (!Object.entries) {
 					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
 					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
 					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse-regex");
+					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse-exclude");
 					oTable.fnFilter("", column_number_filter);
 					resetIApiIndex();
 					return;
 				}
 				// delete class on regex checkbox uncheck
+				$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse-exclude");
 				$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse-regex");
 				var inuseClass = "inuse";
 
 				if (columnObj.exclude === true) {
 					exclude = $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).closest('.yadcf-filter-wrapper').find('.yadcf-exclude-wrapper :checkbox').prop('checked');
+					inuseClass = exclude ? inuseClass + " inuse-exclude" : inuseClass;
 				}
 				if (columnObj.regex_check_box === true) {
 					regex_check_box = $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).closest('.yadcf-filter-wrapper').find('.yadcf-regex-wrapper :checkbox').prop('checked');
-					inuseClass = regex_check_box ? "inuse-regex" : inuseClass;
+					inuseClass = regex_check_box ? inuseClass + " inuse-regex" : inuseClass;
 				}
 				$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass(inuseClass);
 
