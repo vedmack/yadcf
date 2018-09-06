@@ -3689,7 +3689,7 @@ if (!Object.entries) {
 					resetIApiIndex();
 					return;
 				}
-				// delete class on regex checkbox uncheck
+				// delete class also on  regex or exclude checkbox uncheck
 				$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse-exclude");
 				$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse-regex");
 				var inuseClass = "inuse";
