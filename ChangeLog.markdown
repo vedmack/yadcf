@@ -2,13 +2,16 @@
 
  
 ## 0.9.4 is in beta (grab latest stable from https://github.com/vedmack/yadcf/releases)
- 
+
+* Added (by @misanek) "regex" filtering mode checkbox (currently available for the text filter) - https://github.com/vedmack/yadcf/pull/490
 * Added babel transpiled version (es5) in /build folder
 * Fixed cumulative filtering issue (not calling proper dt api / version) 
 * Misc bug fixed issues:
 	https://github.com/vedmack/yadcf/issues/469 - Cannot apply style_class on date filter
 	https://github.com/vedmack/yadcf/issues/470 - filter_delay not working on range_date
 	https://github.com/vedmack/yadcf/issues/482 - Autocomplete is not reading filter_plugin_options
+	https://github.com/vedmack/yadcf/issues/493 - Set the state preselected value only if the option exists in the select dropdown
+	
 	
 ## 0.9.3
 
@@ -91,7 +94,7 @@
 * Add regex for filter_match_mode property (xmikew)
 * Added `alphaNum` and `custom` to the `sort_as` and added `sort_as_custom_func`
 * New property, style_class - allows adding additional class/classes to filter 
-* Added and exclude filtering checkbox (currently available for the text filter)
+* Added "exclude" filtering checkbox (currently available for the text filter)
 * New property, append_data_to_table_data to place your data array in addition to the values that yadcf grabs from the table
 * Aded support for Select2 v.4.0 
 * Added exResetFilters function to reset specific filters (one or more) https://github.com/vedmack/yadcf/issues/162

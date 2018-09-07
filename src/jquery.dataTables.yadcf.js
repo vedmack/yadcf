@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.4
+* Version:     0.9.4.beta.5
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2829,8 +2829,8 @@ if (!Object.entries) {
 								tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 								if (columnObj.filter_type === "select") {
 									tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
-									var filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
-									var optionExists = filter.find("option[value='" + tmpStr + "']").length === 1;
+									let filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
+									let optionExists = filter.find("option[value='" + tmpStr + "']").length === 1;
 									// Set the state preselected value only if the option exists in the select dropdown.
 									if (optionExists) {
 										filter.val(tmpStr).addClass("inuse");
@@ -2920,8 +2920,8 @@ if (!Object.entries) {
 							if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
 								tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 								tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
-								var filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
-								var optionExists = filter.find("option[value='" + tmpStr + "']").length === 1;
+								let filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
+								let optionExists = filter.find("option[value='" + tmpStr + "']").length === 1;
 								// Set the state preselected value only if the option exists in the select dropdown.
 								if (optionExists) {
 									filter.val(tmpStr).addClass("inuse");
@@ -3052,10 +3052,10 @@ if (!Object.entries) {
 								}
 							}
 
-							var append_input = "<input type=\"text\" onkeydown=\"yadcf.preventDefaultForEnter(event);\" id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter " + columnObj.style_class + "\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);" +
+							let append_input = "<input type=\"text\" onkeydown=\"yadcf.preventDefaultForEnter(event);\" id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter " + columnObj.style_class + "\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);" +
 							"' placeholder='" + filter_default_label + "'" + " filter_match_mode='" + filter_match_mode + "' " + filterActionStr + "></input>";
 
-							var append_checkboxes = columnObj.checkbox_position_after ? append_input + exclude_str.replace("yadcf-exclude-wrapper", "yadcf-exclude-wrapper after") + regex_str.replace("yadcf-regex-wrapper", "yadcf-regex-wrapper after")
+							let append_checkboxes = columnObj.checkbox_position_after ? append_input + exclude_str.replace("yadcf-exclude-wrapper", "yadcf-exclude-wrapper after") + regex_str.replace("yadcf-regex-wrapper", "yadcf-regex-wrapper after")
 							: exclude_str + regex_str + append_input;
 
 							$(filter_selector_string).append(append_checkboxes);
