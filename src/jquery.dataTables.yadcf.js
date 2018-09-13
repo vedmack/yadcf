@@ -2545,7 +2545,7 @@ if (!Object.entries) {
 					} else if (columnObj.column_data_render) {
 						col_inner_elements = columnObj.column_data_render(data[j]._aData);
 					} else {
-						console('Looks like you missing column_data_render function for the column ' + column_number_filter);
+						console.log('Looks like you missing column_data_render function for the column ' + column_number_filter);
 					}
 					if (typeof col_inner_elements !== 'string') {
 						col_inner_elements = $(col_inner_elements);
