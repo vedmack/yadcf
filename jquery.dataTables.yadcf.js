@@ -591,7 +591,11 @@ if (!Object.entries) {
 			var i = 0;
 			dot_refs = dot_refs.split(".");
 			for (i = 0; i < dot_refs.length; i++) {
-				tmpObj = tmpObj[dot_refs[i]];
+				if(tmpObj[dot_refs[i]]) {
+					tmpObj = tmpObj[dot_refs[i]];
+				}else{
+					return false;
+				}
 			}
 			return tmpObj;
 		}
