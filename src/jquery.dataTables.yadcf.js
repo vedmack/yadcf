@@ -3078,7 +3078,9 @@ if (!Object.entries) {
 										$('#yadcf-filter-wrapper-' + table_selector_jq_friendly + '-' + column_number).find('.yadcf-exclude-wrapper').find(':checkbox').prop('checked', true);
 										$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass('inuse-exclude');
 									}
-									tmpStr = tmpStr.substring(5, tmpStr.indexOf(').)'));
+									if (tmpStr.indexOf(').)') !== -1) {
+										tmpStr = tmpStr.substring(5, tmpStr.indexOf(').)'));
+									}
 								}
 								// load saved regex_checkbox state
 								if (columnObj.regex_check_box === true) {
