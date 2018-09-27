@@ -6,7 +6,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.5
+* Version:     0.9.4.beta.7
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2491,7 +2491,13 @@ if (!Object.entries) {
 						}
 					}
 				} else if (columnObj.column_data_type === "rendered_html") {
-					col_inner_elements = data[j]._aFilterData[column_number_filter];
+					if (data[j]._aFilterData) {
+						col_inner_elements = data[j]._aFilterData[column_number_filter];
+					} else if (columnObj.column_data_render) {
+						col_inner_elements = columnObj.column_data_render(data[j]._aData);
+					} else {
+						console.log('Looks like you missing column_data_render function for the column ' + column_number_filter);
+					}
 					if (typeof col_inner_elements !== 'string') {
 						col_inner_elements = $(col_inner_elements);
 						if (col_inner_elements.length > 0) {
@@ -2972,9 +2978,23 @@ if (!Object.entries) {
 								tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 								if (columnObj.exclude === true) {
 									if (tmpStr.indexOf('^((?!') !== -1) {
-										$('#yadcf-filter-wrapper-' + table_selector_jq_friendly + '-' + column_number).find(':checkbox').prop('checked', true);
+										$('#yadcf-filter-wrapper-' + table_selector_jq_friendly + '-' + column_number).find('.yadcf-exclude-wrapper').find(':checkbox').prop('checked', true);
+										$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass('inuse-exclude');
 									}
-									tmpStr = tmpStr.substring(5, tmpStr.indexOf(').)'));
+									if (tmpStr.indexOf(').)') !== -1) {
+										tmpStr = tmpStr.substring(5, tmpStr.indexOf(').)'));
+									}
+								}
+								// load saved regex_checkbox state
+								if (columnObj.regex_check_box === true) {
+									if (settingsDt.oFeatures.bStateSave === true && settingsDt.oLoadedState) {
+										if (settingsDt.oLoadedState.yadcfState && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly] && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
+											if (settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].regex_check_box) {
+												$('#yadcf-filter-wrapper-' + table_selector_jq_friendly + '-' + column_number).find('.yadcf-regex-wrapper').find(':checkbox').prop('checked', true);
+												$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass('inuse-regex');
+											}
+										}
+									}
 								}
 								tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
 								$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
@@ -3545,6 +3565,7 @@ if (!Object.entries) {
 			    settingsDt = getSettingsObjFromTable(oTable),
 			    exclude,
 			    regex_check_box,
+			    yadcfState,
 			    keyCodes = [37, 38, 39, 40];
 
 			if (keyCodes.indexOf(ev.keyCode) !== -1) {
@@ -3594,6 +3615,22 @@ if (!Object.entries) {
 
 				yadcfMatchFilter(oTable, $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val(), regex_check_box ? 'regex' : columnObj.filter_match_mode, column_number_filter, exclude, column_number);
 
+				// save regex_checkbox state
+				if (oTable.fnSettings().oFeatures.bStateSave === true) {
+					if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
+						oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] = {
+							regex_check_box: regex_check_box
+						};
+					} else {
+						yadcfState = {};
+						yadcfState[table_selector_jq_friendly] = [];
+						yadcfState[table_selector_jq_friendly][column_number] = {
+							regex_check_box: regex_check_box
+						};
+						oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+					}
+					oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
+				}
 				resetIApiIndex();
 			};
 
