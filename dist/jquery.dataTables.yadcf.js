@@ -6,7 +6,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.7
+* Version:     0.9.4.beta.8
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
