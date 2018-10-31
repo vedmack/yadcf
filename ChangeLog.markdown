@@ -11,6 +11,7 @@
 	https://github.com/vedmack/yadcf/issues/470 - filter_delay not working on range_date
 	https://github.com/vedmack/yadcf/issues/482 - Autocomplete is not reading filter_plugin_options
 	https://github.com/vedmack/yadcf/issues/493 - Set the state preselected value only if the option exists in the select dropdown
+	https://github.com/vedmack/yadcf/issues/510 - Can't handle null value case in deep data properties
 	
 	
 ## 0.9.3
