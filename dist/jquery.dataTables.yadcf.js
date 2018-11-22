@@ -6,7 +6,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.9
+* Version:     0.9.4.beta.10
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -623,7 +623,7 @@ if (!Object.entries) {
 			return tmpObj;
 		}
 
-		function setOptions(selector_arg, options_arg, params) {
+		function setOptions(selector_arg, options_arg, params, table) {
 			var tmpOptions = {},
 			    i,
 			    col_num_as_int,
@@ -678,13 +678,23 @@ if (!Object.entries) {
 						return;
 					}
 				}
-				col_num_as_int = +options_arg[i].column_number;
-				if (isNaN(col_num_as_int)) {
-					tmpOptions[options_arg[i].column_number_str] = $.extend(true, {}, default_options, options_arg[i]);
+				if (!options_arg[i].column_selector) {
+					col_num_as_int = +options_arg[i].column_number;
+					if (isNaN(col_num_as_int)) {
+						tmpOptions[options_arg[i].column_number_str] = $.extend(true, {}, default_options, options_arg[i]);
+					} else {
+						tmpOptions[col_num_as_int] = $.extend(true, {}, default_options, options_arg[i]);
+					}
 				} else {
-					tmpOptions[col_num_as_int] = $.extend(true, {}, default_options, options_arg[i]);
+					//translate from column_selector to column_number
+					var columnNumber = table.column(options_arg[i].column_selector);
+					if (columnNumber.index() >= 0) {
+						options_arg[i].column_number = columnNumber.index();
+						tmpOptions[options_arg[i].column_number] = $.extend(true, {}, default_options, options_arg[i]);
+					}
 				}
 			}
+
 			options[selector_arg] = tmpOptions;
 
 			check3rdPPluginsNeededClose();
@@ -3920,13 +3930,13 @@ if (!Object.entries) {
 			$(document).data(instance.selector + "_filters_position", params.filters_position);
 
 			if ($(instance.selector).length === 1) {
-				setOptions(instance.selector, options_arg, params);
+				setOptions(instance.selector, options_arg, params, oTable);
 				initAndBindTable(instance, instance.selector, 0, oTable);
 			} else {
 				for (i; i < $(instance.selector).length; i++) {
 					$.fn.dataTableExt.iApiIndex = i;
 					selector = instance.selector + ":eq(" + i + ")";
-					setOptions(instance.selector, options_arg, params);
+					setOptions(instance.selector, options_arg, params, oTable);
 					initAndBindTable(instance, selector, i, oTable);
 				}
 				$.fn.dataTableExt.iApiIndex = 0;
@@ -4138,7 +4148,7 @@ if (!Object.entries) {
 				}
 				tablesSelectors = tablesSelectors.substring(0, tablesSelectors.length - 1);
 
-				setOptions(tablesSelectors + '_' + column_number_str, dummyArr);
+				setOptions(tablesSelectors + '_' + column_number_str, dummyArr, tablesArray[i].table);
 				oTables[tablesSelectors] = tablesArray;
 				appendFiltersMultipleTables(tablesArray, tablesSelectors, columnsObj);
 			}
