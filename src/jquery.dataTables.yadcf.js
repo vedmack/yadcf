@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.10
+* Version:     0.9.4.beta.11
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -175,7 +175,7 @@
                 Type:               String
                 Default value:      undefined
                 Possible values:    Any format accepted by momentjs
-                Description:        Defines the format in which the date values are being parsed into Date object by momentjs library
+                Description:        Defines the format in which the table date values are being parsed into Date object by momentjs library
                 Note:               Currently relevant only when using datepicker_type: 'bootstrap-datetimepicker')
 
 * ignore_char
@@ -1461,7 +1461,7 @@ if (!Object.entries) {
 							if (columnObj.datepicker_type === 'jquery-ui') {
 								min = (min !== "") ? $.datepicker.parseDate(date_format, min) : min;
 							} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
-								min = (min !== "") ? moment(min, columnObj.moment_date_format).toDate() : min;
+								min = (min !== "") ? moment(min, columnObj.date_format).toDate() : min;
 							} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 								min = (min !== "") ? dpg.parseDate(min, dpg.parseFormat(columnObj.date_format)) : min;
 							}
@@ -1472,7 +1472,7 @@ if (!Object.entries) {
 							if (columnObj.datepicker_type === 'jquery-ui') {
 								max = (max !== "") ? $.datepicker.parseDate(date_format, max) : max;
 							} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
-								max = (max !== "") ? moment(max, columnObj.moment_date_format).toDate() : max;
+								max = (max !== "") ? moment(max, columnObj.date_format).toDate() : max;
 							} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 								max = (max !== "") ? dpg.parseDate(max, dpg.parseFormat(columnObj.date_format)) : max;
 							}
@@ -2778,7 +2778,7 @@ if (!Object.entries) {
 							}
 						}
 						$filter_selector = $(filter_selector_string).find(".yadcf-filter");
-						if (columnObj.select_type === 'select2') {
+						if (columnObj.select_type === 'select2' || columnObj.select_type === 'custom_select') {
 							$filter_selector = $(filter_selector_string).find("select.yadcf-filter");
 						}
 					} else {
@@ -2791,7 +2791,7 @@ if (!Object.entries) {
 						}
 						filter_selector_string = columnObj.filter_container_selector;
 						$filter_selector = $(filter_selector_string).find(".yadcf-filter");
-						if (columnObj.select_type === 'select2') {
+						if (columnObj.select_type === 'select2' || columnObj.select_type === 'custom_select') {
 							$filter_selector = $(filter_selector_string).find("select.yadcf-filter");
 						}
 					}
@@ -3361,13 +3361,13 @@ if (!Object.entries) {
 					} catch (err) {}
 				} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
 					try {
-						min = moment(min, columnObj.moment_date_format).toDate();
+						min = moment(min, columnObj.date_format).toDate();
 						if (isNaN(min.getTime())) {
 							min = '';
 						}
 					} catch (err) {}
 					try {
-						max = moment(max, columnObj.moment_date_format).toDate();
+						max = moment(max, columnObj.date_format).toDate();
 						if (isNaN(max.getTime())) {
 							max = '';
 						}

@@ -13,6 +13,8 @@
 	https://github.com/vedmack/yadcf/issues/482 - Autocomplete is not reading filter_plugin_options
 	https://github.com/vedmack/yadcf/issues/493 - Set the state preselected value only if the option exists in the select dropdown
 	https://github.com/vedmack/yadcf/issues/510 - Can't handle null value case in deep data properties
+	https://github.com/vedmack/yadcf/issues/522 - Selectize bug (initSelectPluginCustomTriggers 'select_type': 'custom_select' )
+	https://github.com/vedmack/yadcf/issues/524 - range_date filter with bootstrap-datetimepicker date format issue (moment_date_format)
 	
 	
 ## 0.9.3
