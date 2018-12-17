@@ -17,7 +17,9 @@
             var regex = false;
 
             var clientDataTable = $('#example').DataTable({
-                stateSave: true
+                stateSave: true,
+                serverSide: true,
+                ajax: "../server_side/scripts/server_processing.php"
             });
 
             yadcf.init(clientDataTable, [{
@@ -29,10 +31,8 @@
                 checkbox_position_after: true
             }, {
                 column_number: 2,
-                filter_type: "text",
-                exclude: true,
-                regex_check_box: true,
-                checkbox_position_after: true
+                filter_type: "range_number",
+                // custom_range_delimiter: 'sharingan'
             }]);
         });
     </script>
@@ -53,37 +53,37 @@
             <tr>
                 <td>1</td>
                 <td>Vicente Sanchez</td>
-                <td>Valencia</td>
+                <td>5</td>
             </tr>
             <tr>
                 <td>2</td>
                 <td>Antonio Sánchez</td>
-                <td>Málaga</td>
+                <td>8</td>
             </tr>
             <tr>
                 <td>3</td>
                 <td>Jose Ramirez</td>
-                <td>Malaga</td>
+                <td>10</td>
             </tr>
             <tr>
                 <td>4</td>
                 <td>Santiago</td>
-                <td>Valencia</td>
+                <td>576</td>
             </tr>
             <tr>
                 <td>5</td>
                 <td>Pedro Sanchez</td>
-                <td>Malaga</td>
+                <td>300</td>
             </tr>
             <tr>
                 <td>6</td>
                 <td>Pedro123z</td>
-                <td>Malaga9</td>
+                <td>2</td>
             </tr>
             <tr>
                 <td>7</td>
                 <td>89482945</td>
-                <td>1010</td>
+                <td>5</td>
             </tr>
         </tbody>
     </table>
