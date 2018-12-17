@@ -6,11 +6,15 @@
 * Added (by @misanek) "regex" filtering mode checkbox (currently available for the text filter) - https://github.com/vedmack/yadcf/pull/490
 * Added babel transpiled version (es5) in /build folder
 * Fixed cumulative filtering issue (not calling proper dt api / version) 
+* Added "column_selector" - more flexability in column selectors (instead of hard coded column_number)- https://github.com/vedmack/yadcf/issues/513
 * Misc bug fixed issues:
 	https://github.com/vedmack/yadcf/issues/469 - Cannot apply style_class on date filter
 	https://github.com/vedmack/yadcf/issues/470 - filter_delay not working on range_date
 	https://github.com/vedmack/yadcf/issues/482 - Autocomplete is not reading filter_plugin_options
 	https://github.com/vedmack/yadcf/issues/493 - Set the state preselected value only if the option exists in the select dropdown
+	https://github.com/vedmack/yadcf/issues/510 - Can't handle null value case in deep data properties
+	https://github.com/vedmack/yadcf/issues/522 - Selectize bug (initSelectPluginCustomTriggers 'select_type': 'custom_select' )
+	https://github.com/vedmack/yadcf/issues/524 - range_date filter with bootstrap-datetimepicker date format issue (moment_date_format)
 	
 	
 ## 0.9.3

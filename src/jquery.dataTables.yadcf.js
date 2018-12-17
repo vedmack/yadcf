@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.8
+* Version:     0.9.4.beta.11
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -175,7 +175,7 @@
                 Type:               String
                 Default value:      undefined
                 Possible values:    Any format accepted by momentjs
-                Description:        Defines the format in which the date values are being parsed into Date object by momentjs library
+                Description:        Defines the format in which the table date values are being parsed into Date object by momentjs library
                 Note:               Currently relevant only when using datepicker_type: 'bootstrap-datetimepicker')
 
 * ignore_char
@@ -611,12 +611,16 @@ if (!Object.entries) {
 			var i = 0;
 			dot_refs = dot_refs.split(".");
 			for (i = 0; i < dot_refs.length; i++) {
-				tmpObj = tmpObj[dot_refs[i]];
+				if (tmpObj[dot_refs[i]]) {
+					tmpObj = tmpObj[dot_refs[i]];
+				} else {
+					return '';
+				}
 			}
 			return tmpObj;
 		}
 
-		function setOptions(selector_arg, options_arg, params) {
+		function setOptions(selector_arg, options_arg, params, table) {
 			var tmpOptions = {},
 				i,
 				col_num_as_int,
@@ -671,13 +675,23 @@ if (!Object.entries) {
 						return;
 					}
 				}
-				col_num_as_int = +options_arg[i].column_number;
-				if (isNaN(col_num_as_int)) {
-					tmpOptions[options_arg[i].column_number_str] = $.extend(true, {}, default_options, options_arg[i]);
+				if (!options_arg[i].column_selector) {
+					col_num_as_int = +options_arg[i].column_number;
+					if (isNaN(col_num_as_int)) {
+						tmpOptions[options_arg[i].column_number_str] = $.extend(true, {}, default_options, options_arg[i]);
+					} else {
+						tmpOptions[col_num_as_int] = $.extend(true, {}, default_options, options_arg[i]);
+					}	
 				} else {
-					tmpOptions[col_num_as_int] = $.extend(true, {}, default_options, options_arg[i]);
+					//translate from column_selector to column_number
+					let columnNumber = table.column(options_arg[i].column_selector);
+					if (columnNumber.index() >= 0) {
+						options_arg[i].column_number = columnNumber.index();
+						tmpOptions[options_arg[i].column_number] = $.extend(true, {}, default_options, options_arg[i]);
+					}
 				}
 			}
+
 			options[selector_arg] = tmpOptions;
 
 			check3rdPPluginsNeededClose();
@@ -1447,7 +1461,7 @@ if (!Object.entries) {
 							if (columnObj.datepicker_type === 'jquery-ui') {
 								min = (min !== "") ? $.datepicker.parseDate(date_format, min) : min;
 							} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
-								min = (min !== "") ? moment(min, columnObj.moment_date_format).toDate() : min;
+								min = (min !== "") ? moment(min, columnObj.date_format).toDate() : min;
 							} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 								min = (min !== "") ? dpg.parseDate(min, dpg.parseFormat(columnObj.date_format)) : min;
 							}
@@ -1458,7 +1472,7 @@ if (!Object.entries) {
 							if (columnObj.datepicker_type === 'jquery-ui') {
 								max = (max !== "") ? $.datepicker.parseDate(date_format, max) : max;
 							} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
-								max = (max !== "") ? moment(max, columnObj.moment_date_format).toDate() : max;
+								max = (max !== "") ? moment(max, columnObj.date_format).toDate() : max;
 							} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 								max = (max !== "") ? dpg.parseDate(max, dpg.parseFormat(columnObj.date_format)) : max;
 							}
@@ -2764,7 +2778,7 @@ if (!Object.entries) {
 							}
 						}
 						$filter_selector = $(filter_selector_string).find(".yadcf-filter");
-						if (columnObj.select_type === 'select2') {
+						if (columnObj.select_type === 'select2' || columnObj.select_type === 'custom_select') {
 							$filter_selector = $(filter_selector_string).find("select.yadcf-filter");
 						}
 					} else {
@@ -2777,7 +2791,7 @@ if (!Object.entries) {
 						}
 						filter_selector_string = columnObj.filter_container_selector;
 						$filter_selector = $(filter_selector_string).find(".yadcf-filter");
-						if (columnObj.select_type === 'select2') {
+						if (columnObj.select_type === 'select2' || columnObj.select_type === 'custom_select') {
 							$filter_selector = $(filter_selector_string).find("select.yadcf-filter");
 						}
 					}
@@ -3347,13 +3361,13 @@ if (!Object.entries) {
 					} catch (err) {}
 				} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
 					try {
-						min = moment(min, columnObj.moment_date_format).toDate();
+						min = moment(min, columnObj.date_format).toDate();
 						if (isNaN(min.getTime())) {
 							min = '';
 						}
 					} catch (err) {}
 					try {
-						max = moment(max, columnObj.moment_date_format).toDate();
+						max = moment(max, columnObj.date_format).toDate();
 						if (isNaN(max.getTime())) {
 							max = '';
 						}
@@ -4043,13 +4057,13 @@ if (!Object.entries) {
 			$(document).data(instance.selector + "_filters_position", params.filters_position);
 
 			if ($(instance.selector).length === 1) {
-				setOptions(instance.selector, options_arg, params);
+				setOptions(instance.selector, options_arg, params, oTable);
 				initAndBindTable(instance, instance.selector, 0, oTable);
 			} else {
 				for (i; i < $(instance.selector).length; i++) {
 					$.fn.dataTableExt.iApiIndex = i;
 					selector = instance.selector + ":eq(" + i + ")";
-					setOptions(instance.selector, options_arg, params);
+					setOptions(instance.selector, options_arg, params, oTable);
 					initAndBindTable(instance, selector, i, oTable);
 				}
 				$.fn.dataTableExt.iApiIndex = 0;
@@ -4267,7 +4281,7 @@ if (!Object.entries) {
 				}
 				tablesSelectors = tablesSelectors.substring(0, tablesSelectors.length - 1);
 
-				setOptions(tablesSelectors + '_' + column_number_str, dummyArr);
+				setOptions(tablesSelectors + '_' + column_number_str, dummyArr, tablesArray[i].table);
 				oTables[tablesSelectors] = tablesArray;
 				appendFiltersMultipleTables(tablesArray, tablesSelectors, columnsObj);
 			}
