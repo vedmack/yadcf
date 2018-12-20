@@ -15,6 +15,7 @@
 	https://github.com/vedmack/yadcf/issues/510 - Can't handle null value case in deep data properties
 	https://github.com/vedmack/yadcf/issues/522 - Selectize bug (initSelectPluginCustomTriggers 'select_type': 'custom_select' )
 	https://github.com/vedmack/yadcf/issues/524 - range_date filter with bootstrap-datetimepicker date format issue (moment_date_format)
+	https://github.com/vedmack/yadcf/issues/500 - multi_select not working "The select2('close') method was called on an element that is not using Select2.
 	
 	
 ## 0.9.3

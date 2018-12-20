@@ -6,7 +6,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.11
+* Version:     0.9.4.beta.12
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -4170,10 +4170,18 @@ if (!Object.entries) {
 			if (closeSelect2) {
 				var currentSelect2 = void 0;
 				if (evt.target.className.indexOf('yadcf-filter-reset-button') !== -1) {
-					$('select.yadcf-filter').select2('close');
+					$('select.yadcf-filter').each(function (index) {
+						if ($(this).data('select2')) {
+							$(this).select2('close');
+						}
+					});
 				} else {
 					currentSelect2 = $($(evt.target).closest('.yadcf-filter-wrapper').find('select'));
-					$('select.yadcf-filter').not(currentSelect2).select2('close');
+					$('select.yadcf-filter').each(function (index) {
+						if (!$(this).is(currentSelect2) && $(this).data('select2')) {
+							$(this).select2('close');
+						}
+					});
 				}
 			}
 		}
