@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.12
+* Version:     0.9.4.beta.13
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -506,6 +506,7 @@ if (!Object.entries) {
 			},
 			settingsMap = {};
 
+		let ctrlPressed = false;
 		let closeBootstrapDatepicker = false;
 		let	closeBootstrapDatepickerRange = false;
 		let	closeSelect2 = false;
@@ -2843,23 +2844,26 @@ if (!Object.entries) {
 							if (columnObj.filter_type === 'custom_func' || columnObj.filter_type === 'multi_select_custom_func') {
 								custom_func_filter_value_holder = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val();
 							}
-							$filter_selector.empty();
-							$filter_selector.append(column_data);
-							if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
-								tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
-								if (columnObj.filter_type === "select") {
-									tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
-									let filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
-									let optionExists = filter.find("option[value='" + tmpStr + "']").length === 1;
-									// Set the state preselected value only if the option exists in the select dropdown.
-									if (optionExists) {
-										filter.val(tmpStr).addClass("inuse");
+							if (!columnObj.select_type_options || !columnObj.select_type_options.ajax) {
+								$filter_selector.empty();
+								$filter_selector.append(column_data);
+							
+								if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
+									tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
+									if (columnObj.filter_type === "select") {
+										tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
+										let filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
+										let optionExists = filter.find("option[value='" + tmpStr + "']").length === 1;
+										// Set the state preselected value only if the option exists in the select dropdown.
+										if (optionExists) {
+											filter.val(tmpStr).addClass("inuse");
+										}
+									} else if (columnObj.filter_type === "multi_select") {
+										tmpStr = yadcfParseMatchFilterMultiSelect(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
+										tmpStr = tmpStr.replace(/\\/g, "");
+										tmpStr = tmpStr.split("|");
+										$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr);
 									}
-								} else if (columnObj.filter_type === "multi_select") {
-									tmpStr = yadcfParseMatchFilterMultiSelect(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
-									tmpStr = tmpStr.replace(/\\/g, "");
-									tmpStr = tmpStr.split("|");
-									$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr);
 								}
 							}
 							if (columnObj.filter_type === 'custom_func' || columnObj.filter_type === 'multi_select_custom_func') {
@@ -3702,11 +3706,12 @@ if (!Object.entries) {
 				exclude,
 				regex_check_box,
 				yadcfState,
-				keyCodes = [37, 38, 39, 40];
+				keyCodes = [37, 38, 39, 40, 17];
 
-			if (keyCodes.indexOf(ev.keyCode) !== -1) {
+			if (keyCodes.indexOf(ev.keyCode) !== -1 || ctrlPressed) {
 				return;
 			}
+
 			column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
 
 			columnObj = getOptions(oTable.selector)[column_number];
@@ -4328,14 +4333,24 @@ if (!Object.entries) {
 				evt.cancelBubble = true;
 			}
 		}
-
+		
 		function preventDefaultForEnter(evt) {
+			ctrlPressed = false;
 			if (evt.keyCode === 13) {
 				if (evt.preventDefault) {
 					evt.preventDefault();
 				} else {
 					evt.returnValue = false;
 				}
+			}
+			if (evt.keyCode == 65 && evt.ctrlKey) {
+				ctrlPressed = true;
+				evt.target.select();
+				return;
+			}
+			if (evt.ctrlKey && (evt.keyCode == 67 || evt.keyCode == 88)) {
+				ctrlPressed = true;
+				return;
 			}
 		}
 

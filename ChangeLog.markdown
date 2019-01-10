@@ -16,7 +16,8 @@
 	https://github.com/vedmack/yadcf/issues/522 - Selectize bug (initSelectPluginCustomTriggers 'select_type': 'custom_select' )
 	https://github.com/vedmack/yadcf/issues/524 - range_date filter with bootstrap-datetimepicker date format issue (moment_date_format)
 	https://github.com/vedmack/yadcf/issues/500 - multi_select not working "The select2('close') method was called on an element that is not using Select2.
-	
+    https://github.com/vedmack/yadcf/issues/530 - Using Select2 with ajax load multiselect my tags are removed instantly.
+    https://github.com/vedmack/yadcf/issues/531   - Ctrl+A does not work inside text searches.
 	
 ## 0.9.3
 
