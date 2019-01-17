@@ -6,7 +6,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.12
+* Version:     0.9.4.beta.13
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -83,7 +83,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 * text_data_delimiter
                 Required:           false
                 Type:               String
-                Description:        Delimiter that seperates text in table column, for example text_data_delimiter: ","
+				Description:        Delimiter that seperates text in table column, for example text_data_delimiter: ","
+
+* custom_range_delimiter:
+                Required:           false
+				Type:               String
+				Default value:      '-yadcf_delim-'
+                Description:        Delimiter that seperates min and max values for number range filter type, for example custom_range_delimiter: 'minMax'
 
 * html_data_type
                 Required:           false
@@ -507,6 +513,7 @@ if (!Object.entries) {
 		},
 		    settingsMap = {};
 
+		var ctrlPressed = false;
 		var closeBootstrapDatepicker = false;
 		var closeBootstrapDatepickerRange = false;
 		var closeSelect2 = false;
@@ -648,7 +655,8 @@ if (!Object.entries) {
 				datepicker_type: 'jquery-ui',
 				range_data_type: 'single',
 				range_data_type_delim: '-',
-				omit_default_label: false
+				omit_default_label: false,
+				custom_range_delimiter: '-yadcf_delim-'
 			};
 			//adaptContainerCssClassImpl = function (dummy) { return ''; };
 
@@ -1712,7 +1720,7 @@ if (!Object.entries) {
 				if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 					oTable.fnDraw();
 				} else {
-					oTable.fnFilter(from + '-yadcf_delim-' + to, column_number_filter);
+					oTable.fnFilter(from + columnObj.custom_range_delimiter + to, column_number_filter);
 				}
 
 				if (!oTable.fnSettings().oLoadedState) {
@@ -1996,7 +2004,7 @@ if (!Object.entries) {
 				if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 					oTable.fnDraw();
 				} else {
-					oTable.fnFilter(ui.values[0] + '-yadcf_delim-' + ui.values[1], column_number_filter);
+					oTable.fnFilter(ui.values[0] + columnObj.custom_range_delimiter + ui.values[1], column_number_filter);
 				}
 				min_val = +$($(event.target).parent().find(".yadcf-filter-range-number-slider-min-tip-hidden")).text();
 				max_val = +$($(event.target).parent().find(".yadcf-filter-range-number-slider-max-tip-hidden")).text();
@@ -2763,23 +2771,26 @@ if (!Object.entries) {
 							if (columnObj.filter_type === 'custom_func' || columnObj.filter_type === 'multi_select_custom_func') {
 								custom_func_filter_value_holder = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val();
 							}
-							$filter_selector.empty();
-							$filter_selector.append(column_data);
-							if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
-								tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
-								if (columnObj.filter_type === "select") {
-									tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
-									var filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
-									var optionExists = filter.find("option[value='" + tmpStr + "']").length === 1;
-									// Set the state preselected value only if the option exists in the select dropdown.
-									if (optionExists) {
-										filter.val(tmpStr).addClass("inuse");
+							if (!columnObj.select_type_options || !columnObj.select_type_options.ajax) {
+								$filter_selector.empty();
+								$filter_selector.append(column_data);
+
+								if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
+									tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
+									if (columnObj.filter_type === "select") {
+										tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
+										var filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
+										var optionExists = filter.find("option[value='" + tmpStr + "']").length === 1;
+										// Set the state preselected value only if the option exists in the select dropdown.
+										if (optionExists) {
+											filter.val(tmpStr).addClass("inuse");
+										}
+									} else if (columnObj.filter_type === "multi_select") {
+										tmpStr = yadcfParseMatchFilterMultiSelect(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
+										tmpStr = tmpStr.replace(/\\/g, "");
+										tmpStr = tmpStr.split("|");
+										$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr);
 									}
-								} else if (columnObj.filter_type === "multi_select") {
-									tmpStr = yadcfParseMatchFilterMultiSelect(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
-									tmpStr = tmpStr.replace(/\\/g, "");
-									tmpStr = tmpStr.split("|");
-									$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr);
 								}
 							}
 							if (columnObj.filter_type === 'custom_func' || columnObj.filter_type === 'multi_select_custom_func') {
@@ -3276,7 +3287,7 @@ if (!Object.entries) {
 						saveStateSave(oTable, column_number, table_selector_jq_friendly, !min ? '' : minTmp, !max ? '' : maxTmp);
 						oTable.fnDraw();
 					} else {
-						oTable.fnFilter(document.getElementById(fromId).value + '-yadcf_delim-' + document.getElementById(toId).value, column_number_filter);
+						oTable.fnFilter(document.getElementById(fromId).value + columnObj.custom_range_delimiter + document.getElementById(toId).value, column_number_filter);
 					}
 
 					if (min instanceof Date) {
@@ -3350,7 +3361,7 @@ if (!Object.entries) {
 					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 						oTable.fnDraw();
 					} else {
-						oTable.fnFilter(min + '-yadcf_delim-' + max, column_number_filter);
+						oTable.fnFilter(min + columnObj.custom_range_delimiter + max, column_number_filter);
 					}
 					if (document.getElementById(fromId).value !== "") {
 						$("#" + fromId).addClass("inuse");
@@ -3580,11 +3591,12 @@ if (!Object.entries) {
 			    exclude,
 			    regex_check_box,
 			    yadcfState,
-			    keyCodes = [37, 38, 39, 40];
+			    keyCodes = [37, 38, 39, 40, 17];
 
-			if (keyCodes.indexOf(ev.keyCode) !== -1) {
+			if (keyCodes.indexOf(ev.keyCode) !== -1 || ctrlPressed) {
 				return;
 			}
+
 			column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
 
 			columnObj = getOptions(oTable.selector)[column_number];
@@ -4196,12 +4208,22 @@ if (!Object.entries) {
 		}
 
 		function preventDefaultForEnter(evt) {
+			ctrlPressed = false;
 			if (evt.keyCode === 13) {
 				if (evt.preventDefault) {
 					evt.preventDefault();
 				} else {
 					evt.returnValue = false;
 				}
+			}
+			if (evt.keyCode == 65 && evt.ctrlKey) {
+				ctrlPressed = true;
+				evt.target.select();
+				return;
+			}
+			if (evt.ctrlKey && (evt.keyCode == 67 || evt.keyCode == 88)) {
+				ctrlPressed = true;
+				return;
 			}
 		}
 
@@ -4298,7 +4320,7 @@ if (!Object.entries) {
 							if (table_arg.fnSettings().oFeatures.bServerSide === true) {
 								min = filter_value.from;
 								max = filter_value.to;
-								table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = min + '-yadcf_delim-' + max;
+								table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = min + columnObj.custom_range_delimiter + max;
 							}
 							saveStateSave(table_arg, column_number, table_selector_jq_friendly, filter_value.from, filter_value.to);
 							break;
@@ -4318,7 +4340,7 @@ if (!Object.entries) {
 								$('#' + toId).removeClass('inuse');
 							}
 							if (table_arg.fnSettings().oFeatures.bServerSide === true) {
-								table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = filter_value.from + '-yadcf_delim-' + filter_value.to;
+								table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = filter_value.from + columnObj.custom_range_delimiter + filter_value.to;
 							}
 							saveStateSave(table_arg, column_number, table_selector_jq_friendly, filter_value.from, filter_value.to);
 							break;
@@ -4351,7 +4373,7 @@ if (!Object.entries) {
 								$('#' + sliderId).slider('values', 1, filter_value.to);
 							}
 							if (table_arg.fnSettings().oFeatures.bServerSide === true) {
-								table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = filter_value.from + '-yadcf_delim-' + filter_value.to;
+								table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = filter_value.from + columnObj.custom_range_delimiter + filter_value.to;
 							}
 							saveStateSave(table_arg, column_number, table_selector_jq_friendly, filter_value.from, filter_value.to);
 							break;
