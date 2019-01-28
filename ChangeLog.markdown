@@ -17,7 +17,9 @@
 	https://github.com/vedmack/yadcf/issues/524 - range_date filter with bootstrap-datetimepicker date format issue (moment_date_format)
 	https://github.com/vedmack/yadcf/issues/500 - multi_select not working "The select2('close') method was called on an element that is not using Select2.
     https://github.com/vedmack/yadcf/issues/530 - Using Select2 with ajax load multiselect my tags are removed instantly.
-    https://github.com/vedmack/yadcf/issues/531   - Ctrl+A does not work inside text searches.
+    https://github.com/vedmack/yadcf/issues/531 - Ctrl+A does not work inside text searches.
+	https://github.com/vedmack/yadcf/issues/534 - initMultipleTables trows a TypeError: "tablesArray[i] is undefined"
+	https://github.com/vedmack/yadcf/issues/540 - Individual Search Columns in the footer with ScrollX not searching properly 
 	
 ## 0.9.3
 

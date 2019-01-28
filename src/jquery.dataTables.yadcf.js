@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.13
+* Version:     0.9.4.beta.14
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -691,11 +691,13 @@ if (!Object.entries) {
 						tmpOptions[col_num_as_int] = $.extend(true, {}, default_options, options_arg[i]);
 					}
 				} else {
-					//translate from column_selector to column_number
-					let columnNumber = table.column(options_arg[i].column_selector);
-					if (columnNumber.index() >= 0) {
-						options_arg[i].column_number = columnNumber.index();
-						tmpOptions[options_arg[i].column_number] = $.extend(true, {}, default_options, options_arg[i]);
+					if (table && table.column) {
+						//translate from column_selector to column_number
+						let columnNumber = table.column(options_arg[i].column_selector);
+						if (columnNumber.index() >= 0) {
+							options_arg[i].column_number = columnNumber.index();
+							tmpOptions[options_arg[i].column_number] = $.extend(true, {}, default_options, options_arg[i]);
+						}
 					}
 				}
 			}
@@ -1413,6 +1415,11 @@ if (!Object.entries) {
 						return true;
 					}
 					columnObj = getOptions(settingsDt.oInstance.selector)[col_num];
+					if (columnObj.filters_position === 'tfoot') {
+						let selectorePrefix = '.dataTables_scrollFoot ';
+						min = document.querySelector(selectorePrefix + '#' + fromId) ? document.querySelector(selectorePrefix + '#' + fromId).value : '';
+						max = document.querySelector(selectorePrefix + '#' + toId) ? document.querySelector(selectorePrefix + '#' + toId).value : '';
+					}
 					if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 						dpg = $.fn.datepicker.DPGlobal;
 					}
@@ -4125,7 +4132,7 @@ if (!Object.entries) {
 					tableTmp = tablesArray[0];
 				}
 				settingsDt = getSettingsObjFromTable(tableTmp);
-				if (settingsDt.aoPreSearchCols[columnForStateSaving].sSearch !== '') {
+				if (settingsDt.aoPreSearchCols[columnForStateSaving] && settingsDt.aoPreSearchCols[columnForStateSaving].sSearch !== '') {
 					tmpStr = settingsDt.aoPreSearchCols[columnForStateSaving].sSearch;
 					tmpStr = yadcfParseMatchFilter(tmpStr, filterOptions.filter_match_mode);
 					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number_str).val(tmpStr).addClass("inuse");
@@ -4293,7 +4300,7 @@ if (!Object.entries) {
 				}
 				tablesSelectors = tablesSelectors.substring(0, tablesSelectors.length - 1);
 
-				setOptions(tablesSelectors + '_' + column_number_str, dummyArr, tablesArray[i].table);
+				setOptions(tablesSelectors + '_' + column_number_str, dummyArr, {});
 				oTables[tablesSelectors] = tablesArray;
 				appendFiltersMultipleTables(tablesArray, tablesSelectors, columnsObj);
 			}
@@ -4557,7 +4564,11 @@ if (!Object.entries) {
 			optionsObj = getOptions(table_arg.selector)[column_number];
 			table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly2(table_arg);
 
-			$filterElement = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
+			let selectorePrefix = '';
+			if (optionsObj.filters_position === 'tfoot') {
+				selectorePrefix = '.dataTables_scrollFoot ';
+			}
+			$filterElement = $(selectorePrefix + '#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
 			switch (optionsObj.filter_type) {
 			case 'select':
 			case 'custom_func':
@@ -4586,24 +4597,24 @@ if (!Object.entries) {
 				fromId = 'yadcf-filter-' + table_selector_jq_friendly + '-from-date-' + column_number;
 				toId = 'yadcf-filter-' + table_selector_jq_friendly + '-to-date-' + column_number;
 
-				retVal.from = $('#' + fromId).val();
-				retVal.to = $('#' + toId).val();
+				retVal.from = $(selectorePrefix + '#' + fromId).val();
+				retVal.to = $(selectorePrefix + '#' + toId).val();
 				break;
 			case 'range_number':
 				retVal = {};
 				fromId = 'yadcf-filter-' + table_selector_jq_friendly + '-from-' + column_number;
 				toId = 'yadcf-filter-' + table_selector_jq_friendly + '-to-' + column_number;
 
-				retVal.from = $('#' + fromId).val();
-				retVal.to = $('#' + toId).val();
+				retVal.from = $(selectorePrefix + '#' + fromId).val();
+				retVal.to = $(selectorePrefix + '#' + toId).val();
 				break;
 			case 'range_number_slider':
 				retVal = {};
 				fromId = 'yadcf-filter-' + table_selector_jq_friendly + '-min_tip-' + column_number;
 				toId = 'yadcf-filter-' + table_selector_jq_friendly + '-max_tip-' + column_number;
 
-				retVal.from = $('#' + fromId).text();
-				retVal.to = $('#' + toId).text();
+				retVal.from = $(selectorePrefix + '#' + fromId).text();
+				retVal.to = $(selectorePrefix + '#' + toId).text();
 
 				break;
 			default:
@@ -4685,8 +4696,12 @@ if (!Object.entries) {
 						continue;
 					}
 					$(document).removeData("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val");
-
-					$filterElement = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
+					
+					let selectorePrefix = '';
+					if (optionsObj.filters_position === 'tfoot') {
+						selectorePrefix = '.dataTables_scrollFoot ';
+					}
+					$filterElement = $(selectorePrefix + '#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
 
 					switch (optionsObj.filter_type) {
 					case 'select':
@@ -4718,10 +4733,10 @@ if (!Object.entries) {
 					case 'range_date':
 						fromId = 'yadcf-filter-' + table_selector_jq_friendly + '-from-date-' + column_number;
 						toId = 'yadcf-filter-' + table_selector_jq_friendly + '-to-date-' + column_number;
-						$('#' + fromId).val('');
-						$('#' + fromId).removeClass('inuse');
-						$('#' + toId).val('');
-						$('#' + toId).removeClass('inuse');
+						$(selectorePrefix + '#' + fromId).val('');
+						$(selectorePrefix + '#' + fromId).removeClass('inuse');
+						$(selectorePrefix + '#' + toId).val('');
+						$(selectorePrefix + '#' + toId).removeClass('inuse');
 						if (table_arg.fnSettings().oFeatures.bServerSide === true) {
 							table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
 						}
@@ -4730,10 +4745,10 @@ if (!Object.entries) {
 					case 'range_number':
 						fromId = 'yadcf-filter-' + table_selector_jq_friendly + '-from-' + column_number;
 						toId = 'yadcf-filter-' + table_selector_jq_friendly + '-to-' + column_number;
-						$('#' + fromId).val('');
-						$('#' + fromId).removeClass('inuse');
-						$('#' + toId).val('');
-						$('#' + toId).removeClass('inuse');
+						$(selectorePrefix + '#' + fromId).val('');
+						$(selectorePrefix + '#' + fromId).removeClass('inuse');
+						$(selectorePrefix + '#' + toId).val('');
+						$(selectorePrefix + '#' + toId).removeClass('inuse');
 						if (table_arg.fnSettings().oFeatures.bServerSide === true) {
 							table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
 						}
@@ -4743,13 +4758,13 @@ if (!Object.entries) {
 						sliderId = 'yadcf-filter-' + table_selector_jq_friendly + '-slider-' + column_number;
 						fromId = 'yadcf-filter-' + table_selector_jq_friendly + '-min_tip-' + column_number;
 						toId = 'yadcf-filter-' + table_selector_jq_friendly + '-max_tip-' + column_number;
-						$('#' + fromId).text('');
-						$('#' + fromId).parent().removeClass('inuse');
-						$('#' + fromId).parent().parent().find('ui-slider-range').removeClass('inuse');
-						$('#' + toId).text('');
-						$('#' + toId).parent().removeClass('inuse');
-						$('#' + toId).parent().parent().find('.ui-slider-range').removeClass('inuse');
-						$('#' + sliderId).slider("option", "values", [$('#' + fromId).parent().parent().find('.yadcf-filter-range-number-slider-min-tip-hidden').text(), $('#' + fromId).parent().parent().find('.yadcf-filter-range-number-slider-max-tip-hidden').text()]);
+						$(selectorePrefix + '#' + fromId).text('');
+						$(selectorePrefix + '#' + fromId).parent().removeClass('inuse');
+						$(selectorePrefix + '#' + fromId).parent().parent().find('ui-slider-range').removeClass('inuse');
+						$(selectorePrefix + '#' + toId).text('');
+						$(selectorePrefix + '#' + toId).parent().removeClass('inuse');
+						$(selectorePrefix + '#' + toId).parent().parent().find('.ui-slider-range').removeClass('inuse');
+						$(selectorePrefix + '#' + sliderId).slider("option", "values", [$('#' + fromId).parent().parent().find('.yadcf-filter-range-number-slider-min-tip-hidden').text(), $('#' + fromId).parent().parent().find('.yadcf-filter-range-number-slider-max-tip-hidden').text()]);
 						if (table_arg.fnSettings().oFeatures.bServerSide === true) {
 							table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
 						}
