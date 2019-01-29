@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.14
+* Version:     0.9.4.beta.15
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1415,7 +1415,7 @@ if (!Object.entries) {
 						return true;
 					}
 					columnObj = getOptions(settingsDt.oInstance.selector)[col_num];
-					if (columnObj.filters_position === 'tfoot') {
+					if (columnObj.filters_position === 'tfoot' && settingsDt.oScroll.sX) {
 						let selectorePrefix = '.dataTables_scrollFoot ';
 						min = document.querySelector(selectorePrefix + '#' + fromId) ? document.querySelector(selectorePrefix + '#' + fromId).value : '';
 						max = document.querySelector(selectorePrefix + '#' + toId) ? document.querySelector(selectorePrefix + '#' + toId).value : '';
@@ -3103,31 +3103,7 @@ if (!Object.entries) {
 									"onclick=\"yadcf.stopPropagation(event);yadcf.textKeyUP(event,'" + table_selector_jq_friendly + "', '" + column_number + "', 'clear'); return false;\" class=\"yadcf-filter-reset-button " + columnObj.reset_button_style_class + "\">" + filter_reset_button_text + "</button>");
 							}
 
-							if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
-								tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
-								if (columnObj.exclude === true) {
-									if (tmpStr.indexOf('^((?!') !== -1) {
-										$('#yadcf-filter-wrapper-' + table_selector_jq_friendly + '-' + column_number).find('.yadcf-exclude-wrapper').find(':checkbox').prop('checked', true);
-										$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass('inuse-exclude');
-									}
-									if (tmpStr.indexOf(').)') !== -1) {
-										tmpStr = tmpStr.substring(5, tmpStr.indexOf(').)'));
-									}
-								}
-								// load saved regex_checkbox state
-								if (columnObj.regex_check_box === true) {
-									if (settingsDt.oFeatures.bStateSave === true && settingsDt.oLoadedState) {
-										if (settingsDt.oLoadedState.yadcfState && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly] && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
-											if (settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].regex_check_box) {
-												$('#yadcf-filter-wrapper-' + table_selector_jq_friendly + '-' + column_number).find('.yadcf-regex-wrapper').find(':checkbox').prop('checked', true);
-												$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass('inuse-regex');
-											}
-										}
-									}
-								}
-								tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
-								$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
-							}
+							loadFromStateSaveTextFilter(oTable, settingsDt, columnObj, table_selector_jq_friendly, column_position, column_number);
 
 						} else if (columnObj.filter_type === "date" || columnObj.filter_type === 'date_custom_func') {
 
@@ -3174,6 +3150,34 @@ if (!Object.entries) {
 			}
 			if (exFilterColumnQueue.length > 0) {
 				(exFilterColumnQueue.shift())();
+			}
+		}
+
+		function loadFromStateSaveTextFilter(oTable, settingsDt, columnObj, table_selector_jq_friendly, column_position, column_number) {
+			if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
+				let tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
+				if (columnObj.exclude === true) {
+					if (tmpStr.indexOf('^((?!') !== -1) {
+						$('#yadcf-filter-wrapper-' + table_selector_jq_friendly + '-' + column_number).find('.yadcf-exclude-wrapper').find(':checkbox').prop('checked', true);
+						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass('inuse-exclude');
+					}
+					if (tmpStr.indexOf(').)') !== -1) {
+						tmpStr = tmpStr.substring(5, tmpStr.indexOf(').)'));
+					}
+				}
+				// load saved regex_checkbox state
+				if (columnObj.regex_check_box === true) {
+					if (settingsDt.oFeatures.bStateSave === true && settingsDt.oLoadedState) {
+						if (settingsDt.oLoadedState.yadcfState && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly] && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
+							if (settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].regex_check_box) {
+								$('#yadcf-filter-wrapper-' + table_selector_jq_friendly + '-' + column_number).find('.yadcf-regex-wrapper').find(':checkbox').prop('checked', true);
+								$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass('inuse-regex');
+							}
+						}
+					}
+				}
+				tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
+				$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr).addClass("inuse");
 			}
 		}
 
@@ -3912,6 +3916,21 @@ if (!Object.entries) {
 			}
 			//events that affects both DOM and Ajax
 			if (yadcfVersionCheck('1.10')) {
+				$(document).off('stateLoaded.dt', oTable.selector).on('stateLoaded.dt', oTable.selector, function (event, settings) {
+					let args = yadcf.getOptions(settings.oInstance.selector);
+					let columnObjKey;
+					for (columnObjKey in args) {
+						if (args.hasOwnProperty(columnObjKey)) {
+							let columnObj = args[columnObjKey];
+							let column_number = columnObj.column_number;
+							column_number = +column_number;
+							let column_position = column_number;
+							let table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly2(oTable);
+
+							loadFromStateSaveTextFilter(oTable, settings, columnObj, table_selector_jq_friendly, column_position, column_number);
+						}
+					}
+				});
 				$(document).off('draw.dt', oTable.selector).on('draw.dt', oTable.selector, function (event, settings) {
 					appendFilters(oTable, yadcf.getOptions(settings.oInstance.selector), settings.oInstance.selector, settings);
 				});
@@ -4565,7 +4584,8 @@ if (!Object.entries) {
 			table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly2(table_arg);
 
 			let selectorePrefix = '';
-			if (optionsObj.filters_position === 'tfoot') {
+			let settingsDt = getSettingsObjFromTable(table_arg);
+			if (optionsObj.filters_position === 'tfoot' && settingsDt.oScroll.sX) {
 				selectorePrefix = '.dataTables_scrollFoot ';
 			}
 			$filterElement = $(selectorePrefix + '#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
@@ -4698,7 +4718,8 @@ if (!Object.entries) {
 					$(document).removeData("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val");
 					
 					let selectorePrefix = '';
-					if (optionsObj.filters_position === 'tfoot') {
+					let settingsDt = getSettingsObjFromTable(table_arg);
+					if (optionsObj.filters_position === 'tfoot' && settingsDt.oScroll.sX) {
 						selectorePrefix = '.dataTables_scrollFoot ';
 					}
 					$filterElement = $(selectorePrefix + '#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
