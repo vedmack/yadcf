@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.15
+* Version:     0.9.4.beta.16
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -269,7 +269,7 @@
                 Required:           false
                 Type:               String
                 Default value:      'jquery-ui'
-                Possible values:    'jquery-ui' / 'bootstrap-datetimepicker' / bootstrap-datepicker
+                Possible values:    'jquery-ui' / 'bootstrap-datetimepicker' / bootstrap-datepicker / daterangepicker / dt-datetime (DataTable Editor DateTime picker)
                 Description:        You can choose datapicker library from defined in special notes
                 Special notes:      Currently supported only jQueryUI datepicker (datepicker) and Bootstrap datepicker (eonasdan-bootstrap-datetimepicker)
                                     Bootstrap datepicker depends moment library. This plugin depends moment too.
@@ -1410,7 +1410,7 @@ if (!Object.entries) {
 						max_time,
 						dataRenderFunc,
 						dpg;
-
+					//"2019/01/30 - 2019/01/30"
 					if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
 						return true;
 					}
@@ -1419,6 +1419,10 @@ if (!Object.entries) {
 						let selectorePrefix = '.dataTables_scrollFoot ';
 						min = document.querySelector(selectorePrefix + '#' + fromId) ? document.querySelector(selectorePrefix + '#' + fromId).value : '';
 						max = document.querySelector(selectorePrefix + '#' + toId) ? document.querySelector(selectorePrefix + '#' + toId).value : '';
+					}
+					if (columnObj.datepicker_type === 'daterangepicker') {
+						min = $.trim(min.substring(0, min.indexOf('-')));
+						max = $.trim(max.substring(max.indexOf('-') + 1));
 					}
 					if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 						dpg = $.fn.datepicker.DPGlobal;
@@ -1472,10 +1476,10 @@ if (!Object.entries) {
 						return false;
 					}
 					try {
-						if (min.length === (date_format.length + 2) || columnObj.datepicker_type.indexOf('bootstrap') !== -1) {
+						if (min.length === (date_format.length + 2) || columnObj.datepicker_type.indexOf('bootstrap') !== -1 || columnObj.datepicker_type === 'daterangepicker') {
 							if (columnObj.datepicker_type === 'jquery-ui') {
 								min = (min !== "") ? $.datepicker.parseDate(date_format, min) : min;
-							} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
+							} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker' || columnObj.datepicker_type === 'daterangepicker') {
 								min = (min !== "") ? moment(min, columnObj.date_format).toDate() : min;
 							} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 								min = (min !== "") ? dpg.parseDate(min, dpg.parseFormat(columnObj.date_format)) : min;
@@ -1483,10 +1487,10 @@ if (!Object.entries) {
 						}
 					} catch (err1) {}
 					try {
-						if (max.length === (date_format.length + 2) || columnObj.datepicker_type.indexOf('bootstrap') !== -1) {
+						if (max.length === (date_format.length + 2) || columnObj.datepicker_type.indexOf('bootstrap') !== -1 || columnObj.datepicker_type === 'daterangepicker') {
 							if (columnObj.datepicker_type === 'jquery-ui') {
 								max = (max !== "") ? $.datepicker.parseDate(date_format, max) : max;
-							} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
+							} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker' || columnObj.datepicker_type === 'daterangepicker') {
 								max = (max !== "") ? moment(max, columnObj.date_format).toDate() : max;
 							} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 								max = (max !== "") ? dpg.parseDate(max, dpg.parseFormat(columnObj.date_format)) : max;
@@ -1500,6 +1504,8 @@ if (!Object.entries) {
 							val = (val !== "") ? moment(val, columnObj.moment_date_format).toDate() : val;
 						} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 							val = (val !== "") ? dpg.parseDate(val, dpg.parseFormat(columnObj.date_format)) : val;
+						} else if (columnObj.datepicker_type === 'daterangepicker') {
+							val = (val !== "") ? moment(val, columnObj.date_format).toDate() : val;
 						}
 					} catch (err3) {}
 
@@ -1614,13 +1620,15 @@ if (!Object.entries) {
 				settingsDt,
 				columnObj;
 
-			if (pDate.type === 'dp') {
-				event = pDate.target;
-			} else if (pDate.type === 'changeDate') {
-				event = pDate.currentTarget;
-			} else {
-				date = pDate;
-				event = pEvent;
+			if (pDate) {
+				if (pDate.type === 'dp') {
+					event = pDate.target;
+				} else if (pDate.type === 'changeDate') {
+					event = pDate.currentTarget;
+				} else {
+					date = pDate;
+					event = pEvent;
+				}
 			}
 
 			column_number = $(event).attr('id').replace('yadcf-filter-', '').replace('-date', '').replace('-reset', '');
@@ -1644,6 +1652,8 @@ if (!Object.entries) {
 				if (pDate.dates) {
 					date = pDate.format(0, columnObj.date_format);
 				}
+			} else if (columnObj.datepicker_type === 'dt-datetime') {
+				console.log('a');
 			}
 
 			column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
@@ -1684,7 +1694,11 @@ if (!Object.entries) {
 						}
 					}
 				}
-				oTable.fnFilter('', column_number_filter);
+				if (columnObj.datepicker_type === 'daterangepicker' && oTable.fnSettings().oFeatures.bServerSide !== true) {
+					rangeClear(table_selector_jq_friendly, event, column_number);
+				} else {
+					oTable.fnFilter('', column_number_filter);
+				}
 				$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val('').removeClass("inuse");
 				if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 					$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).datepicker('update');
@@ -1708,7 +1722,7 @@ if (!Object.entries) {
 				settingsDt,
 				keyUp;
 
-			if (pDate.type === 'dp') {
+			if (pDate.type === 'dp' || pDate.namespace === 'daterangepicker') {
 				event = pDate.target;
 			} else if (pDate.type === 'changeDate') {
 				event = pDate.currentTarget;
@@ -1749,13 +1763,17 @@ if (!Object.entries) {
 			} else {
 				$(event).addClass("inuse");
 			}
-
-			if ($(event).attr("id").indexOf("-from-") !== -1) {
-				from = document.getElementById($(event).attr("id")).value;
-				to = document.getElementById($(event).attr("id").replace("-from-", "-to-")).value;
+			if (pDate.namespace === 'daterangepicker') {
+				from = moment(pEvent.startDate).format(columnObj.date_format);
+				to = moment(pEvent.endDate).format(columnObj.date_format);
 			} else {
-				to = document.getElementById($(event).attr("id")).value;
-				from = document.getElementById($(event).attr("id").replace("-to-", "-from-")).value;
+				if ($(event).attr("id").indexOf("-from-") !== -1) {
+					from = document.getElementById($(event).attr("id")).value;
+					to = document.getElementById($(event).attr("id").replace("-from-", "-to-")).value;
+				} else {
+					to = document.getElementById($(event).attr("id")).value;
+					from = document.getElementById($(event).attr("id").replace("-to-", "-from-")).value;
+				}
 			}
 
 			keyUp = function () {
@@ -1949,8 +1967,11 @@ if (!Object.entries) {
 
 			if (columnObj.datepicker_type === 'jquery-ui') {
 				datepickerObj.dateFormat = date_format;
-			} else if (columnObj.datepicker_type.indexOf('bootstrap') !== -1) {
+			} else if (columnObj.datepicker_type.indexOf('bootstrap') !== -1 || columnObj.datepicker_type === 'dt-datetime') {
 				datepickerObj.format = date_format;
+			} else if (columnObj.datepicker_type === 'daterangepicker') {
+				datepickerObj.locale = {};
+				datepickerObj.locale.format = date_format;
 			}
 
 			if (columnObj.externally_triggered !== true) {
@@ -1978,6 +1999,19 @@ if (!Object.entries) {
 					dateSelectSingle(e);
 					$(this).datepicker('hide');
 				});
+			} else if (columnObj.datepicker_type === 'dt-datetime') {
+				new $.fn.DataTable.Editor.DateTime(
+					$("#" + dateId),
+					{
+					  format: date_format,
+					  onChange: dateSelectSingle
+					}
+				);
+			} else if (columnObj.datepicker_type === 'daterangepicker') {
+				$("#" + dateId).daterangepicker(datepickerObj);
+				$("#" + dateId).on('apply.daterangepicker, hide.daterangepicker', function(ev, picker) {
+					dateSelect(ev, picker);
+				});
 			}
 
 			if (oTable.fnSettings().aoPreSearchCols[column_number].sSearch !== '') {
@@ -1999,6 +2033,10 @@ if (!Object.entries) {
 				if (settingsDt.oFeatures.bServerSide !== true) {
 					addCustomFunctionFilterCapability(table_selector_jq_friendly, "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_number);
 				}
+			}
+
+			if (columnObj.datepicker_type === 'daterangepicker' && oTable.fnSettings().oFeatures.bServerSide !== true) {
+				addRangeDateFilterCapability(table_selector_jq_friendly, dateId, dateId, column_number, date_format);
 			}
 
 			resetIApiIndex();
@@ -2336,6 +2374,7 @@ if (!Object.entries) {
 				$(document).off('xhr.dt', oTable.selector);
 				$(document).off('column-visibility.dt', oTable.selector);
 				$(document).off('destroy.dt', oTable.selector);
+				$(document).off('stateLoaded.dt', oTable.selector);
 			} else {
 				$(document).off('draw', oTable.selector);
 				$(document).off('destroy', oTable.selector);
@@ -3206,9 +3245,13 @@ if (!Object.entries) {
 
 			columnObj = getOptions(oTable.selector)[column_number];
 
-			$(event.target).parent().find(".yadcf-filter-range").val("");
-			if ($(event.target).parent().find(".yadcf-filter-range-number").length > 0) {
-				$($(event.target).parent().find(".yadcf-filter-range")[0]).focus();
+			if (columnObj.datepicker_type === 'daterangepicker') {
+				$('#' + "yadcf-filter-" + table_selector_jq_friendly + '-' + column_number).val("");
+			} else {
+				$(event.target).parent().find(".yadcf-filter-range").val("");
+				if ($(event.target).parent().find(".yadcf-filter-range-number").length > 0) {
+					$($(event.target).parent().find(".yadcf-filter-range")[0]).focus();
+				}
 			}
 
 			if (oTable.fnSettings().oFeatures.bServerSide !== true) {
