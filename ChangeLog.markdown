@@ -7,6 +7,8 @@
 * Added babel transpiled version (es5) in /build folder
 * Fixed cumulative filtering issue (not calling proper dt api / version) 
 * Added "column_selector" - more flexability in column selectors (instead of hard coded column_number)- https://github.com/vedmack/yadcf/issues/513
+* Support for stateSave with serverSide currently only for filter_type: 'text'
+* Support Date Range Picker plugin (datepicker_type: 'daterangepicker') - https://github.com/vedmack/yadcf/issues/537
 * Misc bug fixed issues:
 	https://github.com/vedmack/yadcf/issues/469 - Cannot apply style_class on date filter
 	https://github.com/vedmack/yadcf/issues/470 - filter_delay not working on range_date
@@ -15,7 +17,11 @@
 	https://github.com/vedmack/yadcf/issues/510 - Can't handle null value case in deep data properties
 	https://github.com/vedmack/yadcf/issues/522 - Selectize bug (initSelectPluginCustomTriggers 'select_type': 'custom_select' )
 	https://github.com/vedmack/yadcf/issues/524 - range_date filter with bootstrap-datetimepicker date format issue (moment_date_format)
-	
+	https://github.com/vedmack/yadcf/issues/500 - multi_select not working "The select2('close') method was called on an element that is not using Select2.
+    https://github.com/vedmack/yadcf/issues/530 - Using Select2 with ajax load multiselect my tags are removed instantly.
+    https://github.com/vedmack/yadcf/issues/531 - Ctrl+A does not work inside text searches.
+	https://github.com/vedmack/yadcf/issues/534 - initMultipleTables trows a TypeError: "tablesArray[i] is undefined"
+	https://github.com/vedmack/yadcf/issues/540 - Individual Search Columns in the footer with ScrollX not searching properly 
 	
 ## 0.9.3
 
