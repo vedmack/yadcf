@@ -3244,10 +3244,11 @@ if (!Object.entries) {
 
 			columnObj = getOptions(oTable.selector)[column_number];
 
+			const buttonSelector = $(event.target).prop('nodeName') === 'BUTTON' ? $(event.target).parent() : $(event.target).parent().parent();
+
 			if (columnObj.datepicker_type === 'daterangepicker') {
 				$('#' + "yadcf-filter-" + table_selector_jq_friendly + '-' + column_number).val("");
 			} else {
-				const buttonSelector = $(event.target).prop('nodeName') === 'BUTTON' ? $(event.target).parent() : $(event.target).parent().parent()
 				buttonSelector.find(".yadcf-filter-range").val("");
 				if (buttonSelector.find(".yadcf-filter-range-number").length > 0) {
 					$(buttonSelector.find(".yadcf-filter-range")[0]).focus();
@@ -3285,7 +3286,7 @@ if (!Object.entries) {
 			}
 			resetIApiIndex();
 
-			$(event.target).parent().find(".yadcf-filter-range").removeClass("inuse");
+			buttonSelector.parent().find(".yadcf-filter-range").removeClass("inuse");
 			if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 				$fromInput = $("#" + fromId);
 				$toInput = $("#" + toId);
