@@ -3244,13 +3244,15 @@ if (!Object.entries) {
 			}
 
 			columnObj = getOptions(oTable.selector)[column_number];
+			
+			const buttonSelector = $(event.target).prop('nodeName') === 'BUTTON' ? $(event.target).parent() : $(event.target).parent().parent();
 
 			if (columnObj.datepicker_type === 'daterangepicker') {
 				$('#' + "yadcf-filter-" + table_selector_jq_friendly + '-' + column_number).val("");
 			} else {
-				$(event.target).parent().find(".yadcf-filter-range").val("");
-				if ($(event.target).parent().find(".yadcf-filter-range-number").length > 0) {
-					$($(event.target).parent().find(".yadcf-filter-range")[0]).focus();
+				buttonSelector.find(".yadcf-filter-range").val("");
+				if (buttonSelector.find(".yadcf-filter-range-number").length > 0) {
+					$(buttonSelector.find(".yadcf-filter-range")[0]).focus();
 				}
 			}
 
@@ -3285,7 +3287,7 @@ if (!Object.entries) {
 			}
 			resetIApiIndex();
 
-			$(event.target).parent().find(".yadcf-filter-range").removeClass("inuse");
+			buttonSelector.parent().find(".yadcf-filter-range").removeClass("inuse");
 			if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 				$fromInput = $("#" + fromId);
 				$toInput = $("#" + toId);
@@ -3306,24 +3308,26 @@ if (!Object.entries) {
 			event = eventTargetFixUp(event);
 			$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 
-			column_number = parseInt($(event.target).prev().find(".yadcf-filter-range-number-slider").attr("id").replace("yadcf-filter-" + table_selector_jq_friendly + "-slider-", ""), 10);
+			const buttonSelector = $(event.target).prop('nodeName') === 'BUTTON' ? $(event.target) : $(event.target).parent();
 
-			min_val = +$($(event.target).parent().find(".yadcf-filter-range-number-slider-min-tip-hidden")).text();
-			max_val = +$($(event.target).parent().find(".yadcf-filter-range-number-slider-max-tip-hidden")).text();
+			column_number = parseInt(buttonSelector.prev().find(".yadcf-filter-range-number-slider").attr("id").replace("yadcf-filter-" + table_selector_jq_friendly + "-slider-", ""), 10);
+
+			min_val = +$(buttonSelector.parent().find(".yadcf-filter-range-number-slider-min-tip-hidden")).text();
+			max_val = +$(buttonSelector.parent().find(".yadcf-filter-range-number-slider-max-tip-hidden")).text();
 
 			currentFilterValues = exGetColumnFilterVal(oTable, column_number);
 			if (+currentFilterValues.from === min_val && +currentFilterValues.to === max_val) {
 				return;
 			}
 
-			$(event.target).prev().find(".yadcf-filter-range-number-slider").slider("option", "yadcf-reset", true);
-			$(event.target).prev().find(".yadcf-filter-range-number-slider").slider("option", "values", [min_val, max_val]);
+			buttonSelector.prev().find(".yadcf-filter-range-number-slider").slider("option", "yadcf-reset", true);
+			buttonSelector.prev().find(".yadcf-filter-range-number-slider").slider("option", "values", [min_val, max_val]);
 
-			$($(event.target).prev().find(".ui-slider-handle")[0]).attr("tabindex", -1).focus();
+			$(buttonSelector.prev().find(".ui-slider-handle")[0]).attr("tabindex", -1).focus();
 
-			$($(event.target).prev().find(".ui-slider-handle")[0]).removeClass("inuse");
-			$($(event.target).prev().find(".ui-slider-handle")[1]).removeClass("inuse");
-			$(event.target).prev().find(".ui-slider-range").removeClass("inuse");
+			$(buttonSelector.prev().find(".ui-slider-handle")[0]).removeClass("inuse");
+			$(buttonSelector.prev().find(".ui-slider-handle")[1]).removeClass("inuse");
+			buttonSelector.prev().find(".ui-slider-range").removeClass("inuse");
 
 			oTable.fnDraw();
 			resetIApiIndex();
