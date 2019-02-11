@@ -2912,7 +2912,6 @@ if (!Object.entries) {
 							if (!columnObj.select_type_options || !columnObj.select_type_options.ajax) {
 								$filter_selector.empty();
 								$filter_selector.append(column_data);
-							
 								if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
 									tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 									if (columnObj.filter_type === "select") {
@@ -3257,6 +3256,8 @@ if (!Object.entries) {
 
 			columnObj = getOptions(oTable.selector)[column_number];
 			
+			const buttonSelector = $(event.target).prop('nodeName') === 'BUTTON' ? $(event.target).parent() : $(event.target).parent().parent();
+
 			const buttonSelector = $(event.target).prop('nodeName') === 'BUTTON' ? $(event.target).parent() : $(event.target).parent().parent();
 
 			if (columnObj.datepicker_type === 'daterangepicker') {
@@ -4412,7 +4413,6 @@ if (!Object.entries) {
 							$(this).select2('close');
 						}
 					});
-					
 				}
 			}
 		}
@@ -4425,7 +4425,6 @@ if (!Object.entries) {
 				evt.cancelBubble = true;
 			}
 		}
-		
 		function preventDefaultForEnter(evt) {
 			ctrlPressed = false;
 			if (evt.keyCode === 13) {
@@ -4775,7 +4774,6 @@ if (!Object.entries) {
 						continue;
 					}
 					$(document).removeData("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val");
-					
 					let selectorePrefix = '';
 					let settingsDt = getSettingsObjFromTable(table_arg);
 					if (optionsObj.filters_position === 'tfoot' && settingsDt.oScroll.sX) {
