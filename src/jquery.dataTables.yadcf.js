@@ -3468,9 +3468,6 @@ if (!Object.entries) {
 						}
 					} catch (err) {}
 				}
-				console.log('max' + (max instanceof Date));
-				console.log('min' + (min instanceof Date));
-				debugger;
 				if (((max instanceof Date) && (min instanceof Date) && (max >= min)) || !min || !max) {
 
 					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
