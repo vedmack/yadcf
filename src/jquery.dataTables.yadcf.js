@@ -1805,6 +1805,9 @@ if (!Object.entries) {
 					}
 					oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 				}
+				if (from !== '' || to !== ''){
+					$('#' + event.id).addClass("inuse");
+				}
 				resetIApiIndex();
 			}
 			if (columnObj.filter_delay === undefined) {
