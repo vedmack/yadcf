@@ -340,7 +340,7 @@
 		Possible values:    af, ar-DZ, ar, az, be, bg, bs, ca, cs, cy-GB, da, de, el, en-AU, en-GB, en-NZ, eo, es, et, eu, fa, fi, fo, fr-CA, fr-CH,
 				    fr, gl, he, hi, hr, hu, hy, id, is, it-CH, it, ja, ka, kk, km, ko, ky, lb, lt, lv, mk, ml, ms, nb, nl-BE, nl, nn, no, pl,
 				    pt-BR, pt, rm, ro, ru, sk, sl, sq, sr-SR, sr, sv, ta, th, tj, tr, uk, vi, zh-CN, zh-HK, zh-TW
-									
+
 *
 *
 *
@@ -1891,7 +1891,9 @@ if (!Object.entries) {
 			datepickerObj = $.extend({}, datepickerObj, columnObj.filter_plugin_options);
 
 			if (columnObj.datepicker_type === 'jquery-ui') {
-				$.extend(datepickerObj, $.datepicker.regional[columnObj.jquery_ui_datepicker_locale]);
+				if (columnObj.jquery_ui_datepicker_locale) {
+					$.extend(datepickerObj, $.datepicker.regional[columnObj.jquery_ui_datepicker_locale]);
+				}
 				$fromInput.datepicker($.extend(datepickerObj, {onClose: function (selectedDate) {
 					$toInput.datepicker('option', 'minDate', selectedDate);
 				}  }));
@@ -1994,7 +1996,9 @@ if (!Object.entries) {
 			datepickerObj = $.extend({}, datepickerObj, columnObj.filter_plugin_options);
 
 			if (columnObj.datepicker_type === 'jquery-ui') {
-				$.extend(datepickerObj, $.datepicker.regional[columnObj.jquery_ui_datepicker_locale]);
+				if (columnObj.jquery_ui_datepicker_locale) {
+					$.extend(datepickerObj, $.datepicker.regional[columnObj.jquery_ui_datepicker_locale]);
+				}
 				$("#" + dateId).datepicker(datepickerObj);
 			} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
 				datepickerObj.useCurrent = false;
@@ -3255,8 +3259,6 @@ if (!Object.entries) {
 			}
 
 			columnObj = getOptions(oTable.selector)[column_number];
-			
-			const buttonSelector = $(event.target).prop('nodeName') === 'BUTTON' ? $(event.target).parent() : $(event.target).parent().parent();
 
 			const buttonSelector = $(event.target).prop('nodeName') === 'BUTTON' ? $(event.target).parent() : $(event.target).parent().parent();
 
