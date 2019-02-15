@@ -2394,6 +2394,7 @@ if (!Object.entries) {
 				$(document).off('destroy', oTable.selector);
 			}
 			destroyThirdPartyPlugins(oTable);
+			$.fn.dataTableExt.afnFiltering = [];
 		}
 
 		/* alphanum.js (C) Brian Huisman
