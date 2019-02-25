@@ -2398,6 +2398,9 @@ if (!Object.entries) {
 				$(document).off('draw', oTable.selector);
 				$(document).off('destroy', oTable.selector);
 			}
+			if ($.fn.dataTableExt.afnFiltering.length > 0) {
+				$.fn.dataTableExt.afnFiltering.splice(0, $.fn.dataTableExt.afnFiltering.length);
+			}
 			destroyThirdPartyPlugins(oTable);
 		}
 
