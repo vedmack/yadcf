@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.16
+* Version:     0.9.4.beta.18
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2747,8 +2747,11 @@ if (!Object.entries) {
 
 					columnObj.column_number = column_number;
 					column_number_data = undefined;
-					if (isNaN(settingsDt.aoColumns[column_position].mData) && typeof settingsDt.aoColumns[column_position].mData !== 'object') {
+					if (isNaN(settingsDt.aoColumns[column_position].mData) && (typeof settingsDt.aoColumns[column_position].mData !== 'object')) {
 						column_number_data = settingsDt.aoColumns[column_position].mData;
+						columnObj.column_number_data = column_number_data;
+					} else if (settingsDt.aoColumns[column_position].mData && settingsDt.aoColumns[column_position].mData.filter) {
+						column_number_data = settingsDt.aoColumns[column_position].mData.filter;
 						columnObj.column_number_data = column_number_data;
 					}
 					if (isNaN(settingsDt.aoColumns[column_position].mRender) && typeof settingsDt.aoColumns[column_position].mRender !== 'object') {
