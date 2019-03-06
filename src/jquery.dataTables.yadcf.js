@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.16
+* Version:     0.9.4.beta.18
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -336,10 +336,11 @@
                 Type:               string
                 Default value:      ""
                 Description:        Load localized jquery-ui datepicker
-				Note:               Need to load jquery-ui-i18n lib.
-				Possible values:    af, ar-DZ, ar, az, be, bg, bs, ca, cs, cy-GB, da, de, el, en-AU, en-GB, en-NZ, eo, es, et, eu, fa, fi, fo, fr-CA, fr-CH,
-									fr, gl, he, hi, hr, hu, hy, id, is, it-CH, it, ja, ka, kk, km, ko, ky, lb, lt, lv, mk, ml, ms, nb, nl-BE, nl, nn, no, pl,
-									pt-BR, pt, rm, ro, ru, sk, sl, sq, sr-SR, sr, sv, ta, th, tj, tr, uk, vi, zh-CN, zh-HK, zh-TW
+		Note:               Need to load jquery-ui-i18n lib.
+		Possible values:    af, ar-DZ, ar, az, be, bg, bs, ca, cs, cy-GB, da, de, el, en-AU, en-GB, en-NZ, eo, es, et, eu, fa, fi, fo, fr-CA, fr-CH,
+				    fr, gl, he, hi, hr, hu, hy, id, is, it-CH, it, ja, ka, kk, km, ko, ky, lb, lt, lv, mk, ml, ms, nb, nl-BE, nl, nn, no, pl,
+				    pt-BR, pt, rm, ro, ru, sk, sl, sq, sr-SR, sr, sv, ta, th, tj, tr, uk, vi, zh-CN, zh-HK, zh-TW
+
 *
 *
 *
@@ -1814,8 +1815,8 @@ if (!Object.entries) {
 					}
 					oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 				}
-				if (from !== '' || to !== '') {
-					$('#' + event.id).addClass('inuse');
+				if (from !== '' || to !== ''){
+					$('#' + event.id).addClass("inuse");
 				}
 				resetIApiIndex();
 			}
@@ -1893,7 +1894,9 @@ if (!Object.entries) {
 			datepickerObj = $.extend({}, datepickerObj, columnObj.filter_plugin_options);
 
 			if (columnObj.datepicker_type === 'jquery-ui') {
-				$.extend(datepickerObj, $.datepicker.regional[columnObj.jquery_ui_datepicker_locale]);
+				if (columnObj.jquery_ui_datepicker_locale) {
+					$.extend(datepickerObj, $.datepicker.regional[columnObj.jquery_ui_datepicker_locale]);
+				}
 				$fromInput.datepicker($.extend(datepickerObj, {onClose: function (selectedDate) {
 					$toInput.datepicker('option', 'minDate', selectedDate);
 				}  }));
@@ -1996,7 +1999,9 @@ if (!Object.entries) {
 			datepickerObj = $.extend({}, datepickerObj, columnObj.filter_plugin_options);
 
 			if (columnObj.datepicker_type === 'jquery-ui') {
-				$.extend(datepickerObj, $.datepicker.regional[columnObj.jquery_ui_datepicker_locale]);
+				if (columnObj.jquery_ui_datepicker_locale) {
+					$.extend(datepickerObj, $.datepicker.regional[columnObj.jquery_ui_datepicker_locale]);
+				}
 				$("#" + dateId).datepicker(datepickerObj);
 			} else if (columnObj.datepicker_type === 'bootstrap-datetimepicker') {
 				datepickerObj.useCurrent = false;
@@ -2393,8 +2398,10 @@ if (!Object.entries) {
 				$(document).off('draw', oTable.selector);
 				$(document).off('destroy', oTable.selector);
 			}
+			if ($.fn.dataTableExt.afnFiltering.length > 0) {
+				$.fn.dataTableExt.afnFiltering.splice(0, $.fn.dataTableExt.afnFiltering.length);
+			}
 			destroyThirdPartyPlugins(oTable);
-			$.fn.dataTableExt.afnFiltering = [];
 		}
 
 		/* alphanum.js (C) Brian Huisman
@@ -2740,8 +2747,11 @@ if (!Object.entries) {
 
 					columnObj.column_number = column_number;
 					column_number_data = undefined;
-					if (isNaN(settingsDt.aoColumns[column_position].mData) && typeof settingsDt.aoColumns[column_position].mData !== 'object') {
+					if (isNaN(settingsDt.aoColumns[column_position].mData) && (typeof settingsDt.aoColumns[column_position].mData !== 'object')) {
 						column_number_data = settingsDt.aoColumns[column_position].mData;
+						columnObj.column_number_data = column_number_data;
+					} else if (settingsDt.aoColumns[column_position].mData && settingsDt.aoColumns[column_position].mData.filter) {
+						column_number_data = settingsDt.aoColumns[column_position].mData.filter;
 						columnObj.column_number_data = column_number_data;
 					}
 					if (isNaN(settingsDt.aoColumns[column_position].mRender) && typeof settingsDt.aoColumns[column_position].mRender !== 'object') {
@@ -3469,6 +3479,7 @@ if (!Object.entries) {
 						}
 					} catch (err) {}
 				}
+
 				if (((max instanceof Date) && (min instanceof Date) && (max >= min)) || !min || !max) {
 
 					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
