@@ -1276,7 +1276,13 @@ if (!Object.entries) {
 					column_number_filter = calcColumnNumberFilter(settingsDt, col_num, table_selector_jq_friendly);
 
 					if (rowData !== undefined) {
-						aData = rowData;
+						let rowDataRender = [];
+						if (columnObj.column_number_render) {
+							rowDataRender = $.extend(true, [], rowData);
+							const index = columnObj.column_number_data ? columnObj.column_number_data : column_number_filter;
+							rowDataRender[index] = columnObj.column_number_render(rowDataRender[index], 'filter', null, null);
+						}
+						aData = rowDataRender ? rowDataRender : rowData;
 						if (columnObj.column_number_data !== undefined) {
 							column_number_filter = columnObj.column_number_data;
 							val = dot2obj(aData, column_number_filter);
@@ -2824,8 +2830,15 @@ if (!Object.entries) {
 					}
 
 					if (columnObj.filter_type === "range_number_slider") {
-						min_val = findMinInArray(column_data, columnObj);
-						max_val = findMaxInArray(column_data, columnObj);
+						let column_data_render = [];
+						if (columnObj.column_number_render) {
+							column_data_render = $.extend(true, [], column_data);
+							column_data_render.forEach((data, index) => {
+								column_data_render[index] = columnObj.column_number_render(column_data_render[index], 'filter', null, null);
+							});
+						}
+						min_val = findMinInArray(column_data_render ? column_data_render : column_data, columnObj);
+						max_val = findMaxInArray(column_data_render ? column_data_render : column_data, columnObj);
 					}
 
 					if (filter_container_id === undefined && columnObj.filter_container_selector === undefined) {
