@@ -23,6 +23,7 @@
 	https://github.com/vedmack/yadcf/issues/534 - initMultipleTables trows a TypeError: "tablesArray[i] is undefined"
 	https://github.com/vedmack/yadcf/issues/540 - Individual Search Columns in the footer with ScrollX not searching properly 
 	https://github.com/vedmack/yadcf/issues/552 - Error when using orthogonal data and text_data_delimiter (support columns.data.filter)
+	https://github.com/vedmack/yadcf/issues/554 - DT render not working properly - range number / slider filters
 	
 ## 0.9.3
 
