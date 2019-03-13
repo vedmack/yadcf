@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.19
+* Version:     0.9.4.beta.20
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -942,6 +942,11 @@ if (!Object.entries) {
 					oTable.fnFilter(selected_value, column_number, true, false, true, case_insensitive);
 				}
 			} else {
+				if (filter_match_mode === "exact") {
+					selected_value = "^" + escapeRegExp(selected_value) + "$";
+				} else if (filter_match_mode === "startsWith") {
+					selected_value = "^" + escapeRegExp(selected_value);
+				}
 				oTable.fnFilter("^((?!" + selected_value + ").)*$", column_number, true, false, true, case_insensitive);
 			}
 		}
@@ -1819,7 +1824,7 @@ if (!Object.entries) {
 					$('#' + event.id).addClass("inuse");
 				}
 				resetIApiIndex();
-			}
+			};
 			if (columnObj.filter_delay === undefined) {
 				keyUp();
 			} else {
@@ -4786,7 +4791,6 @@ if (!Object.entries) {
 					}
 					$(document).removeData("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val");
 					let selectorePrefix = '';
-					let settingsDt = getSettingsObjFromTable(table_arg);
 					if (optionsObj.filters_position === 'tfoot' && settingsDt.oScroll.sX) {
 						selectorePrefix = '.dataTables_scrollFoot ';
 					}

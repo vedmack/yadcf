@@ -24,6 +24,8 @@
 	https://github.com/vedmack/yadcf/issues/540 - Individual Search Columns in the footer with ScrollX not searching properly 
 	https://github.com/vedmack/yadcf/issues/552 - Error when using orthogonal data and text_data_delimiter (support columns.data.filter)
 	https://github.com/vedmack/yadcf/issues/554 - DT render not working properly - range number / slider filters
+	https://github.com/vedmack/yadcf/issues/557 - startsWith being ignored when exclude option set
+
 	
 ## 0.9.3
 
