@@ -25,6 +25,7 @@
 	https://github.com/vedmack/yadcf/issues/552 - Error when using orthogonal data and text_data_delimiter (support columns.data.filter)
 	https://github.com/vedmack/yadcf/issues/554 - DT render not working properly - range number / slider filters
 	https://github.com/vedmack/yadcf/issues/557 - startsWith being ignored when exclude option set
+	https://github.com/vedmack/yadcf/issues/553 - Using orthogonal data and text_data_delimiter with columns.data function
 
 	
 ## 0.9.3
