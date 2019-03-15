@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.18
+* Version:     0.9.4.beta.22
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -942,6 +942,11 @@ if (!Object.entries) {
 					oTable.fnFilter(selected_value, column_number, true, false, true, case_insensitive);
 				}
 			} else {
+				if (filter_match_mode === "exact") {
+					selected_value = "^" + escapeRegExp(selected_value) + "$";
+				} else if (filter_match_mode === "startsWith") {
+					selected_value = "^" + escapeRegExp(selected_value);
+				}
 				oTable.fnFilter("^((?!" + selected_value + ").)*$", column_number, true, false, true, case_insensitive);
 			}
 		}
@@ -1825,7 +1830,7 @@ if (!Object.entries) {
 					$('#' + event.id).addClass("inuse");
 				}
 				resetIApiIndex();
-			}
+			};
 			if (columnObj.filter_delay === undefined) {
 				keyUp();
 			} else {
@@ -2668,9 +2673,20 @@ if (!Object.entries) {
 					} else {
 						col_inner_data = col_inner_elements;
 					}
-					if ($.trim(col_inner_data) !== '' && !(col_filter_array.hasOwnProperty(col_inner_data))) {
-						col_filter_array[col_inner_data] = col_inner_data;
-						column_data.push(col_inner_data);
+					if (columnObj.text_data_delimiter !== undefined) {
+						col_inner_elements = col_inner_elements.split(columnObj.text_data_delimiter);
+						for (k = 0; k < col_inner_elements.length; k++) {
+							col_inner_data = col_inner_elements[k];
+							if ($.trim(col_inner_data) !== '' && !(col_filter_array.hasOwnProperty(col_inner_data))) {
+								col_filter_array[col_inner_data] = col_inner_data;
+								column_data.push(col_inner_data);
+							}
+						}
+					} else {
+						if ($.trim(col_inner_data) !== '' && !(col_filter_array.hasOwnProperty(col_inner_data))) {
+							col_filter_array[col_inner_data] = col_inner_data;
+							column_data.push(col_inner_data);
+						}
 					}
 				}
 			}
@@ -4799,7 +4815,6 @@ if (!Object.entries) {
 					}
 					$(document).removeData("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val");
 					let selectorePrefix = '';
-					let settingsDt = getSettingsObjFromTable(table_arg);
 					if (optionsObj.filters_position === 'tfoot' && settingsDt.oScroll.sX) {
 						selectorePrefix = '.dataTables_scrollFoot ';
 					}
