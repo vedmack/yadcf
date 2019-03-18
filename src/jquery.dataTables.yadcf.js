@@ -1298,7 +1298,7 @@ if (!Object.entries) {
 								rowDataRender[index] =  cellDataRender ? cellDataRender : rowData[index];
 							}
 						}
-						aData = rowDataRender ? rowDataRender : rowData;
+						aData = rowDataRender.length ? rowDataRender : rowData;
 						if (columnObj.column_number_data !== undefined) {
 							column_number_filter = columnObj.column_number_data;
 							val = dot2obj(aData, column_number_filter);
@@ -2876,8 +2876,8 @@ if (!Object.entries) {
 								}
 							});
 						}
-						min_val = findMinInArray(column_data_render ? column_data_render : column_data, columnObj);
-						max_val = findMaxInArray(column_data_render ? column_data_render : column_data, columnObj);
+						min_val = findMinInArray(column_data_render.length ? column_data_render : column_data, columnObj);
+						max_val = findMaxInArray(column_data_render.length ? column_data_render : column_data, columnObj);
 					}
 
 					if (filter_container_id === undefined && columnObj.filter_container_selector === undefined) {
