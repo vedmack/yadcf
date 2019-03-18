@@ -1285,7 +1285,18 @@ if (!Object.entries) {
 						if (columnObj.column_number_render) {
 							rowDataRender = $.extend(true, [], rowData);
 							const index = columnObj.column_number_data ? columnObj.column_number_data : column_number_filter;
-							rowDataRender[index] = columnObj.column_number_render(rowDataRender[index], 'filter', null, null);
+							const meta = {
+													row: iDataIndex,
+													col: columnObj.column_number,
+													settings: settingsDt
+							};
+							if (typeof index === 'string' &&  typeof rowDataRender === 'object') {
+								const cellDataRender = columnObj.column_number_render(getProp(rowDataRender, index), 'filter', rowData, meta);
+								setProp(rowDataRender, index, cellDataRender ? cellDataRender : getProp(rowData, index));
+							}	else {
+								const cellDataRender = columnObj.column_number_render(rowDataRender[index], 'filter', rowData, meta);
+								rowDataRender[index] =  cellDataRender ? cellDataRender : rowData[index];
+							}
 						}
 						aData = rowDataRender ? rowDataRender : rowData;
 						if (columnObj.column_number_data !== undefined) {
@@ -2850,7 +2861,19 @@ if (!Object.entries) {
 						if (columnObj.column_number_render) {
 							column_data_render = $.extend(true, [], column_data);
 							column_data_render.forEach((data, index) => {
-								column_data_render[index] = columnObj.column_number_render(column_data_render[index], 'filter', null, null);
+								const meta = {
+									row: index,
+									col: columnObj.column_number,
+									settings: settingsDt
+								};
+								const indexData = columnObj.column_number_data ? columnObj.column_number_data : index;
+								if (typeof indexData === 'string' &&  typeof column_data_render === 'object') {
+									const cellDataRender = columnObj.column_number_render(getProp(column_data_render, indexData), 'filter', column_data, meta);
+									setProp(column_data_render, indexData, cellDataRender ? cellDataRender : getProp(column_data, indexData));
+								}	else {
+								const cellDataRender = columnObj.column_number_render(column_data_render[indexData], 'filter', column_data, meta);
+								column_data_render[indexData] = cellDataRender ? cellDataRender : column_data[indexData];
+								}
 							});
 						}
 						min_val = findMinInArray(column_data_render ? column_data_render : column_data, columnObj);
@@ -4933,6 +4956,21 @@ if (!Object.entries) {
 				}
 			}
 			exFilterColumn(table_arg, filtersValuesArr, true);
+		}
+
+		function getProp(nestedObj, keys) {
+			const pathArr = Array.isArray( keys )? keys : keys.split('.');
+			return pathArr.reduce((obj, key) =>
+				(obj && obj[key] !== 'undefined') ? obj[key] : undefined, nestedObj);
+		}
+
+		function setProp( object, keys, val ){
+  		keys = Array.isArray( keys )? keys : keys.split('.');
+  		if( keys.length>1 ){
+    		object[keys[0]] = object[keys[0]] || {};
+    		return setProp( object[keys[0]], keys.slice(1), val );
+  		}
+  		object[keys[0]] = val;
 		}
 
 		return {
