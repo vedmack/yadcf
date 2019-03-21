@@ -3848,9 +3848,10 @@ if (!Object.entries) {
 					if (clear === 'clear') {
 						// uncheck checkboxes on reset button pressed
 						resetExcludeRegexCheckboxes($(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number));
-						if (exGetColumnFilterVal(oTable, column_number) === ''){
+						if (exGetColumnFilterVal(oTable, column_number) === '') {
 							return;
 						}
+					}
 
 					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
 					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse inuse-exclude inuse-regex");
