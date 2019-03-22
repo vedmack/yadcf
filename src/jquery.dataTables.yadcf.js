@@ -1281,7 +1281,7 @@ if (!Object.entries) {
 					column_number_filter = calcColumnNumberFilter(settingsDt, col_num, table_selector_jq_friendly);
 
 					if (rowData !== undefined) {
-						let rowDataRender = [];
+						let rowDataRender;
 						if (columnObj.column_number_render) {
 							rowDataRender = $.extend(true, [], rowData);
 							const index = columnObj.column_number_data ? columnObj.column_number_data : column_number_filter;
@@ -1292,13 +1292,13 @@ if (!Object.entries) {
 							};
 							if (typeof index === 'string' &&  typeof rowDataRender === 'object') {
 								const cellDataRender = columnObj.column_number_render(getProp(rowDataRender, index), 'filter', rowData, meta);
-								setProp(rowDataRender, index, cellDataRender ? cellDataRender : getProp(rowData, index));
+								setProp(rowDataRender, index, (cellDataRender !== undefined && cellDataRender !== null) ? cellDataRender : getProp(rowData, index));
 							}	else {
 								const cellDataRender = columnObj.column_number_render(rowDataRender[index], 'filter', rowData, meta);
-								rowDataRender[index] =  cellDataRender ? cellDataRender : rowData[index];
+								rowDataRender[index] =  (cellDataRender !== undefined && cellDataRender !== null) ? cellDataRender : rowData[index];
 							}
 						}
-						aData = rowDataRender.length ? rowDataRender : rowData;
+						aData = rowDataRender ? rowDataRender : rowData;
 						if (columnObj.column_number_data !== undefined) {
 							column_number_filter = columnObj.column_number_data;
 							val = dot2obj(aData, column_number_filter);
@@ -2857,7 +2857,7 @@ if (!Object.entries) {
 					}
 
 					if (columnObj.filter_type === "range_number_slider") {
-						let column_data_render = [];
+						let column_data_render;
 						if (columnObj.column_number_render) {
 							column_data_render = $.extend(true, [], column_data);
 							column_data_render.forEach((data, index) => {
@@ -2869,15 +2869,15 @@ if (!Object.entries) {
 								const indexData = columnObj.column_number_data ? columnObj.column_number_data : index;
 								if (typeof indexData === 'string' &&  typeof column_data_render === 'object') {
 									const cellDataRender = columnObj.column_number_render(getProp(column_data_render, indexData), 'filter', column_data, meta);
-									setProp(column_data_render, indexData, cellDataRender ? cellDataRender : getProp(column_data, indexData));
+									setProp(column_data_render, indexData, (cellDataRender !== undefined && cellDataRender !== null) ? cellDataRender : getProp(column_data, indexData));
 								}	else {
 								const cellDataRender = columnObj.column_number_render(column_data_render[indexData], 'filter', column_data, meta);
-								column_data_render[indexData] = cellDataRender ? cellDataRender : column_data[indexData];
+								column_data_render[indexData] = (cellDataRender !== undefined && cellDataRender !== null) ? cellDataRender : column_data[indexData];
 								}
 							});
 						}
-						min_val = findMinInArray(column_data_render.length ? column_data_render : column_data, columnObj);
-						max_val = findMaxInArray(column_data_render.length ? column_data_render : column_data, columnObj);
+						min_val = findMinInArray(column_data_render ? column_data_render : column_data, columnObj);
+						max_val = findMaxInArray(column_data_render ? column_data_render : column_data, columnObj);
 					}
 
 					if (filter_container_id === undefined && columnObj.filter_container_selector === undefined) {

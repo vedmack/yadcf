@@ -16,38 +16,111 @@
 
     <script>
         $(document).ready(function() {
-            var regex = false;
+            var dataSet = [{
+      id: 1,
+      height: 150,
+      weight: 40,
+      level: 5,
+      person: {
+        name: 101,
+        age: 16
+      }
+    },
+    {
+      id: 2,
+      height: 180,
+      weight: 70,
+      level: 15,
+      person: {
+        name: 102,
+        age: 18
+      }
+    },
+    {
+      id: 3,
+      height: 190,
+      weight: 100,
+      level: 8,
+      person: {
+        name: 103,
+        age: 19
+      }
+    },
+  ];
 
-            var clientDataTable = $('#example').DataTable({
-                // stateSave: true,
-                // serverSide: true,
-                // ajax: "../server_side/scripts/server_processing.php"
-            });
+  function renderFunc(data, type, row, meta) {
+    const current = parseInt(data, 10);
+    if (type === 'filter') {
+      return (current + 1);
+    }
 
-            yadcf.init(clientDataTable, [{
-                column_number: 1,
-                filter_type: "text",
-                filter_reset_button_text: `<i class="fas fa-times"></i>`
-            },
-             {
-                column_number: 2,
-                filter_type: "date",
-                filter_reset_button_text: `<i class="fas fa-times"></i>`
-            },
+    if (type === 'display') {
+      return (current + 1);
+    }
+
+    return data;
+  }
+
+  $(document).ready(function() {
+    const table = $('#example').DataTable({
+      data: dataSet,
+      columns: [{
+          title: "ID",
+          data: 'id',
+          render: renderFunc
+        },
+        {
+          title: "height",
+          data: 'height',
+          render: renderFunc
+        },
+        {
+          title: "weight",
+          data: 'weight',
+        },
+        {
+          title: "level",
+          data: 'level',
+        },
+        {
+          title: "Name",
+          data: 'person.name',
+          render: renderFunc
+        },
+        {
+          title: "Age",
+          data: 'person.age',
+        },
+      ]
+    });
+
+    yadcf.init(table, [{
+        column_number: 0,
+        filter_type: "range_number",
+      },
+      {
+        column_number: 1,
+        filter_type: "range_number_slider",
+      },
+      {
+        column_number: 2,
+        filter_type: "range_number",
+      },
+      {
+        column_number: 3,
+        filter_type: "range_number_slider",
+      },
             {
-                column_number: 3,
-                filter_type: "range_date",
-                filter_reset_button_text: `<i class="fas fa-times"></i>`
-            },
-            {
-                column_number: 4,
-                filter_type: "range_number_slider",
-                filter_reset_button_text: `<i class="fas fa-times"></i>`
-            },
-        ],             {
-                jquery_ui_datepicker_locale: 'ja'
-            }
-        );
+        column_number: 4,
+        filter_type: "range_number",
+      },
+      {
+        column_number: 5,
+        filter_type: "range_number",
+      },
+    ]);
+
+  });
         });
     </script>
     <meta charset=utf-8 />
@@ -55,55 +128,7 @@
 </head>
 
 <body id="yadcf_example">
-    <table id='example'>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th> Name </th>
-                <th> Birth date </th>
-                <th> Date </th>
-                <th> Level </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-              <td>1</td>
-              <td>Vicente Sanchez</td>
-              <td>01/20/2018</td>
-              <td>02/06/2010</td>
-              <td>1</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Antonio Sánchez</td>
-              <td>05/20/1918</td>
-              <td>02/15/2010</td>
-              <td>5</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>Jose Ramirez</td>
-              <td>05/20/1888</td>
-              <td>02/06/2018</td>
-              <td>8</td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td>Santiago</td>
-              <td>05/20/918</td>
-              <td>07/06/2018</td>
-              <td>2</td>
-            </tr>
-            <tr>
-              <td>5</td>
-              <td>Pedro Sanchez</td>
-              <td>05/20/2918</td>
-              <td>02/15/2010</td>
-              <td>3</td>
-            </tr>
-          </tbody>
-    </table>
-    </div>
+    <table id="example" class="display" width="100%"></table>
 </body>
 
 </html>
