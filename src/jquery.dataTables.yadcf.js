@@ -3868,21 +3868,22 @@ if (!Object.entries) {
 				$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 
 				if (clear === 'clear' || $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val() === '') {
-					if (clear === 'clear' && exGetColumnFilterVal(oTable, column_number) === '') {
-						return;
+					if (clear === 'clear') {
+						// uncheck checkboxes on reset button pressed
+						resetExcludeRegexCheckboxes($(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number));
+						if (exGetColumnFilterVal(oTable, column_number) === '') {
+							return;
+						}
 					}
 
 					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
-					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
-					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse-regex");
-					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse-exclude");
+					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse inuse-exclude inuse-regex");
 					oTable.fnFilter("", column_number_filter);
 					resetIApiIndex();
 					return;
 				}
 				// delete class also on  regex or exclude checkbox uncheck
-				$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse-exclude");
-				$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse-regex");
+				$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse-exclude inuse-regex");
 				var inuseClass = "inuse";
 
 				if (columnObj.exclude === true) {
@@ -4854,6 +4855,10 @@ if (!Object.entries) {
 						break;
 					case 'auto_complete':
 					case 'text':
+						$filterElement.val('').removeClass('inuse inuse-exclude inuse-regex');
+						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
+						resetExcludeRegexCheckboxes($filterElement);
+						break;
 					case 'date':
 						$filterElement.val('').removeClass('inuse');
 						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
@@ -4964,13 +4969,18 @@ if (!Object.entries) {
 				(obj && obj[key] !== 'undefined') ? obj[key] : undefined, nestedObj);
 		}
 
-		function setProp( object, keys, val ){
+		function setProp( object, keys, val ) {
   		keys = Array.isArray( keys )? keys : keys.split('.');
   		if( keys.length>1 ){
     		object[keys[0]] = object[keys[0]] || {};
     		return setProp( object[keys[0]], keys.slice(1), val );
   		}
-  		object[keys[0]] = val;
+			object[keys[0]] = val;
+		}
+
+		function resetExcludeRegexCheckboxes(selector) {
+			selector.closest('.yadcf-filter-wrapper').find('.yadcf-exclude-wrapper :checkbox').prop('checked', false);
+			selector.closest('.yadcf-filter-wrapper').find('.yadcf-regex-wrapper :checkbox').prop('checked', false);
 		}
 
 		return {
