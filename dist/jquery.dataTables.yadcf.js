@@ -6,7 +6,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.24
+* Version:     0.9.4.beta.25
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1275,11 +1275,22 @@ if (!Object.entries) {
 				column_number_filter = calcColumnNumberFilter(settingsDt, col_num, table_selector_jq_friendly);
 
 				if (rowData !== undefined) {
-					var rowDataRender = [];
+					var rowDataRender = void 0;
 					if (columnObj.column_number_render) {
 						rowDataRender = $.extend(true, [], rowData);
 						var index = columnObj.column_number_data ? columnObj.column_number_data : column_number_filter;
-						rowDataRender[index] = columnObj.column_number_render(rowDataRender[index], 'filter', null, null);
+						var meta = {
+							row: iDataIndex,
+							col: columnObj.column_number,
+							settings: settingsDt
+						};
+						if (typeof index === 'string' && (typeof rowDataRender === 'undefined' ? 'undefined' : _typeof(rowDataRender)) === 'object') {
+							var cellDataRender = columnObj.column_number_render(getProp(rowDataRender, index), 'filter', rowData, meta);
+							setProp(rowDataRender, index, cellDataRender !== undefined && cellDataRender !== null ? cellDataRender : getProp(rowData, index));
+						} else {
+							var _cellDataRender = columnObj.column_number_render(rowDataRender[index], 'filter', rowData, meta);
+							rowDataRender[index] = _cellDataRender !== undefined && _cellDataRender !== null ? _cellDataRender : rowData[index];
+						}
 					}
 					aData = rowDataRender ? rowDataRender : rowData;
 					if (columnObj.column_number_data !== undefined) {
@@ -2767,11 +2778,23 @@ if (!Object.entries) {
 
 					if (columnObj.filter_type === "range_number_slider") {
 						(function () {
-							var column_data_render = [];
+							var column_data_render = void 0;
 							if (columnObj.column_number_render) {
 								column_data_render = $.extend(true, [], column_data);
 								column_data_render.forEach(function (data, index) {
-									column_data_render[index] = columnObj.column_number_render(column_data_render[index], 'filter', null, null);
+									var meta = {
+										row: index,
+										col: columnObj.column_number,
+										settings: settingsDt
+									};
+									var indexData = columnObj.column_number_data ? columnObj.column_number_data : index;
+									if (typeof indexData === 'string' && (typeof column_data_render === 'undefined' ? 'undefined' : _typeof(column_data_render)) === 'object') {
+										var cellDataRender = columnObj.column_number_render(getProp(column_data_render, indexData), 'filter', column_data, meta);
+										setProp(column_data_render, indexData, cellDataRender !== undefined && cellDataRender !== null ? cellDataRender : getProp(column_data, indexData));
+									} else {
+										var _cellDataRender2 = columnObj.column_number_render(column_data_render[indexData], 'filter', column_data, meta);
+										column_data_render[indexData] = _cellDataRender2 !== undefined && _cellDataRender2 !== null ? _cellDataRender2 : column_data[indexData];
+									}
 								});
 							}
 							min_val = findMinInArray(column_data_render ? column_data_render : column_data, columnObj);
@@ -4802,6 +4825,22 @@ if (!Object.entries) {
 				}
 			}
 			exFilterColumn(table_arg, filtersValuesArr, true);
+		}
+
+		function getProp(nestedObj, keys) {
+			var pathArr = Array.isArray(keys) ? keys : keys.split('.');
+			return pathArr.reduce(function (obj, key) {
+				return obj && obj[key] !== 'undefined' ? obj[key] : undefined;
+			}, nestedObj);
+		}
+
+		function setProp(object, keys, val) {
+			keys = Array.isArray(keys) ? keys : keys.split('.');
+			if (keys.length > 1) {
+				object[keys[0]] = object[keys[0]] || {};
+				return setProp(object[keys[0]], keys.slice(1), val);
+			}
+			object[keys[0]] = val;
 		}
 
 		function resetExcludeRegexCheckboxes(selector) {
