@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.22
+* Version:     0.9.4.beta.25
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1092,7 +1092,7 @@ if (!Object.entries) {
 						stringForSearch = stringForSearch.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 						stringForSearch = stringForSearch.split('narutouzomaki').join('|');
 						if (filter_match_mode === "contains") {
-							oTable.fnFilter(stringForSearch, column_number_filter, true, false, true);
+							oTable.fnFilter(stringForSearch, column_number_filter, true, false, true);//"^((?!" + stringForSearch + ").)*$"
 						} else if (filter_match_mode === "exact") {
 							oTable.fnFilter("^(" + stringForSearch + ")$", column_number_filter, true, false, true);
 						} else if (filter_match_mode === "startsWith") {
@@ -1295,7 +1295,7 @@ if (!Object.entries) {
 								setProp(rowDataRender, index, (cellDataRender !== undefined && cellDataRender !== null) ? cellDataRender : getProp(rowData, index));
 							}	else {
 								const cellDataRender = columnObj.column_number_render(rowDataRender[index], 'filter', rowData, meta);
-								rowDataRender[index] =  (cellDataRender !== undefined && cellDataRender !== null) ? cellDataRender : rowData[index];
+								rowDataRender[index] = (cellDataRender !== undefined && cellDataRender !== null) ? cellDataRender : rowData[index];
 							}
 						}
 						aData = rowDataRender ? rowDataRender : rowData;
@@ -1657,6 +1657,10 @@ if (!Object.entries) {
 					event = pDate.target;
 				} else if (pDate.type === 'changeDate') {
 					event = pDate.currentTarget;
+				} else if ($(clear).length === 1) { // dt-datetime
+					date = pDate;
+					event = clear;
+					clear = undefined;
 				} else {
 					date = pDate;
 					event = pEvent;
@@ -1684,8 +1688,6 @@ if (!Object.entries) {
 				if (pDate.dates) {
 					date = pDate.format(0, columnObj.date_format);
 				}
-			} else if (columnObj.datepicker_type === 'dt-datetime') {
-				console.log('a');
 			}
 
 			column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
@@ -3871,10 +3873,11 @@ if (!Object.entries) {
 					if (clear === 'clear') {
 						// uncheck checkboxes on reset button pressed
 						resetExcludeRegexCheckboxes($(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number));
-						if (exGetColumnFilterVal(oTable, column_number) === ''){
+						if (exGetColumnFilterVal(oTable, column_number) === '') {
 							return;
 						}
 					}
+
 					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
 					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse inuse-exclude inuse-regex");
 					oTable.fnFilter("", column_number_filter);
@@ -4728,6 +4731,7 @@ if (!Object.entries) {
 				}
 				break;
 			case 'multi_select':
+			case 'multi_select_custom_func':
 				retVal = $filterElement.val();
 				if (retVal === null) {
 					retVal = '';
@@ -4968,13 +4972,13 @@ if (!Object.entries) {
 				(obj && obj[key] !== 'undefined') ? obj[key] : undefined, nestedObj);
 		}
 
-		function setProp( object, keys, val ){
+		function setProp( object, keys, val ) {
   		keys = Array.isArray( keys )? keys : keys.split('.');
   		if( keys.length>1 ){
     		object[keys[0]] = object[keys[0]] || {};
     		return setProp( object[keys[0]], keys.slice(1), val );
   		}
-  		object[keys[0]] = val;
+			object[keys[0]] = val;
 		}
 
 		function resetExcludeRegexCheckboxes(selector) {

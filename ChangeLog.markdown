@@ -26,6 +26,8 @@
 	https://github.com/vedmack/yadcf/issues/554 - DT render not working properly - range number / slider filters
 	https://github.com/vedmack/yadcf/issues/557 - startsWith being ignored when exclude option set
 	https://github.com/vedmack/yadcf/issues/553 - Using orthogonal data and text_data_delimiter with columns.data function
+	https://github.com/vedmack/yadcf/issues/535 - Feature request: DataTables Editor DateTime picker support.
+	https://github.com/vedmack/yadcf/issues/562 - multi_select_custom_func not considered in exGetColumnFilterVal
 
 	
 ## 0.9.3
