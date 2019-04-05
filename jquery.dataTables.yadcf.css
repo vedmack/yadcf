@@ -133,6 +133,12 @@
     margin-right: 5px;
 }
 
+.yadcf-null-wrapper {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
 .yadcf-label.small {
 	font-size: 10px;
 }
