@@ -28,7 +28,7 @@
 	https://github.com/vedmack/yadcf/issues/553 - Using orthogonal data and text_data_delimiter with columns.data function
 	https://github.com/vedmack/yadcf/issues/535 - Feature request: DataTables Editor DateTime picker support.
 	https://github.com/vedmack/yadcf/issues/562 - multi_select_custom_func not considered in exGetColumnFilterVal
-
+	https://github.com/vedmack/yadcf/issues/564 - Error undefinded ColumnObj with ServerSide, Range_Number and Custom_Range_Delimiter
 	
 ## 0.9.3
 

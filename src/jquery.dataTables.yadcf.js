@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.25
+* Version:     0.9.4.beta.26
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -4604,7 +4604,7 @@ if (!Object.entries) {
 						if (table_arg.fnSettings().oFeatures.bServerSide === true) {
 							min = filter_value.from;
 							max = filter_value.to;
-							table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = min + columnObj.custom_range_delimiter + max;
+							table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = min + optionsObj.custom_range_delimiter + max;
 						}
 						saveStateSave(table_arg, column_number, table_selector_jq_friendly, filter_value.from, filter_value.to);
 						break;
@@ -4624,7 +4624,7 @@ if (!Object.entries) {
 							$('#' + toId).removeClass('inuse');
 						}
 						if (table_arg.fnSettings().oFeatures.bServerSide === true) {
-							table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = filter_value.from + columnObj.custom_range_delimiter + filter_value.to;
+							table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = filter_value.from + optionsObj.custom_range_delimiter + filter_value.to;
 						}
 						saveStateSave(table_arg, column_number, table_selector_jq_friendly, filter_value.from, filter_value.to);
 						break;
@@ -4657,7 +4657,7 @@ if (!Object.entries) {
 							$('#' + sliderId).slider('values', 1, filter_value.to);
 						}
 						if (table_arg.fnSettings().oFeatures.bServerSide === true) {
-							table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = filter_value.from + columnObj.custom_range_delimiter + filter_value.to;
+							table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = filter_value.from + optionsObj.custom_range_delimiter + filter_value.to;
 						}
 						saveStateSave(table_arg, column_number, table_selector_jq_friendly, filter_value.from, filter_value.to);
 						break;
