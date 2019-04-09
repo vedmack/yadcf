@@ -4253,7 +4253,7 @@ if (!Object.entries) {
 				if (columnObj.filter_type === "text") {
 					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
 					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
-						oTable.fnDraw();
+						oTable.fnFilter('', column_number_filter);
 					}
 				}
 				if (columnObj.filter_type === "range_number") {
