@@ -356,12 +356,19 @@
 				    fr, gl, he, hi, hr, hu, hy, id, is, it-CH, it, ja, ka, kk, km, ko, ky, lb, lt, lv, mk, ml, ms, nb, nl-BE, nl, nn, no, pl,
 						pt-BR, pt, rm, ro, ru, sk, sl, sq, sr-SR, sr, sv, ta, th, tj, tr, uk, vi, zh-CN, zh-HK, zh-TW
 
+						* null_api_call_value
+                Required:           false
+                Type:               string
+                Default value:      "null"
+                Description:        Value which represents null, and is used as argument for fnFilter function, and sended to server
+				Note:               works with null filter enabled only
+
 * not_null_api_call_value
                 Required:           false
                 Type:               string
                 Default value:      "!^@"
-                Description:        Value which represents not null, and is used as argument fot fnFilter function, and sended to server
-								Note:               works with null filter enabled only
+                Description:        Value which represents not null, and is used as argument for fnFilter function, and sended to server
+				Note:               works with null filter enabled only
 
 *
 *
@@ -3472,6 +3479,9 @@ if (!Object.entries) {
 						if (settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].exclude_checked) {
 							$('#yadcf-filter-wrapper-' + table_selector_jq_friendly + '-' + column_number).find('.yadcf-exclude-wrapper').find(':checkbox').prop('checked', true);
 						}
+						if (settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].null_checked) {
+							return;
+						}
 					}
 				}
 			}
@@ -3830,6 +3840,24 @@ if (!Object.entries) {
 				min = (min !== "") ? (+min) : min;
 				max = (max !== "") ? (+max) : max;
 
+				// no request
+				if (min === "" && max === "" && !null_checked) {
+					$("#" + fromId).removeClass("inuse inuse-exclude");
+					$("#" + toId).removeClass("inuse inuse-exclude");
+					return;
+				}
+				if (null_checked){
+					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+						oTable.fnDraw();
+					} else {
+						const excludeString = columnObj.not_null_api_call_value ? columnObj.not_null_api_call_value : '!^@';
+						const nullString = columnObj.null_api_call_value ? columnObj.null_api_call_value : 'null';
+						const requestString = exclude_checked ? excludeString: nullString;
+						oTable.fnFilter(requestString, column_number_filter);
+					}
+					return;
+				}
+
 				if ((!isNaN(max) && !isNaN(min) && (max >= min)) || min === "" || max === "") {
 
 					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
@@ -4112,7 +4140,7 @@ if (!Object.entries) {
 						if (columnObj.null_check_box) {
 							if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 								oTable.fnDraw();
-							} else  {
+							} else {
 								oTable.fnFilter("", column_number_filter);
 							}
 						}
@@ -4122,8 +4150,20 @@ if (!Object.entries) {
 					}
 
 					if(null_checked && columnObj.exclude) {
+						if (oTable.fnSettings().oFeatures.bServerSide === true){
+							if (exclude) {
+								columnObj.not_null_api_call_value = columnObj.not_null_api_call_value ? columnObj.not_null_api_call_value : '!^@';
+								oTable.fnFilter(columnObj.not_null_api_call_value, column_number_filter);
+							} else {
+								oTable.fnFilter("", column_number_filter);
+							}
+						} else {
+							oTable.fnDraw();
+						}
 						saveTextKeyUpState(oTable, table_selector_jq_friendly, column_number, regex_check_box, null_checked, exclude);
+						return;
 					}
+
 					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
 					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse inuse-exclude inuse-regex");
 					oTable.fnFilter("", column_number_filter);
@@ -4212,19 +4252,14 @@ if (!Object.entries) {
 
 				if (columnObj.filter_type === "text") {
 					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
-					oTable.fnFilter("", column_number_filter);
-					resetIApiIndex();
-				}
-				if (columnObj.filter_type === "range_number") {
-					const buttonSelector = $(event.target).prop('nodeName') === 'BUTTON' ? $(event.target).parent() : $(event.target).parent().parent();
-					buttonSelector.find(".yadcf-filter-range").val("");
-					if (buttonSelector.find(".yadcf-filter-range-number").length > 0) {
-							$(buttonSelector.find(".yadcf-filter-range")[0]).focus();
-					}
 					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 						oTable.fnDraw();
-					} else {
-						oTable.fnFilter('', column_number_filter);
+					}
+				}
+				if (columnObj.filter_type === "range_number") {
+					input.val("");
+					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+						oTable.fnDraw();
 					}
 				}
 				// disable inputs
@@ -4238,11 +4273,17 @@ if (!Object.entries) {
 				if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 					oTable.fnDraw();
 				} else {
-					if (!exclude_checked) {
-						oTable.fnFilter(null, column_number_filter);
+					if (null_checked){
+						if (!exclude_checked) {
+							columnObj.null_api_call_value = columnObj.null_api_call_value ? columnObj.null_api_call_value : 'null';
+							oTable.fnFilter(null, column_number_filter);
+						} else {
+							columnObj.not_null_api_call_value = columnObj.not_null_api_call_value ? columnObj.not_null_api_call_value : '!^@';
+							oTable.fnFilter(columnObj.not_null_api_call_value, column_number_filter);
+						}
+					} else {
+						oTable.fnFilter('', column_number_filter);
 					}
-					columnObj.not_null_api_call_value = columnObj.not_null_api_call_value ? columnObj.not_null_api_call_value : '!^@';
-					oTable.fnFilter(columnObj.not_null_api_call_value, column_number_filter);
 				}
 
 				// save regex_checkbox state
