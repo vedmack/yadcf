@@ -4155,7 +4155,8 @@ if (!Object.entries) {
 								columnObj.not_null_api_call_value = columnObj.not_null_api_call_value ? columnObj.not_null_api_call_value : '!^@';
 								oTable.fnFilter(columnObj.not_null_api_call_value, column_number_filter);
 							} else {
-								oTable.fnFilter("", column_number_filter);
+								columnObj.null_api_call_value = columnObj.null_api_call_value ? columnObj.null_api_call_value : 'null';
+								oTable.fnFilter(columnObj.null_api_call_value, column_number_filter);
 							}
 						} else {
 							oTable.fnDraw();
@@ -4276,7 +4277,7 @@ if (!Object.entries) {
 					if (null_checked){
 						if (!exclude_checked) {
 							columnObj.null_api_call_value = columnObj.null_api_call_value ? columnObj.null_api_call_value : 'null';
-							oTable.fnFilter(null, column_number_filter);
+							oTable.fnFilter(columnObj.null_api_call_value, column_number_filter);
 						} else {
 							columnObj.not_null_api_call_value = columnObj.not_null_api_call_value ? columnObj.not_null_api_call_value : '!^@';
 							oTable.fnFilter(columnObj.not_null_api_call_value, column_number_filter);
