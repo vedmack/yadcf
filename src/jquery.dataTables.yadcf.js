@@ -3840,13 +3840,6 @@ if (!Object.entries) {
 				min = (min !== "") ? (+min) : min;
 				max = (max !== "") ? (+max) : max;
 
-				// no request
-				if (min === "" && max === "" && !null_checked) {
-					$("#" + fromId).removeClass("inuse inuse-exclude");
-					$("#" + toId).removeClass("inuse inuse-exclude");
-					oTable.fnDraw();
-					return;
-				}
 				if (null_checked){
 					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 						oTable.fnDraw();
