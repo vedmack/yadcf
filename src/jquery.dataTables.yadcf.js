@@ -3844,6 +3844,7 @@ if (!Object.entries) {
 				if (min === "" && max === "" && !null_checked) {
 					$("#" + fromId).removeClass("inuse inuse-exclude");
 					$("#" + toId).removeClass("inuse inuse-exclude");
+					oTable.fnDraw();
 					return;
 				}
 				if (null_checked){
