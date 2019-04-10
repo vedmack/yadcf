@@ -657,7 +657,7 @@ if (!Object.entries) {
 			var i = 0;
 			dot_refs = dot_refs.split(".");
 			for (i = 0; i < dot_refs.length; i++) {
-				if (tmpObj[dot_refs[i]] !== undefined && tmpObj[dot_refs[i]] !== null ) {
+				if (tmpObj[dot_refs[i]]) {
 					tmpObj = tmpObj[dot_refs[i]];
 				} else {
 					return '';
@@ -3840,7 +3840,6 @@ if (!Object.entries) {
 				min = (min !== "") ? (+min) : min;
 				max = (max !== "") ? (+max) : max;
 
-				// no request
 				if (null_checked){
 					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 						oTable.fnDraw();
