@@ -1084,16 +1084,11 @@ if (!Object.entries) {
 					clearStateSave(oTable, column_number, table_selector_jq_friendly);
 				}
 				if (exGetColumnFilterVal(oTable, column_number) === '') {
-					refreshSelectPlugin(columnObj, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number), '-1');
-					oTable.fnFilter("", column_number_filter);
 					return;
 				}
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("-1").focus();
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
 				$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", "-1");
-				if (oTable.fnSettings().oFeatures.bServerSide === false) {
-					oTable.fnDraw();
-				}
 				oTable.fnFilter("", column_number_filter);
 				resetIApiIndex();
 
