@@ -202,7 +202,7 @@
                 Type:               boolean
                 Default value:      undefined
                 Description:        Adds a checkbox next to the filter that allows to do a "not/exclude" filtering (acts the same  all filter_match_mode)
-                Note:               Currently available for the text and number_range filter
+                Note:               Currently available for the text, select and number_range filter
 
 * exclude_label
                 Required:           false
