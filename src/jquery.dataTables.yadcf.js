@@ -5353,6 +5353,11 @@ if (!Object.entries) {
 
 					switch (optionsObj.filter_type) {
 					case 'select':
+						$filterElement.val('').removeClass('inuse inuse-exclude inuse-regex');
+						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
+						resetExcludeRegexCheckboxes($filterElement.parent());
+						clearStateSave(table_arg, column_number, table_selector_jq_friendly);
+					break;
 					case 'custom_func':
 						$filterElement.val('-1').removeClass('inuse');
 						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
