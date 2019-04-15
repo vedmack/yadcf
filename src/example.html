@@ -11,6 +11,14 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/i18n/jquery-ui-i18n.min.js"></script>
+
+    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/css/select2.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/js/select2.js"></script> -->
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.js"></script>
+
+    <!-- https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.css -->
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script src="jquery.dataTables.yadcf.js"></script>
 
@@ -18,7 +26,9 @@
         $(document).ready(function() {
             var dataSet = [
     {
-      id: null,
+      id: {
+        name: null
+      },
       height: 150,
       level: 11,
       weight: 90,
@@ -29,7 +39,9 @@
       gender: 'male'
     },
     {
-      id: 2,
+      id: {
+        name: 2
+      },
       height: null,
       level: 3,
       weight: 180,
@@ -40,7 +52,9 @@
       gender: null
     },
     {
-      id: 3,
+      id: {
+        name: 3
+      },
       height: null,
       level: null,
       weight: null,
@@ -51,7 +65,9 @@
       gender: 'male'
     },
     {
-      id: 0,
+      id: {
+        name: 0
+      },
       height: 0,
       level: 0,
       weight: 80,
@@ -82,7 +98,7 @@
       // ajax: "../server_side.php",
       columns: [{
           title: "ID",
-          data: 'id',
+          data: 'id.name',
           render: renderFunc
         },
         {
@@ -131,58 +147,64 @@
     yadcf.init(table, [
       {
         column_number: 0,
-        filter_type: "text",
-        null_check_box: true,
+
+        // select_type_options: [{id: 0, name: 0}, {id: 2, name: 2}, {id: 3, name: 3}, {id: null, name: null}],
+        // data_as_is: true,
+        data: [null, 0, 2, 3],
+        select_type: 'select2',
+        filter_type: "select",
         exclude: true,
+        exclude_label: 'NULL',
         checkbox_position_after: true,
-        null_label: 'NULL',
-        // filter_reset_button_text: false,
+        filter_match_mode: 'exact',
       },
       {
+        data: [150, 0, null],
+        filter_match_mode: 'exact',
         column_number: 1,
-        filter_type: "text",
-        null_check_box: true,
+        filter_type: "select",
+        // null_check_box: true,
         exclude: true,
         // filter_reset_button_text: false,
       },
       {
         column_number: 2,
-        filter_type: "text",
+        filter_type: "select",
         null_check_box: true,
         // filter_reset_button_text: false,
       },
-      {
-        column_number: 3,
-        filter_type: "text",
-        exclude: true,
-        // filter_reset_button_text: false,
-      },
-      {
-        column_number: 4,
-        filter_type: "text",
-        // filter_reset_button_text: false,
-      },
-      {
-        column_number: 5,
-        filter_type: "text",
-        null_check_box: true,
-        // filter_reset_button_text: false,
-        exclude: true
-      },
-      {
-        column_number: 6,
-        filter_type: "text",
-        // filter_reset_button_text: false,
-      },
-      {
-        column_number: 7,
-        filter_type: "text",
-        null_check_box: true,
-        filter_reset_button_text: false,
-        exclude: true,
-        regex_check_box: true,
-        // checkbox_position_after: true
-      }
+      // {
+      //   column_number: 3,
+      //   filter_type: "text",
+      //   exclude: true,
+      //   // filter_reset_button_text: false,
+      // },
+      // {
+      //   column_number: 4,
+      //   filter_type: "range_number",
+      //   // filter_reset_button_text: false,
+      // },
+      // {
+      //   column_number: 5,
+      //   filter_type: "text",
+      //   null_check_box: true,
+      //   // filter_reset_button_text: false,
+      //   exclude: true
+      // },
+      // {
+      //   column_number: 6,
+      //   filter_type: "text",
+      //   // filter_reset_button_text: false,
+      // },
+      // {
+      //   column_number: 7,
+      //   filter_type: "text",
+      //   null_check_box: true,
+      //   filter_reset_button_text: false,
+      //   exclude: true,
+      //   regex_check_box: true,
+      //   // checkbox_position_after: true
+      // }
     ]);
 
     $('#resetAll').click(function(e, dt, button, conf) {
