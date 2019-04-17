@@ -1145,8 +1145,10 @@ if (!Object.entries) {
 			const excludeStrStart = 	"^((?!";
 			const excludeStrEnd = ").)*$";
 			null_str = exclude_checked ? (excludeStrStart + null_str + excludeStrEnd) : null_str;
-			if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
-				oTable.fnSettings().aoPreSearchCols[column_number].sSearch = null_str;
+			if (oTable.fnSettings().oLoadedState) {
+				if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
+					oTable.fnSettings().aoPreSearchCols[column_number].sSearch = null_str;
+				}
 			}
 		}
 
@@ -4399,20 +4401,22 @@ if (!Object.entries) {
 
 				// save regex_checkbox state
 				if (oTable.fnSettings().oFeatures.bStateSave === true) {
-					if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
-						oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
-							{
+					if (oTable.fnSettings().oLoadedState) {
+						if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
+							oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
+								{
+									null_checked: null_checked,
+									exclude_checked: exclude_checked
+								};
+						} else {
+							yadcfState = {};
+							yadcfState[table_selector_jq_friendly] = [];
+							yadcfState[table_selector_jq_friendly][column_number] = {
 								null_checked: null_checked,
 								exclude_checked: exclude_checked
 							};
-					} else {
-						yadcfState = {};
-						yadcfState[table_selector_jq_friendly] = [];
-						yadcfState[table_selector_jq_friendly][column_number] = {
-							null_checked: null_checked,
-							exclude_checked: exclude_checked
-						};
-						oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+							oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+						}
 					}
 					oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 				}
