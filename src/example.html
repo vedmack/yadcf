@@ -159,18 +159,21 @@
         filter_match_mode: 'exact',
       },
       {
-        data: [150, 0, null],
-        filter_match_mode: 'exact',
         column_number: 1,
-        filter_type: "select",
-        // null_check_box: true,
+        filter_type: "text",
+        null_check_box: true,
         exclude: true,
+        regex_check_box: true,
+        checkbox_position_after: true,
         // filter_reset_button_text: false,
       },
       {
         column_number: 2,
-        filter_type: "select",
+        filter_type: "range_number",
         null_check_box: true,
+        exclude: true,
+        checkbox_position_after: true,
+
         // filter_reset_button_text: false,
       },
       // {
