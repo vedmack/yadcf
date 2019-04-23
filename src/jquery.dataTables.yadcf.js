@@ -202,7 +202,7 @@
                 Type:               boolean
                 Default value:      undefined
                 Description:        Adds a checkbox next to the filter that allows to do a "not/exclude" filtering (acts the same  all filter_match_mode)
-                Note:               Currently available for the text and number_range filter
+                Note:               Currently available for the text, select and number_range filter
 
 * exclude_label
                 Required:           false
@@ -665,7 +665,7 @@ if (!Object.entries) {
 			var i = 0;
 			dot_refs = dot_refs.split(".");
 			for (i = 0; i < dot_refs.length; i++) {
-				if (tmpObj[dot_refs[i]] !== undefined && tmpObj[dot_refs[i]] !== null ) {
+				if (tmpObj[dot_refs[i]] !== undefined && tmpObj[dot_refs[i]] !== null) {
 					tmpObj = tmpObj[dot_refs[i]];
 				} else {
 					return '';
@@ -1145,8 +1145,10 @@ if (!Object.entries) {
 			const excludeStrStart = 	"^((?!";
 			const excludeStrEnd = ").)*$";
 			null_str = exclude_checked ? (excludeStrStart + null_str + excludeStrEnd) : null_str;
-			if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
-				oTable.fnSettings().aoPreSearchCols[column_number].sSearch = null_str;
+			if (oTable.fnSettings().oLoadedState) {
+				if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
+					oTable.fnSettings().aoPreSearchCols[column_number].sSearch = null_str;
+				}
 			}
 		}
 
@@ -4306,7 +4308,7 @@ if (!Object.entries) {
 		}
 
 		function saveTextKeyUpState(oTable, table_selector_jq_friendly, column_number, regex_check_box, null_checked, exclude) {
-			if (oTable.fnSettings().oFeatures.bStateSave === true) {
+			if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState.yadcfState) {
 				if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
 					oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
 						{
@@ -4399,20 +4401,22 @@ if (!Object.entries) {
 
 				// save regex_checkbox state
 				if (oTable.fnSettings().oFeatures.bStateSave === true) {
-					if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
-						oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
-							{
+					if (oTable.fnSettings().oLoadedState) {
+						if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
+							oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
+								{
+									null_checked: null_checked,
+									exclude_checked: exclude_checked
+								};
+						} else {
+							yadcfState = {};
+							yadcfState[table_selector_jq_friendly] = [];
+							yadcfState[table_selector_jq_friendly][column_number] = {
 								null_checked: null_checked,
 								exclude_checked: exclude_checked
 							};
-					} else {
-						yadcfState = {};
-						yadcfState[table_selector_jq_friendly] = [];
-						yadcfState[table_selector_jq_friendly][column_number] = {
-							null_checked: null_checked,
-							exclude_checked: exclude_checked
-						};
-						oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+							oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+						}
 					}
 					oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 				}
@@ -5348,6 +5352,8 @@ if (!Object.entries) {
 
 					switch (optionsObj.filter_type) {
 					case 'select':
+						resetExcludeRegexCheckboxes($filterElement.parent());
+						clearStateSave(table_arg, column_number, table_selector_jq_friendly);
 					case 'custom_func':
 						$filterElement.val('-1').removeClass('inuse');
 						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
