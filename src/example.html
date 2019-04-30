@@ -7,10 +7,16 @@
     <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
     <link href="../jquery.datatables.yadcf.css" rel="stylesheet" type="text/css" />
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
+    <script  src="https://code.jquery.com/jquery-1.12.4.min.js"  integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="  crossorigin="anonymous"></script>
+
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/i18n/jquery-ui-i18n.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
 
     <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/css/select2.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/js/select2.js"></script> -->
@@ -147,16 +153,34 @@
     yadcf.init(table, [
       {
         column_number: 0,
-
-        // select_type_options: [{id: 0, name: 0}, {id: 2, name: 2}, {id: 3, name: 3}, {id: null, name: null}],
-        // data_as_is: true,
         data: [null, 0, 2, 3],
         select_type: 'select2',
         filter_type: "select",
         exclude: true,
-        exclude_label: 'NULL',
+        exclude_label: 'EXCLUDE',
         checkbox_position_after: true,
         filter_match_mode: 'exact',
+        externally_triggered_checkboxes_text: 'O',
+        externally_triggered_checkboxes_function: (event) => {
+          const parent = $(event.target).parent();
+          const exclude = parent.find('.yadcf-exclude-wrapper input');
+          checkedEx  = exclude.prop('checked') ? 'checked' : '';
+          ex = function() {
+            exclude.trigger('click')
+          };
+          const content = `
+          <input id="checkedExx" type="checkbox" title="exclude" onclick="ex()"> Exclude <br>
+          `;
+          $(event.target).popover({
+            placement:'right',
+            trigger: 'focus',
+            html: true,
+            sanitize: false,
+            content: content
+          });
+          $(event.target).popover('show');
+          $('#checkedExx').prop('checked', checkedEx);
+		    }
       },
       {
         column_number: 1,
@@ -165,7 +189,40 @@
         exclude: true,
         regex_check_box: true,
         checkbox_position_after: true,
-        // filter_reset_button_text: false,
+        externally_triggered_checkboxes_text: 'O',
+        externally_triggered_checkboxes_function: (event) => {
+          const parent = $(event.target).parent();
+          const exclude = parent.find('.yadcf-exclude-wrapper input');
+          checkedEx  = exclude.prop('checked') ? 'checked' : '';
+          const regex = parent.find('.yadcf-regex-wrapper input');
+          checkedReg  = regex.prop('checked') ? 'checked' : '';
+          const nullC = parent.find('.yadcf-null-wrapper input');
+          checkedNull  = nullC.prop('checked') ? 'checked' : '';
+          ex = function() {
+            exclude.trigger('click')
+          };
+          reg = function() {
+            regex.trigger('click')
+          };
+          nulll = function() {
+            nullC.trigger('click');
+          };
+          const content = `<input id="checkedEx" type="checkbox" title="exclude" onclick="ex()"> Exclude <br>
+          <input type="checkbox" id="checkedReg" title="regex" onclick="reg()"> Regex <br>
+          <input type="checkbox" id="checkedNull" title="null" onclick="nulll()"> Null <br>
+          `;
+          $(event.target).popover({
+            placement:'right',
+            trigger: 'manual',
+            html: true,
+            sanitize: false,
+            content: content
+          });
+          $(event.target).popover('toggle');
+          $('#checkedEx').prop('checked', checkedEx);
+          $('#checkedReg').prop('checked', checkedReg);
+          $('#checkedNull').prop('checked', checkedNull);
+		    }
       },
       {
         column_number: 2,
@@ -173,8 +230,34 @@
         null_check_box: true,
         exclude: true,
         checkbox_position_after: true,
-
-        // filter_reset_button_text: false,
+        externally_triggered_checkboxes_text: 'O',
+        externally_triggered_checkboxes_function: (event) => {
+          const parent = $(event.target).parent();
+          const exclude = parent.find('.yadcf-exclude-wrapper input');
+          checkedEx  = exclude.prop('checked') ? 'checked' : '';
+          const nullC = parent.find('.yadcf-null-wrapper input');
+          checkedNull  = nullC.prop('checked') ? 'checked' : '';
+          ex = function() {
+            exclude.trigger('click')
+          };
+          nulll = function() {
+            nullC.trigger('click');
+          };
+          const content = `
+          <input id="checkedExx" type="checkbox" title="exclude" onclick="ex()"> Exclude <br>
+          <input id="checkedNulll" type="checkbox" title="null" onclick="nulll()"> Null <br>
+          `;
+          $(event.target).popover({
+            placement:'right',
+            trigger: 'focus',
+            html: true,
+            content: content,
+            sanitize: false,
+          });
+          $(event.target).popover('show');
+          $('#checkedExx').prop('checked', checkedEx);
+          $('#checkedNulll').prop('checked', checkedNull);
+		    }
       },
       // {
       //   column_number: 3,
