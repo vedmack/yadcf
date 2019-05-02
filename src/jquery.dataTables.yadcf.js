@@ -3600,7 +3600,7 @@ if (!Object.entries) {
 								sel.find('.yadcf-regex-wrapper').hide();
 								sel.find('.yadcf-null-wrapper').hide();
 								$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-externally_triggered_checkboxes-button\" onmousedown=\"yadcf.stopPropagation(event);\" " +
-								"onclick=\"yadcf.stopPropagation(event);\" class=\"yadcf-filter-externally_triggered_checkboxes-button" + columnObj.externally_triggered_checkboxes_button_style_class + "\">" + externally_triggered_checkboxes_text + "</button>");
+								"onclick=\"yadcf.stopPropagation(event);\" class=\"yadcf-filter-externally_triggered_checkboxes-button " + columnObj.externally_triggered_checkboxes_button_style_class + "\">" + externally_triggered_checkboxes_text + "</button>");
 								$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-externally_triggered_checkboxes-button").on('click', externally_triggered_checkboxes_function);
 							}
 
