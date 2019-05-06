@@ -202,7 +202,7 @@
                 Type:               boolean
                 Default value:      undefined
                 Description:        Adds a checkbox next to the filter that allows to do a "not/exclude" filtering (acts the same  all filter_match_mode)
-                Note:               Currently available for the text filter
+                Note:               Currently available for the text, select and number_range filter
 
 * exclude_label
                 Required:           false
@@ -222,6 +222,21 @@
                 Type:               String
                 Default value:      'regex'
 				Description:        The label that will appear above the regex checkbox
+
+* null_check_box
+                Required:           false
+                Type:               boolean
+                Default value:      undefined
+								Description:        Adds a checkbox next to the filter that allows to filter by null value,
+																		works only for tables with data retrieved via data property, not working for html defined tables,
+																		where null is represented as string
+								Note:               Currently available for the text and range_number filters
+
+* null_label
+                Required:           false
+                Type:               String
+                Default value:      'null'
+								Description:        The label that will appear above the null checkbox
 
 * checkbox_position_after
                 Required:           false
@@ -243,7 +258,15 @@
                 Required:           false
                 Type:               Object
                 Default value:      {}
-                Description:        This parameter will be passed "as is" to the Chosen/Select2 plugin constructor
+								Description:        This parameter will be passed "as is" to the Chosen/Select2 plugin constructor
+
+* select_null_option
+                Required:           false
+                Type:               string
+                Default value:      'null'
+								Description:        String value which internaly represents null option in select filters,
+																		also it is send to server if serverside feature is enabled
+																		Supports exclude, with exclude enabled the string is wrapped with exclude regex
 
 * filter_plugin_options
                 Required:           false
@@ -339,7 +362,21 @@
 		Note:               Need to load jquery-ui-i18n lib.
 		Possible values:    af, ar-DZ, ar, az, be, bg, bs, ca, cs, cy-GB, da, de, el, en-AU, en-GB, en-NZ, eo, es, et, eu, fa, fi, fo, fr-CA, fr-CH,
 				    fr, gl, he, hi, hr, hu, hy, id, is, it-CH, it, ja, ka, kk, km, ko, ky, lb, lt, lv, mk, ml, ms, nb, nl-BE, nl, nn, no, pl,
-				    pt-BR, pt, rm, ro, ru, sk, sl, sq, sr-SR, sr, sv, ta, th, tj, tr, uk, vi, zh-CN, zh-HK, zh-TW
+						pt-BR, pt, rm, ro, ru, sk, sl, sq, sr-SR, sr, sv, ta, th, tj, tr, uk, vi, zh-CN, zh-HK, zh-TW
+
+						* null_api_call_value
+                Required:           false
+                Type:               string
+                Default value:      "null"
+                Description:        Value which represents null, and is used as argument for fnFilter function, and sended to server
+				Note:               works with null filter enabled only
+
+* not_null_api_call_value
+                Required:           false
+                Type:               string
+                Default value:      "!^@"
+                Description:        Value which represents not null, and is used as argument for fnFilter function, and sended to server
+				Note:               works with null filter enabled only
 
 *
 *
@@ -651,11 +688,13 @@ if (!Object.entries) {
 					filter_match_mode: "contains",
 					select_type: undefined,
 					select_type_options: {},
+					select_null_option: 'null',
 					case_insensitive: true,
 					column_data_type: 'text',
 					html_data_type: 'text',
 					exclude_label: 'exclude',
 					regex_label: 'regex',
+					null_label: 'null',
 					checkbox_position_after: false,
 					style_class: '',
 					reset_button_style_class: '',
@@ -1028,12 +1067,22 @@ if (!Object.entries) {
 				selected_value,
 				column_number_filter,
 				columnObj,
+				exclude_checked = false,
 				settingsDt = getSettingsObjFromTable(oTable);
 
 			column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
 
 			columnObj = getOptions(oTable.selector)[column_number];
+			if (columnObj.exclude) {
+				exclude_checked = $("#yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number).find('.yadcf-exclude-wrapper :checkbox').prop('checked');
+			}
+
 			if (arg === "clear") {
+				clearStateSave(oTable, column_number, table_selector_jq_friendly);
+				if (exclude_checked) {
+					resetExcludeRegexCheckboxes($("#yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number));
+					clearStateSave(oTable, column_number, table_selector_jq_friendly);
+				}
 				if (exGetColumnFilterVal(oTable, column_number) === '') {
 					return;
 				}
@@ -1047,19 +1096,60 @@ if (!Object.entries) {
 				return;
 			}
 
+			if (arg === "exclude" && $.trim($("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).find('option:selected').val()) === "-1") {
+				return;
+			}
+
 			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
 
-			$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", arg.value);
+			selected_value = $.trim($(arg === "exclude" ? "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number : arg).find('option:selected').val());
 
-			selected_value = $.trim($(arg).find('option:selected').val());
+			$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", (arg === "exclude" || exclude_checked) ? selected_value  : arg.value);
 
-			if (arg.value !== "-1") {
-				yadcfMatchFilter(oTable, selected_value, filter_match_mode, column_number_filter, false, column_number);
+			if (arg.value !== "-1" && selected_value !== columnObj.select_null_option) {
+				if (oTable.fnSettings().oFeatures.bServerSide === false) {
+					oTable.fnDraw();
+				}
+				yadcfMatchFilter(oTable, selected_value, filter_match_mode, column_number_filter, exclude_checked, column_number);
+			} else if (selected_value === columnObj.select_null_option) {
+				if (oTable.fnSettings().oFeatures.bServerSide === false) {
+					oTable.fnFilter("", column_number_filter);
+					addNullFilterCapability(table_selector_jq_friendly, column_number, true);
+					oTable.fnDraw();
+				} else {
+					yadcfMatchFilter(oTable, selected_value, filter_match_mode, column_number_filter, exclude_checked, column_number);
+				}
+				if (oTable.fnSettings().oFeatures.bStateSave === true) {
+					stateSaveNullSelect(oTable, columnObj, table_selector_jq_friendly, column_number, filter_match_mode, exclude_checked);
+					oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
+				}
 			} else {
 				oTable.fnFilter("", column_number_filter);
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
 			}
 			resetIApiIndex();
+		}
+
+		function stateSaveNullSelect(oTable, columnObj, table_selector_jq_friendly, column_number, filter_match_mode, exclude_checked) {
+			let null_str = columnObj.select_null_option;
+			switch (filter_match_mode) {
+				case "exact":
+					null_str = "^" + escapeRegExp(null_str) + "$";
+					break;
+				case "startsWith":
+					null_str = "^" + escapeRegExp(null_str);
+					break;
+				default:
+					break;
+			}
+			const excludeStrStart = 	"^((?!";
+			const excludeStrEnd = ").)*$";
+			null_str = exclude_checked ? (excludeStrStart + null_str + excludeStrEnd) : null_str;
+			if (oTable.fnSettings().oLoadedState) {
+				if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
+					oTable.fnSettings().aoPreSearchCols[column_number].sSearch = null_str;
+				}
+			}
 		}
 
 		function doFilterMultiSelect(arg, table_selector_jq_friendly, column_number, filter_match_mode) {
@@ -1264,7 +1354,8 @@ if (!Object.entries) {
 						columnObj,
 						column_number_filter,
 						valFrom,
-						valTo;
+						valTo,
+						exclude_checked = false;
 
 					if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
 						return true;
@@ -1276,6 +1367,10 @@ if (!Object.entries) {
 					} else {
 						min = $('#' + fromId).val();
 						max = $('#' + toId).val();
+					}
+
+					if (columnObj.exclude) {
+						exclude_checked = $("#yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + col_num).find('.yadcf-exclude-wrapper :checkbox').prop('checked');
 					}
 
 					column_number_filter = calcColumnNumberFilter(settingsDt, col_num, table_selector_jq_friendly);
@@ -1362,36 +1457,69 @@ if (!Object.entries) {
 					}
 					min = (min !== "") ? (+min) : min;
 					max = (max !== "") ? (+max) : max;
-					if (columnObj.range_data_type === 'single') {
-						val = (val !== "") ? (+val) : val;
-						if (min === "" && max === "") {
-							retVal = true;
-						} else if (min === "" && val <= max) {
-							retVal = true;
-						} else if (min <= val && "" === max) {
-							retVal = true;
-						} else if (min <= val && val <= max) {
-							retVal = true;
-						} else if (val === '' || isNaN(val)) {
-							retVal = true;
+					if (!exclude_checked) {
+						if (columnObj.range_data_type === 'single') {
+							val = (val !== "") ? (+val) : val;
+							if (min === "" && max === "") {
+								retVal = true;
+							} else if (min === "" && val <= max) {
+								retVal = true;
+							} else if (min <= val && "" === max) {
+								retVal = true;
+							} else if (min <= val && val <= max) {
+								retVal = true;
+							} else if (val === '' || isNaN(val)) {
+								retVal = true;
+							}
+						} else if (columnObj.range_data_type === 'range') {
+							val = val.split(columnObj.range_data_type_delim);
+							valFrom = (val[0] !== "") ? (+val[0]) : val[0];
+							valTo = (val[1] !== "") ? (+val[1]) : val[1];
+							if (min === "" && max === "") {
+								retVal = true;
+							} else if (min === "" && valTo <= max) {
+								retVal = true;
+							} else if (min <= valFrom && "" === max) {
+								retVal = true;
+							} else if (min <= valFrom && valTo <= max) {
+								retVal = true;
+							} else if ((valFrom === '' || isNaN(valFrom)) && (valTo === '' || isNaN(valTo))) {
+								retVal = true;
+							}
 						}
-					} else if (columnObj.range_data_type === 'range') {
-						val = val.split(columnObj.range_data_type_delim);
-						valFrom = (val[0] !== "") ? (+val[0]) : val[0];
-						valTo = (val[1] !== "") ? (+val[1]) : val[1];
-						if (min === "" && max === "") {
-							retVal = true;
-						} else if (min === "" && valTo <= max) {
-							retVal = true;
-						} else if (min <= valFrom && "" === max) {
-							retVal = true;
-						} else if (min <= valFrom && valTo <= max) {
-							retVal = true;
-						} else if ((valFrom === '' || isNaN(valFrom)) && (valTo === '' || isNaN(valTo))) {
-							retVal = true;
+						return retVal;
+					} else {
+						if (columnObj.range_data_type === 'single') {
+							val = (val !== "") ? (+val) : val;
+							if (min === "" && max === "") {
+								retVal = true;
+							} else if (min === "" && val > max) {
+								retVal = true;
+							} else if (min > val && "" === max) {
+								retVal = true;
+							} else if (!(min <= val && val <= max) && ("" !== max &&  "" !== min)) {
+								retVal = true;
+							} else if (val === '' || isNaN(val)) {
+								retVal = true;
+							}
+						} else if (columnObj.range_data_type === 'range') {
+							val = val.split(columnObj.range_data_type_delim);
+							valFrom = (val[0] !== "") ? (+val[0]) : val[0];
+							valTo = (val[1] !== "") ? (+val[1]) : val[1];
+							if (min === "" && max === "") {
+								retVal = true;
+							} else if (min === "" && valTo > max) {
+								retVal = true;
+							} else if (min > valFrom && "" === max) {
+								retVal = true;
+							} else if (!(min <= valFrom && valTo <= max) && ("" !== max &&  "" !== min)) {
+								retVal = true;
+							} else if ((valFrom === '' || isNaN(valFrom)) && (valTo === '' || isNaN(valTo))) {
+								retVal = true;
+							}
 						}
+						return retVal;
 					}
-					return retVal;
 				}
 			);
 		}
@@ -1580,6 +1708,84 @@ if (!Object.entries) {
 			);
 		}
 
+		function addNullFilterCapability(table_selector_jq_friendly, col_num, isSelect) {
+
+			$.fn.dataTableExt.afnFiltering.push(
+				function (settingsDt, aData, iDataIndex, rowData) {
+					var val,
+						retVal = false,
+						oTable = oTables[table_selector_jq_friendly],
+						table_selector_jq_friendly_local = table_selector_jq_friendly,
+						current_table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly2(settingsDt),
+						columnObj,
+						column_number_filter,
+						null_checked,
+						exclude_checked;
+
+					if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
+						return true;
+					}
+					columnObj = getOptions(settingsDt.oInstance.selector)[col_num];
+
+					column_number_filter = calcColumnNumberFilter(settingsDt, col_num, table_selector_jq_friendly);
+
+					var fixedPrefix = '';
+					if (settingsDt._fixedHeader !== undefined && $('.fixedHeader-floating').is(":visible")) {
+						fixedPrefix = '.fixedHeader-floating ';
+					}
+					if (columnObj.filters_position === 'tfoot' && settingsDt.nScrollFoot) {
+						fixedPrefix = '.' + settingsDt.nScrollFoot.className + ' ';
+					}
+
+					null_checked = $(fixedPrefix + "#yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + col_num).find('.yadcf-null-wrapper :checkbox').prop('checked');
+					null_checked = isSelect ? ($.trim($("#yadcf-filter-" + table_selector_jq_friendly + "-" + col_num).find('option:selected').val()) === columnObj.select_null_option) : null_checked;
+
+					if (!null_checked) {
+						return true;
+					}
+					if (columnObj.exclude) {
+						exclude_checked = $(fixedPrefix + "#yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + col_num).find('.yadcf-exclude-wrapper :checkbox').prop('checked');
+					}
+					if (rowData !== undefined) {
+						// supprort dt render fn, usecase structured data when top is null inner property will return undefined
+						// e.g data = person.cat.name && person.cat = null
+						let rowDataRender;
+						if (columnObj.column_number_render) {
+							rowDataRender = $.extend(true, [], rowData);
+							const index = columnObj.column_number_data ? columnObj.column_number_data : column_number_filter;
+							const meta = {
+													row: iDataIndex,
+													col: columnObj.column_number,
+													settings: settingsDt
+							};
+							if (typeof index === 'string' &&  typeof rowDataRender === 'object') {
+								const cellDataRender = columnObj.column_number_render(getProp(rowDataRender, index), 'filter', rowData, meta);
+								setProp(rowDataRender, index, (cellDataRender !== undefined) ? cellDataRender : getProp(rowData, index));
+							}	else {
+								const cellDataRender = columnObj.column_number_render(rowDataRender[index], 'filter', rowData, meta);
+								rowDataRender[index] = (cellDataRender !== undefined) ? cellDataRender : rowData[index];
+							}
+						}
+						aData = rowDataRender ? rowDataRender : rowData;
+						if (columnObj.column_number_data !== undefined) {
+							column_number_filter = columnObj.column_number_data;
+							val = getProp(aData, column_number_filter);
+						} else {
+							val = aData[column_number_filter];
+						}
+					} else {
+						val = aData[column_number_filter];
+					}
+					if (columnObj.exclude && exclude_checked) {
+						retVal = val === null ? false : true;
+					} else {
+						retVal = val === null ? true : false;
+					}
+					return retVal;
+				}
+			);
+		}
+
 		function addRangeNumberFilter(filter_selector_string, table_selector_jq_friendly, column_number, filter_reset_button_text, filter_default_label, ignore_char) {
 			var fromId = "yadcf-filter-" + table_selector_jq_friendly + "-from-" + column_number,
 				toId = "yadcf-filter-" + table_selector_jq_friendly + "-to-" + column_number,
@@ -1587,7 +1793,9 @@ if (!Object.entries) {
 				filter_wrapper_id,
 				oTable,
 				columnObj,
-				filterActionStr;
+				filterActionStr,
+				null_str,
+				exclude_str;
 
 			filter_wrapper_id = "yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number;
 
@@ -1602,6 +1810,7 @@ if (!Object.entries) {
 			$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper " + columnObj.style_class + "\"></div>");
 			filter_selector_string += " div.yadcf-filter-wrapper";
 			filter_selector_string_tmp = filter_selector_string;
+
 
 			$(filter_selector_string).append("<div id=\"yadcf-filter-wrapper-inner-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter-wrapper-inner" + " -" + table_selector_jq_friendly + "-" + column_number + "\"></div>");
 			filter_selector_string += " div.yadcf-filter-wrapper-inner";
@@ -1621,15 +1830,70 @@ if (!Object.entries) {
 					"onclick=\"yadcf.stopPropagation(event);yadcf.rangeClear('" + table_selector_jq_friendly + "',event," + column_number + "); return false;\" class=\"yadcf-filter-reset-button " + columnObj.reset_button_style_class + "\">" + filter_reset_button_text + "</button>");
 			}
 
+			exclude_str = '';
+			if (columnObj.exclude === true) {
+				if (columnObj.externally_triggered !== true) {
+					exclude_str = '<span class="yadcf-exclude-wrapper" onmousedown="yadcf.stopPropagation(event);" onclick="yadcf.stopPropagation(event);">' +
+						'<div class="yadcf-label small">' + columnObj.exclude_label + '</div><input type="checkbox" title="' + columnObj.exclude_label + '" onclick="yadcf.stopPropagation(event);yadcf.rangeNumberKeyUP(\'' + table_selector_jq_friendly + '\',event);"></span>';
+				} else {
+					exclude_str = '<span class="yadcf-exclude-wrapper" onmousedown="yadcf.stopPropagation(event);" onclick="yadcf.stopPropagation(event);">' +
+						'<div class="yadcf-label small">' + columnObj.exclude_label + '</div><input type="checkbox" title="' + columnObj.exclude_label + '" onclick="yadcf.stopPropagation(event);"></span>';
+				}
+			}
+
+			null_str = '';
+			if (columnObj.null_check_box === true) {
+				if (columnObj.externally_triggered !== true) {
+					null_str = '<span class="yadcf-null-wrapper" onmousedown="yadcf.stopPropagation(event);" onclick="yadcf.stopPropagation(event);">' +
+						'<div class="yadcf-label small">' + columnObj.null_label + '</div><input type="checkbox" title="' + columnObj.null_label + '" onclick="yadcf.stopPropagation(event);yadcf.nullChecked(event,\'' + table_selector_jq_friendly + '\',' + column_number + ');"></span>';
+				} else {
+					null_str = '<span class="yadcf-null-wrapper" onmousedown="yadcf.stopPropagation(event);" onclick="yadcf.stopPropagation(event);">' +
+						'<div class="yadcf-label small">' + columnObj.null_label + '</div><input type="checkbox" title="' + columnObj.null_label + '" onclick="yadcf.stopPropagation(event);yadcf.nullChecked(event,\'' + table_selector_jq_friendly + '\',' + column_number + ');"></span>';
+				}
+				if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+					addNullFilterCapability(table_selector_jq_friendly, column_number, false);
+				}
+			}
+
+			let append_checkboxes = columnObj.checkbox_position_after ? exclude_str.replace("yadcf-exclude-wrapper", "yadcf-exclude-wrapper after") + null_str.replace("yadcf-null-wrapper", "yadcf-null-wrapper after")
+			: exclude_str + null_str;
+
+			if (columnObj.checkbox_position_after) {
+				$(filter_selector_string_tmp).append(append_checkboxes);
+			} else {
+				$(filter_selector_string).before(append_checkboxes);
+			}
+
 			if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
 				if (oTable.fnSettings().oLoadedState.yadcfState && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
-					$('#' + fromId).val(oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from);
-					if (oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from !== "") {
-						$('#' + fromId).addClass("inuse");
+					let exclude_checked = false;
+					let null_checked = false;
+					if (columnObj.null_check_box) {
+						null_checked = oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].null_checked;
+						$('#' + filter_wrapper_id).find('.yadcf-null-wrapper :checkbox').prop('checked', null_checked);
+						if (columnObj.exclude) {
+							exclude_checked = oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].exclude_checked
+							$('#' + filter_wrapper_id).find('.yadcf-exclude-wrapper :checkbox').prop('checked', exclude_checked);
+						}
 					}
-					$('#' + toId).val(oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].to);
-					if (oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].to !== "") {
-						$('#' + toId).addClass("inuse");
+
+					if (null_checked) {
+						$('#' + fromId).prop('disabled', true);
+						$('#' + toId).prop('disabled', true);
+					} else {
+						const inuseClass = exclude_checked ? ' inuse inuse-exclude' : ' inuse ';
+						if(oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from) {
+							$('#' + fromId).val(oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from);
+							if (oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from !== "") {
+								$('#' + fromId).addClass(inuseClass);
+							}
+						}
+						if(oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].to) {
+							$('#' + toId).val(oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].to);
+							if (oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].to !== "") {
+								$('#' + toId).addClass(inuseClass);
+							}
+						}
 					}
 				}
 			}
@@ -2739,7 +3003,8 @@ if (!Object.entries) {
 				filterActionStr,
 				custom_func_filter_value_holder,
 				exclude_str,
-				regex_str;
+				regex_str,
+				null_str;
 
 			if (pSettings === undefined) {
 				settingsDt = getSettingsObjFromTable(oTable);
@@ -3045,6 +3310,19 @@ if (!Object.entries) {
 									$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " +
 										"id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button " + columnObj.reset_button_style_class + "\">" + filter_reset_button_text + "</button>");
 								}
+								exclude_str = '';
+								if (columnObj.exclude === true) {
+									exclude_str = '<span class="yadcf-exclude-wrapper" onmousedown="yadcf.stopPropagation(event);" onclick="yadcf.stopPropagation(event);">' +
+										'<div class="yadcf-label small">' + columnObj.exclude_label + '</div><input type="checkbox" title="' + columnObj.exclude_label + '" onclick="yadcf.stopPropagation(event);yadcf.doFilter(\'exclude\',\'' + table_selector_jq_friendly + '\',' + column_number + ', \'' + filter_match_mode + '\');"></span>';
+								}
+
+								exclude_str = columnObj.checkbox_position_after ? exclude_str.replace("yadcf-exclude-wrapper", "yadcf-exclude-wrapper after") : exclude_str;
+								if (columnObj.checkbox_position_after) {
+									$(filter_selector_string).append(exclude_str);
+								} else {
+									$(filter_selector_string).prepend(exclude_str);
+								}
+
 							} else {
 								filterActionStr = 'onchange="yadcf.doFilterCustomDateFunc(this, \'' + table_selector_jq_friendly  + '\', ' +  column_number + ');"';
 								if (columnObj.externally_triggered === true) {
@@ -3075,11 +3353,54 @@ if (!Object.entries) {
 							if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
 								tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 								tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
+								const match_mode = getOptions(oTable.selector)[column_number].filter_match_mode;
+								let null_str = columnObj.select_null_option;
+								let excludeStrStart = "^((?!";
+								let excludeStrEnd = ").)*$";
+								switch (match_mode) {
+									case "exact":
+										null_str = "^" + escapeRegExp(null_str) + "$";
+										excludeStrStart = "((?!^";
+										excludeStrEnd =  "$).)*";
+										break;
+									case "startsWith":
+										null_str = "^" + escapeRegExp(null_str);
+										excludeStrStart = "((?!^";
+										excludeStrEnd =  ").)*$";
+										break;
+									default:
+										break;
+								}
+								null_str = "^((?!" + null_str + ").)*$";
+								null_str = yadcfParseMatchFilter(null_str, getOptions(oTable.selector)[column_number].filter_match_mode);
+
+								let exclude = false;
+								// null with exclude selected
+								if (null_str === tmpStr) {
+									exclude = true;
+									tmpStr = columnObj.select_null_option;
+								} else if (tmpStr.includes(excludeStrStart) && tmpStr.includes(excludeStrEnd)) {
+									exclude = true;
+									tmpStr = tmpStr.replace(excludeStrStart, '');
+									tmpStr = tmpStr.replace(excludeStrEnd, '');
+								}
 								let filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
 								let optionExists = filter.find("option[value='" + tmpStr + "']").length === 1;
 								// Set the state preselected value only if the option exists in the select dropdown.
 								if (optionExists) {
 									filter.val(tmpStr).addClass("inuse");
+									if (exclude) {
+										$('#yadcf-filter-wrapper-' + table_selector_jq_friendly + '-' + column_number).find('.yadcf-exclude-wrapper').find(':checkbox').prop('checked', true);
+										$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", tmpStr);
+										refreshSelectPlugin(columnObj, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number), tmpStr);
+									}
+									if (tmpStr === columnObj.select_null_option && settingsDt.oFeatures.bServerSide === false) {
+										oTable.fnFilter("", column_number);
+										addNullFilterCapability(table_selector_jq_friendly, column_number, true);
+										oTable.fnDraw();
+										$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", tmpStr);
+										refreshSelectPlugin(columnObj, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number), tmpStr);
+									}
 								}
 							}
 
@@ -3207,11 +3528,25 @@ if (!Object.entries) {
 								}
 							}
 
+							null_str = '';
+							if (columnObj.null_check_box === true) {
+								if (columnObj.externally_triggered !== true) {
+									null_str = '<span class="yadcf-null-wrapper" onmousedown="yadcf.stopPropagation(event);" onclick="yadcf.stopPropagation(event);">' +
+										'<div class="yadcf-label small">' + columnObj.null_label + '</div><input type="checkbox" title="' + columnObj.null_label + '" onclick="yadcf.stopPropagation(event);yadcf.nullChecked(event,\'' + table_selector_jq_friendly + '\',' + column_number + ');"></span>';
+								} else {
+									null_str = '<span class="yadcf-null-wrapper" onmousedown="yadcf.stopPropagation(event);" onclick="yadcf.stopPropagation(event);">' +
+										'<div class="yadcf-label small">' + columnObj.null_label + '</div><input type="checkbox" title="' + columnObj.null_label + '" onclick="yadcf.stopPropagation(event);yadcf.nullChecked(event,\'' + table_selector_jq_friendly + '\',' + column_number + ');"></span>';
+								}
+								if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+									addNullFilterCapability(table_selector_jq_friendly, column_number, false);
+								}
+							}
+
 							let append_input = "<input type=\"text\" onkeydown=\"yadcf.preventDefaultForEnter(event);\" id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "\" class=\"yadcf-filter " + columnObj.style_class + "\" onmousedown=\"yadcf.stopPropagation(event);\" onclick='yadcf.stopPropagation(event);" +
 							"' placeholder='" + filter_default_label + "'" + " filter_match_mode='" + filter_match_mode + "' " + filterActionStr + "></input>";
 
-							let append_checkboxes = columnObj.checkbox_position_after ? append_input + exclude_str.replace("yadcf-exclude-wrapper", "yadcf-exclude-wrapper after") + regex_str.replace("yadcf-regex-wrapper", "yadcf-regex-wrapper after")
-							: exclude_str + regex_str + append_input;
+							let append_checkboxes = columnObj.checkbox_position_after ? append_input + exclude_str.replace("yadcf-exclude-wrapper", "yadcf-exclude-wrapper after") + regex_str.replace("yadcf-regex-wrapper", "yadcf-regex-wrapper after") + null_str.replace("yadcf-null-wrapper", "yadcf-null-wrapper after")
+							: exclude_str + regex_str + null_str + append_input;
 
 							$(filter_selector_string).append(append_checkboxes);
 
@@ -3271,6 +3606,22 @@ if (!Object.entries) {
 		}
 
 		function loadFromStateSaveTextFilter(oTable, settingsDt, columnObj, table_selector_jq_friendly, column_position, column_number) {
+			if (columnObj.null_check_box === true) {
+				if (settingsDt.oFeatures.bStateSave === true && settingsDt.oLoadedState) {
+					if (settingsDt.oLoadedState.yadcfState && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly] && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
+						if (settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].null_checked) {
+							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).prop('disabled', true);
+							$('#yadcf-filter-wrapper-' + table_selector_jq_friendly + '-' + column_number).find('.yadcf-null-wrapper').find(':checkbox').prop('checked', true);
+						}
+						if (settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].exclude_checked) {
+							$('#yadcf-filter-wrapper-' + table_selector_jq_friendly + '-' + column_number).find('.yadcf-exclude-wrapper').find(':checkbox').prop('checked', true);
+						}
+						if (settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].null_checked) {
+							return;
+						}
+					}
+				}
+			}
 			if (settingsDt.aoPreSearchCols[column_position].sSearch !== '') {
 				let tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 				if (columnObj.exclude === true) {
@@ -3313,15 +3664,25 @@ if (!Object.entries) {
 			$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 			event = eventTargetFixUp(event);
 			settingsDt = getSettingsObjFromTable(oTable);
+			columnObj = getOptions(oTable.selector)[column_number];
 
 			column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
+			resetExcludeRegexCheckboxes($("#yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number));
+			clearStateSave(oTable, column_number, table_selector_jq_friendly);
 
+			if (columnObj.null_check_box) {
+				$('#' + fromId.replace('-from-date-', '-from-')).prop('disabled', false);
+				$('#' + toId.replace('-to-date-', '-to-')).prop('disabled', false);
+				if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+					oTable.fnDraw();
+				} else {
+					oTable.fnFilter("", column_number_filter);
+				}
+			}
 			currentFilterValues = exGetColumnFilterVal(oTable, column_number);
 			if (currentFilterValues.from === '' && currentFilterValues.to === '') {
 				return;
 			}
-
-			columnObj = getOptions(oTable.selector)[column_number];
 
 			const buttonSelector = $(event.target).prop('nodeName') === 'BUTTON' ? $(event.target).parent() : $(event.target).parent().parent();
 
@@ -3365,7 +3726,7 @@ if (!Object.entries) {
 			}
 			resetIApiIndex();
 
-			buttonSelector.parent().find(".yadcf-filter-range").removeClass("inuse");
+			buttonSelector.parent().find(".yadcf-filter-range").removeClass("inuse inuse-exclude");
 			if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 				$fromInput = $("#" + fromId);
 				$toInput = $("#" + toId);
@@ -3584,51 +3945,69 @@ if (!Object.entries) {
 				columnObj,
 				keyUp,
 				settingsDt,
-				column_number_filter;
+				column_number_filter,
+				exclude_checked = false,
+				null_checked = false,
+				checkbox;
 
 			event = eventTargetFixUp(event);
+			checkbox = $(event.target).attr('type') === 'checkbox';
+			const target = checkbox ? $(event.target).parent().parent().find('.yadcf-filter-range-number').first() : $(event.target);
 			$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 
-			column_number = parseInt($(event.target).attr("id").replace('-from-', '').replace('-to-', '').replace('yadcf-filter-' + table_selector_jq_friendly, ''), 10);
+			column_number = parseInt(target.attr("id").replace('-from-', '').replace('-to-', '').replace('yadcf-filter-' + table_selector_jq_friendly, ''), 10);
 			columnObj = getOptions(oTable.selector)[column_number];
 			settingsDt = getSettingsObjFromTable(oTable);
 			column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
 
+			if (columnObj.exclude) {
+				exclude_checked = $("#yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number).find('.yadcf-exclude-wrapper :checkbox').prop('checked');
+			}
+			// state save when exclude was fired last
+			if (columnObj.null_check_box) {
+				null_checked = $("#yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number).find('.yadcf-null-wrapper :checkbox').prop('checked');
+			}
+
 			keyUp = function () {
-				if (event.target.id.indexOf("-from-") !== -1) {
-					fromId = event.target.id;
-					toId = event.target.id.replace("-from-", "-to-");
-
-					min = document.getElementById(fromId).value;
-					max = document.getElementById(toId).value;
-				} else {
-					toId = event.target.id;
-					fromId = event.target.id.replace("-to-", "-from-");
-
-					max = document.getElementById(toId).value;
-					min = document.getElementById(fromId).value;
-				}
+				fromId = 'yadcf-filter-' +  table_selector_jq_friendly + "-from-" + column_number;
+				toId = 'yadcf-filter-' +  table_selector_jq_friendly + "-to-" + column_number;
+				min = document.getElementById(fromId).value;
+				max = document.getElementById(toId).value;
 
 				min = (min !== "") ? (+min) : min;
 				max = (max !== "") ? (+max) : max;
+
+				if (null_checked){
+					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+						oTable.fnDraw();
+					} else {
+						const excludeString = columnObj.not_null_api_call_value ? columnObj.not_null_api_call_value : '!^@';
+						const nullString = columnObj.null_api_call_value ? columnObj.null_api_call_value : 'null';
+						const requestString = exclude_checked ? excludeString: nullString;
+						oTable.fnFilter(requestString, column_number_filter);
+					}
+					return;
+				}
 
 				if ((!isNaN(max) && !isNaN(min) && (max >= min)) || min === "" || max === "") {
 
 					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 						oTable.fnDraw();
 					} else {
-						oTable.fnFilter(min + columnObj.custom_range_delimiter + max, column_number_filter);
+						const exclude_delimeter = exclude_checked ? '!': '';
+						oTable.fnFilter(exclude_delimeter + min + columnObj.custom_range_delimiter + max, column_number_filter);
 					}
+					$("#" + fromId).removeClass("inuse inuse-exclude");
+					$("#" + toId).removeClass("inuse inuse-exclude");
+
+					const inuse_class = exclude_checked ? 'inuse inuse-exclude' : 'inuse';
 					if (document.getElementById(fromId).value !== "") {
-						$("#" + fromId).addClass("inuse");
+						$("#" + fromId).addClass(inuse_class);
 					}
 					if (document.getElementById(toId).value !== "") {
-						$("#" + toId).addClass("inuse");
+						$("#" + toId).addClass(inuse_class);
 					}
 
-					if ($.trim(event.target.value) === "" && $(event.target).hasClass("inuse")) {
-						$("#" + event.target.id).removeClass("inuse");
-					}
 					if (!oTable.fnSettings().oLoadedState) {
 						oTable.fnSettings().oLoadedState = {};
 						oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
@@ -3638,7 +4017,9 @@ if (!Object.entries) {
 							oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
 								{
 									from: min,
-									to: max
+									to: max,
+									exclude_checked: exclude_checked,
+									null_checked: null_checked
 								};
 						} else {
 							yadcfState = {};
@@ -3848,6 +4229,7 @@ if (!Object.entries) {
 				settingsDt = getSettingsObjFromTable(oTable),
 				exclude,
 				regex_check_box,
+				null_checked = false,
 				yadcfState,
 				keyCodes = [37, 38, 39, 40, 17];
 
@@ -3869,13 +4251,49 @@ if (!Object.entries) {
 				}
 				$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 
+				// chcek checkboxes
+				if (columnObj.null_check_box === true) {
+					null_checked = $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).closest('.yadcf-filter-wrapper').find('.yadcf-null-wrapper :checkbox').prop('checked');
+				}
+				if (columnObj.exclude === true) {
+					exclude = $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).closest('.yadcf-filter-wrapper').find('.yadcf-exclude-wrapper :checkbox').prop('checked');
+				}
+				if (columnObj.regex_check_box === true) {
+					regex_check_box = $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).closest('.yadcf-filter-wrapper').find('.yadcf-regex-wrapper :checkbox').prop('checked');
+				}
+
 				if (clear === 'clear' || $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val() === '') {
 					if (clear === 'clear') {
 						// uncheck checkboxes on reset button pressed
-						resetExcludeRegexCheckboxes($(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number));
+						resetExcludeRegexCheckboxes($(fixedPrefix + "#yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number));
+						clearStateSave(oTable, column_number, table_selector_jq_friendly);
+						$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).prop('disabled', false);
+						if (columnObj.null_check_box) {
+							if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+								oTable.fnDraw();
+							} else {
+								oTable.fnFilter("", column_number_filter);
+							}
+						}
 						if (exGetColumnFilterVal(oTable, column_number) === '') {
 							return;
 						}
+					}
+
+					if(null_checked && columnObj.exclude) {
+						if (oTable.fnSettings().oFeatures.bServerSide === true){
+							if (exclude) {
+								columnObj.not_null_api_call_value = columnObj.not_null_api_call_value ? columnObj.not_null_api_call_value : '!^@';
+								oTable.fnFilter(columnObj.not_null_api_call_value, column_number_filter);
+							} else {
+								columnObj.null_api_call_value = columnObj.null_api_call_value ? columnObj.null_api_call_value : 'null';
+								oTable.fnFilter(columnObj.null_api_call_value, column_number_filter);
+							}
+						} else {
+							oTable.fnDraw();
+						}
+						saveTextKeyUpState(oTable, table_selector_jq_friendly, column_number, regex_check_box, null_checked, exclude);
+						return;
 					}
 
 					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
@@ -3884,39 +4302,18 @@ if (!Object.entries) {
 					resetIApiIndex();
 					return;
 				}
-				// delete class also on  regex or exclude checkbox uncheck
+				// delete class also on regex or exclude checkbox uncheck
 				$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse-exclude inuse-regex");
 				var inuseClass = "inuse";
+				inuseClass = exclude ? inuseClass + " inuse-exclude" : inuseClass;
+				inuseClass = regex_check_box ? inuseClass + " inuse-regex" : inuseClass;
 
-				if (columnObj.exclude === true) {
-					exclude = $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).closest('.yadcf-filter-wrapper').find('.yadcf-exclude-wrapper :checkbox').prop('checked');
-					inuseClass = exclude ? inuseClass + " inuse-exclude" : inuseClass;
-				}
-				if (columnObj.regex_check_box === true) {
-					regex_check_box = $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).closest('.yadcf-filter-wrapper').find('.yadcf-regex-wrapper :checkbox').prop('checked');
-					inuseClass = regex_check_box ? inuseClass + " inuse-regex" : inuseClass;
-				}
 				$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass(inuseClass);
 
 				yadcfMatchFilter(oTable, $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val(), regex_check_box ? 'regex' : columnObj.filter_match_mode, column_number_filter, exclude, column_number);
 
 				// save regex_checkbox state
-				if (oTable.fnSettings().oFeatures.bStateSave === true) {
-					if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
-						oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
-							{
-								regex_check_box: regex_check_box
-							};
-					} else {
-						yadcfState = {};
-						yadcfState[table_selector_jq_friendly] = [];
-						yadcfState[table_selector_jq_friendly][column_number] = {
-							regex_check_box: regex_check_box
-						};
-						oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
-					}
-					oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
-				}
+				saveTextKeyUpState(oTable, table_selector_jq_friendly, column_number, regex_check_box, null_checked, exclude);
 				resetIApiIndex();
 			};
 
@@ -3925,6 +4322,131 @@ if (!Object.entries) {
 			} else {
 				yadcfDelay(function () {
 					keyUp(table_selector_jq_friendly, column_number, clear);
+				}, columnObj.filter_delay);
+			}
+		}
+
+		function saveTextKeyUpState(oTable, table_selector_jq_friendly, column_number, regex_check_box, null_checked, exclude) {
+			if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState.yadcfState) {
+				if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
+					oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
+						{
+							regex_check_box: regex_check_box,
+							null_checked: null_checked,
+							exclude_checked: exclude,
+						};
+				} else {
+					yadcfState = {};
+					yadcfState[table_selector_jq_friendly] = [];
+					yadcfState[table_selector_jq_friendly][column_number] = {
+						regex_check_box: regex_check_box,
+						exclude_checked: exclude,
+						null_checked: null_checked,
+					};
+					oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+				}
+				oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
+			}
+		}
+
+		function nullChecked(ev, table_selector_jq_friendly, column_number) {
+			var column_number_filter,
+				oTable = oTables[table_selector_jq_friendly],
+				click,
+				columnObj,
+				settingsDt = getSettingsObjFromTable(oTable),
+				yadcfState,
+				null_checked,
+				exclude_checked = false;
+
+			column_number_filter = calcColumnNumberFilter(settingsDt, column_number, table_selector_jq_friendly);
+
+			columnObj = getOptions(oTable.selector)[column_number];
+
+			var fixedPrefix = '';
+			if (settingsDt._fixedHeader !== undefined && $('.fixedHeader-floating').is(":visible")) {
+				fixedPrefix = '.fixedHeader-floating ';
+			}
+			if (columnObj.filters_position === 'tfoot' && settingsDt.nScrollFoot) {
+				fixedPrefix = '.' + settingsDt.nScrollFoot.className + ' ';
+			}
+			null_checked = $(fixedPrefix + "#yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number).find('.yadcf-null-wrapper :checkbox').prop('checked');
+			if (columnObj.exclude) {
+				exclude_checked = $(fixedPrefix + "#yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number).find('.yadcf-exclude-wrapper :checkbox').prop('checked');
+			}
+
+			click = function (table_selector_jq_friendly, column_number) {
+				// remove input data and inuse classes
+				const inner = columnObj.filter_type === "range_number" ? 'wrapper-inner-' : '';
+				const inner_input = columnObj.filter_type === "range_number" ? ' :input' : '';
+				const input = $('#yadcf-filter-' + inner + table_selector_jq_friendly + '-' + column_number + inner_input);
+				input.removeClass('inuse inuse-exclude inuse-regex');
+
+				if (columnObj.filter_type === "text") {
+					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
+					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+						oTable.fnFilter('', column_number_filter);
+					}
+				}
+				if (columnObj.filter_type === "range_number") {
+					input.val("");
+					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+						oTable.fnDraw();
+					}
+				}
+				// disable inputs
+				if (!null_checked) {
+					input.prop('disabled', false);
+				} else {
+					input.prop('disabled', true);
+				}
+
+				//filter by null
+				if (oTable.fnSettings().oFeatures.bServerSide !== true) {
+					oTable.fnDraw();
+				} else {
+					if (null_checked){
+						if (!exclude_checked) {
+							columnObj.null_api_call_value = columnObj.null_api_call_value ? columnObj.null_api_call_value : 'null';
+							oTable.fnFilter(columnObj.null_api_call_value, column_number_filter);
+						} else {
+							columnObj.not_null_api_call_value = columnObj.not_null_api_call_value ? columnObj.not_null_api_call_value : '!^@';
+							oTable.fnFilter(columnObj.not_null_api_call_value, column_number_filter);
+						}
+					} else {
+						oTable.fnFilter('', column_number_filter);
+					}
+				}
+
+				// save regex_checkbox state
+				if (oTable.fnSettings().oFeatures.bStateSave === true) {
+					if (oTable.fnSettings().oLoadedState) {
+						if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
+							oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
+								{
+									null_checked: null_checked,
+									exclude_checked: exclude_checked
+								};
+						} else {
+							yadcfState = {};
+							yadcfState[table_selector_jq_friendly] = [];
+							yadcfState[table_selector_jq_friendly][column_number] = {
+								null_checked: null_checked,
+								exclude_checked: exclude_checked
+							};
+							oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
+						}
+					}
+					oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
+				}
+				resetIApiIndex();
+			};
+
+			if (columnObj.filter_delay === undefined) {
+				click(table_selector_jq_friendly, column_number);
+			} else {
+				yadcfDelay(function () {
+					click(table_selector_jq_friendly, column_number);
 				}, columnObj.filter_delay);
 			}
 		}
@@ -4849,6 +5371,8 @@ if (!Object.entries) {
 
 					switch (optionsObj.filter_type) {
 					case 'select':
+						resetExcludeRegexCheckboxes($filterElement.parent());
+						clearStateSave(table_arg, column_number, table_selector_jq_friendly);
 					case 'custom_func':
 						$filterElement.val('-1').removeClass('inuse');
 						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
@@ -4858,9 +5382,11 @@ if (!Object.entries) {
 						break;
 					case 'auto_complete':
 					case 'text':
+						$filterElement.prop('disabled', false)
 						$filterElement.val('').removeClass('inuse inuse-exclude inuse-regex');
 						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
-						resetExcludeRegexCheckboxes($filterElement);
+						resetExcludeRegexCheckboxes($filterElement.parent());
+						clearStateSave(table_arg, column_number, table_selector_jq_friendly);
 						break;
 					case 'date':
 						$filterElement.val('').removeClass('inuse');
@@ -4893,13 +5419,16 @@ if (!Object.entries) {
 					case 'range_number':
 						fromId = 'yadcf-filter-' + table_selector_jq_friendly + '-from-' + column_number;
 						toId = 'yadcf-filter-' + table_selector_jq_friendly + '-to-' + column_number;
+						$(selectorePrefix + '#' + fromId).prop('disabled', false);
 						$(selectorePrefix + '#' + fromId).val('');
-						$(selectorePrefix + '#' + fromId).removeClass('inuse');
+						$(selectorePrefix + '#' + fromId).removeClass('inuse inuse-exclude');
+						$(selectorePrefix + '#' + toId).prop('disabled', false);
 						$(selectorePrefix + '#' + toId).val('');
-						$(selectorePrefix + '#' + toId).removeClass('inuse');
+						$(selectorePrefix + '#' + toId).removeClass('inuse inuse-exclude');
 						if (table_arg.fnSettings().oFeatures.bServerSide === true) {
 							table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
 						}
+						resetExcludeRegexCheckboxes($(selectorePrefix + '#' + fromId).parent().parent());
 						clearStateSave(table_arg, column_number, table_selector_jq_friendly);
 						break;
 					case 'range_number_slider':
@@ -4982,8 +5511,9 @@ if (!Object.entries) {
 		}
 
 		function resetExcludeRegexCheckboxes(selector) {
-			selector.closest('.yadcf-filter-wrapper').find('.yadcf-exclude-wrapper :checkbox').prop('checked', false);
-			selector.closest('.yadcf-filter-wrapper').find('.yadcf-regex-wrapper :checkbox').prop('checked', false);
+			selector.find('.yadcf-exclude-wrapper :checkbox').prop('checked', false);
+			selector.find('.yadcf-regex-wrapper :checkbox').prop('checked', false);
+			selector.find('.yadcf-null-wrapper :checkbox').prop('checked', false);
 		}
 
 		return {
@@ -5004,6 +5534,7 @@ if (!Object.entries) {
 			dateKeyUP: dateKeyUP,
 			dateSelectSingle: dateSelectSingle,
 			textKeyUP: textKeyUP,
+			nullChecked: nullChecked,
 			doFilterCustomDateFunc: doFilterCustomDateFunc,
 			eventTargetFixUp: eventTargetFixUp,
 			initMultipleTables: initMultipleTables,
