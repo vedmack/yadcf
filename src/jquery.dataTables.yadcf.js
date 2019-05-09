@@ -5577,6 +5577,20 @@ if (!Object.entries) {
 			parent.find('.yadcf-null-wrapper').toggle();
 		}
 
+		function exRefreshSelect2Filter(table_arg, col_num, updatedData) {
+			//check if the table arg is from new datatables API (capital "D")
+			if (table_arg.settings !== undefined) {
+				table_arg = table_arg.settings()[0].oInstance;
+			}
+			var columnsObj = getOptions(table_arg.selector);
+			var columnObj = columnsObj[col_num];
+			// columnObj.select_type_options = data;
+
+			var table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly2(table_arg);
+			// refreshSelectPlugin(columnObj, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + col_num));
+			$("#yadcf-filter-" + table_selector_jq_friendly + "-" + col_num).select2('destroy').empty().select2({data: updatedData});
+		}
+
 		return {
 			init: init,
 			doFilter: doFilter,
@@ -5606,6 +5620,7 @@ if (!Object.entries) {
 			generateTableSelectorJQFriendlyNew: generateTableSelectorJQFriendlyNew,
 			exFilterExternallyTriggered: exFilterExternallyTriggered,
 			exResetFilters: exResetFilters,
+			exRefreshSelect2Filter: exRefreshSelect2Filter,
 			initSelectPluginCustomTriggers: initSelectPluginCustomTriggers,
 			preventDefaultForEnter: preventDefaultForEnter,
 			generateTableSelectorJQFriendly2: generateTableSelectorJQFriendly2,

@@ -99,7 +99,7 @@
   $(document).ready(function() {
     const table = $('#example').DataTable({
       data: dataSet,
-      stateSave: true,
+      // stateSave: true,
       // serverSide: true,
       // ajax: "../server_side.php",
       columns: [{
@@ -160,7 +160,7 @@
         exclude_label: 'EXCLUDE',
         checkbox_position_after: true,
         filter_match_mode: 'exact',
-        externally_triggered_checkboxes_text: 'O',
+        /*externally_triggered_checkboxes_text: 'O',
         externally_triggered_checkboxes_function: (event) => {
           const parent = $(event.target).parent();
           const exclude = parent.find('.yadcf-exclude-wrapper input');
@@ -180,7 +180,7 @@
           });
           $(event.target).popover('show');
           $('#checkedExx').prop('checked', checkedEx);
-		    }
+		    }*/
       },
       {
         column_number: 1,
@@ -189,7 +189,7 @@
         exclude: true,
         regex_check_box: true,
         checkbox_position_after: true,
-        externally_triggered_checkboxes_text: 'O',
+        /*externally_triggered_checkboxes_text: 'O',
         externally_triggered_checkboxes_function: (event) => {
           const parent = $(event.target).parent();
           const exclude = parent.find('.yadcf-exclude-wrapper input');
@@ -222,7 +222,7 @@
           $('#checkedEx').prop('checked', checkedEx);
           $('#checkedReg').prop('checked', checkedReg);
           $('#checkedNull').prop('checked', checkedNull);
-		    }
+		    }*/
       },
       {
         column_number: 2,
@@ -230,7 +230,7 @@
         null_check_box: true,
         exclude: true,
         checkbox_position_after: true,
-        externally_triggered_checkboxes_text: 'O',
+        /*externally_triggered_checkboxes_text: 'O',
         externally_triggered_checkboxes_function: (event) => {
           const parent = $(event.target).parent();
           const exclude = parent.find('.yadcf-exclude-wrapper input');
@@ -257,7 +257,7 @@
           $(event.target).popover('show');
           $('#checkedExx').prop('checked', checkedEx);
           $('#checkedNulll').prop('checked', checkedNull);
-		    }
+		    }*/
       },
       // {
       //   column_number: 3,
@@ -294,7 +294,8 @@
     ]);
 
     $('#resetAll').click(function(e, dt, button, conf) {
-    yadcf.exResetAllFilters(table);
+      data = [{id: 2, text:'2'}];
+      yadcf.exRefreshSelect2Filter(table, 0, data);
   });
 
   });
