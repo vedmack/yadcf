@@ -21,8 +21,8 @@
     <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/css/select2.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/js/select2.js"></script> -->
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.js"></script>
 
     <!-- https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.css -->
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
@@ -293,12 +293,28 @@
       // }
     ]);
 
+    var counter = 1;
     $('#resetAll').click(function(e, dt, button, conf) {
-      data = [{id: 2, text:'2'}];
-      yadcf.exRefreshSelect2Filter(table, 0, data);
-  });
+      var t = $('#example').DataTable();
+      t.row.add(
+      {
+      id: {
+        name: counter
+      },
+      height: 666,
+      level: 66,
+      weight: 6666,
+      age: 66,
+      number: 6,
+      salary: 6666,
+      card: 6666,
+      gender: 'male'
+    }).draw( false );
+      yadcf.exRefreshColumnFilterWithDataProp(t, 0, counter);
+      counter++;
+     });
 
-  });
+    });
 
         });
     </script>
