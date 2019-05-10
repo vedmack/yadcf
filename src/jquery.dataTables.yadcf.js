@@ -3170,7 +3170,7 @@ if (!Object.entries) {
 						let column_data_render;
 						if (columnObj.column_number_render) {
 							column_data_render = $.extend(true, [], column_data);
-							column_data_render.forEach((data, index) => {
+							column_data_render.forEach(function(data, index) {
 								const meta = {
 									row: index,
 									col: columnObj.column_number,
@@ -5559,14 +5559,15 @@ if (!Object.entries) {
 		}
 
 		function getProp(nestedObj, keys) {
-			const pathArr = Array.isArray( keys )? keys : keys.split('.');
-			return pathArr.reduce((obj, key) =>
-				(obj && obj[key] !== 'undefined') ? obj[key] : undefined, nestedObj);
+			var pathArr = Array.isArray(keys) ? keys : keys.split('.');
+			return pathArr.reduce(function (obj, key) {
+				return obj && obj[key] !== 'undefined' ? obj[key] : undefined;
+			}, nestedObj);
 		}
 
 		function setProp( object, keys, val ) {
   		keys = Array.isArray( keys )? keys : keys.split('.');
-  		if( keys.length>1 ){
+  		if ( keys.length > 1 ) {
     		object[keys[0]] = object[keys[0]] || {};
     		return setProp( object[keys[0]], keys.slice(1), val );
   		}
