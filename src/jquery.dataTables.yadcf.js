@@ -306,8 +306,26 @@
 * reset_button_style_class
                 Required:           false
                 Type:               String
-                Description:        Allows adding additional class/classes to filter reset button
+								Description:        Allows adding additional class/classes to filter reset button
 
+* externally_triggered_checkboxes_text
+								Required:           false
+								Default value:      false,
+                Type:               boolean | string
+								Description:        Adds external checkboxes button, and hiddes exclude/null/regex checkboxes
+																		usecase: hide/show options (checkboxes) button,  checkboxes in popover/modal
+
+* externally_triggered_checkboxes_function
+								Required:           false
+								Default value:      undefined,
+                Type:               function
+								Description:        Adds onclick function to external checkboxes button, with event parameter
+
+* externally_triggered_checkboxes_button_style_class
+								Required:           false
+								Default value:      ''
+                Type:               String
+								Description:        Allows adding additional class/classes to external checkboxes button
 
 * Global Parameters (per table rather than per column)
 *
@@ -429,7 +447,7 @@
 * exFilterExternallyTriggered
                 Description:        Triggers all the available filters, should be used only when the externally_triggered option used
                 Arguments:          table_arg: (variable of the datatable)
-                Usage example:      yadcf.exResetAllFilters(table_arg);
+								Usage example:      yadcf.exResetAllFilters(table_arg);
 *
 *
 *
@@ -702,7 +720,10 @@ if (!Object.entries) {
 					range_data_type: 'single',
 					range_data_type_delim: '-',
 					omit_default_label: false,
-					custom_range_delimiter: '-yadcf_delim-'
+					custom_range_delimiter: '-yadcf_delim-',
+					externally_triggered_checkboxes_text: false,
+					externally_triggered_checkboxes_function: undefined,
+					externally_triggered_checkboxes_button_style_class: '',
 				};
 				//adaptContainerCssClassImpl = function (dummy) { return ''; };
 
@@ -1826,8 +1847,14 @@ if (!Object.entries) {
 			$(filter_selector_string).append("<input onkeydown=\"yadcf.preventDefaultForEnter(event);\" placeholder=\"" + filter_default_label[1] + "\" id=\"" + toId + "\" class=\"yadcf-filter-range-number yadcf-filter-range\" " + filterActionStr + "></input>");
 
 			if (filter_reset_button_text !== false) {
-				$(filter_selector_string_tmp).append("<button type=\"button\" onmousedown=\"yadcf.stopPropagation(event);\" " +
+				$(filter_selector_string_tmp).append("<button type=\"button\" id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" " +
 					"onclick=\"yadcf.stopPropagation(event);yadcf.rangeClear('" + table_selector_jq_friendly + "',event," + column_number + "); return false;\" class=\"yadcf-filter-reset-button " + columnObj.reset_button_style_class + "\">" + filter_reset_button_text + "</button>");
+			}
+
+			if (columnObj.externally_triggered_checkboxes_text && typeof columnObj.externally_triggered_checkboxes_function === 'function') {
+				$(filter_selector_string_tmp).append("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-externally_triggered_checkboxes-button\" onmousedown=\"yadcf.stopPropagation(event);\" " +
+				"onclick=\"yadcf.stopPropagation(event);\" class=\"yadcf-filter-externally_triggered_checkboxes-button " + columnObj.externally_triggered_checkboxes_button_style_class + "\">" + columnObj.externally_triggered_checkboxes_text + "</button>");
+				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-externally_triggered_checkboxes-button").on('click', columnObj.externally_triggered_checkboxes_function);
 			}
 
 			exclude_str = '';
@@ -1862,6 +1889,12 @@ if (!Object.entries) {
 				$(filter_selector_string_tmp).append(append_checkboxes);
 			} else {
 				$(filter_selector_string).before(append_checkboxes);
+			}
+			// hide on load
+			if (columnObj.externally_triggered_checkboxes_text && typeof columnObj.externally_triggered_checkboxes_function === 'function') {
+				const sel = $("#yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number);
+				sel.find('.yadcf-exclude-wrapper').hide();
+				sel.find('.yadcf-null-wrapper').hide();
 			}
 
 			if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState) {
@@ -3004,7 +3037,9 @@ if (!Object.entries) {
 				custom_func_filter_value_holder,
 				exclude_str,
 				regex_str,
-				null_str;
+				null_str,
+				externally_triggered_checkboxes_text,
+				externally_triggered_checkboxes_function;
 
 			if (pSettings === undefined) {
 				settingsDt = getSettingsObjFromTable(oTable);
@@ -3059,6 +3094,8 @@ if (!Object.entries) {
 					}
 					filter_default_label = columnObj.filter_default_label;
 					filter_reset_button_text = columnObj.filter_reset_button_text;
+					externally_triggered_checkboxes_text = columnObj.externally_triggered_checkboxes_text;
+					externally_triggered_checkboxes_function = columnObj.externally_triggered_checkboxes_function;
 					enable_auto_complete = columnObj.enable_auto_complete;
 					date_format = columnObj.date_format;
 					if (columnObj.datepicker_type === 'jquery-ui') {
@@ -3310,6 +3347,11 @@ if (!Object.entries) {
 									$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " +
 										"id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;\" class=\"yadcf-filter-reset-button " + columnObj.reset_button_style_class + "\">" + filter_reset_button_text + "</button>");
 								}
+								if (columnObj.externally_triggered_checkboxes_text && typeof columnObj.externally_triggered_checkboxes_function === 'function') {
+									$(filter_selector_string).append("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-externally_triggered_checkboxes-button\" onmousedown=\"yadcf.stopPropagation(event);\" " +
+									"onclick=\"yadcf.stopPropagation(event);\" class=\"yadcf-filter-externally_triggered_checkboxes-button " + columnObj.externally_triggered_checkboxes_button_style_class + "\">" + columnObj.externally_triggered_checkboxes_text + "</button>");
+									$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-externally_triggered_checkboxes-button").on('click', columnObj.externally_triggered_checkboxes_function);
+								}
 								exclude_str = '';
 								if (columnObj.exclude === true) {
 									exclude_str = '<span class="yadcf-exclude-wrapper" onmousedown="yadcf.stopPropagation(event);" onclick="yadcf.stopPropagation(event);">' +
@@ -3321,6 +3363,11 @@ if (!Object.entries) {
 									$(filter_selector_string).append(exclude_str);
 								} else {
 									$(filter_selector_string).prepend(exclude_str);
+								}
+								// hide on load
+								if (columnObj.externally_triggered_checkboxes_text && typeof columnObj.externally_triggered_checkboxes_function === 'function') {
+									const sel = $("#yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number);
+									sel.find('.yadcf-exclude-wrapper').hide();
 								}
 
 							} else {
@@ -3549,6 +3596,17 @@ if (!Object.entries) {
 							: exclude_str + regex_str + null_str + append_input;
 
 							$(filter_selector_string).append(append_checkboxes);
+
+							if (externally_triggered_checkboxes_text && typeof externally_triggered_checkboxes_function === 'function') {
+								const sel = $("#yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number);
+								// hide on load
+								sel.find('.yadcf-exclude-wrapper').hide();
+								sel.find('.yadcf-regex-wrapper').hide();
+								sel.find('.yadcf-null-wrapper').hide();
+								$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-externally_triggered_checkboxes-button\" onmousedown=\"yadcf.stopPropagation(event);\" " +
+								"onclick=\"yadcf.stopPropagation(event);\" class=\"yadcf-filter-externally_triggered_checkboxes-button " + columnObj.externally_triggered_checkboxes_button_style_class + "\">" + externally_triggered_checkboxes_text + "</button>");
+								$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-externally_triggered_checkboxes-button").on('click', externally_triggered_checkboxes_function);
+							}
 
 							if (filter_reset_button_text !== false) {
 								$(filter_selector_string).find(".yadcf-filter").after("<button type=\"button\" " + " id=\"yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset\" onmousedown=\"yadcf.stopPropagation(event);\" " +
