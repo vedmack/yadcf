@@ -124,6 +124,7 @@ $(document).ready(function(){
 Available parameters - being set per column (detailed explanation inside jquery.dataTables.yadcf.js)
 
 * column_number
+* column_selector
 * filter_type
 * custom_func
 * data

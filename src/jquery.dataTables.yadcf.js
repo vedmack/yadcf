@@ -24,9 +24,14 @@
 * -------------
 
 * column_number
-                Required:           true
+                Required:           true (or use column_selector)
                 Type:               int
                 Description:        The number of the column to which the filter will be applied
+
+* column_selector
+                Required:           true (or use column_number)
+                Type:               see https://datatables.net/reference/type/column-selector for valid column-selector formats
+                Description:        The column-selector of the column to which the filter will be applied
 
 * filter_type
                 Required:           false
@@ -227,16 +232,16 @@
                 Required:           false
                 Type:               boolean
                 Default value:      undefined
-								Description:        Adds a checkbox next to the filter that allows to filter by null value,
-																		works only for tables with data retrieved via data property, not working for html defined tables,
-																		where null is represented as string
-								Note:               Currently available for the text and range_number filters
+                Description:        Adds a checkbox next to the filter that allows to filter by null value,
+                                    works only for tables with data retrieved via data property, not working for html defined tables,
+                                    where null is represented as string
+                Note:               Currently available for the text and range_number filters
 
 * null_label
                 Required:           false
                 Type:               String
                 Default value:      'null'
-								Description:        The label that will appear above the null checkbox
+                Description:        The label that will appear above the null checkbox
 
 * checkbox_position_after
                 Required:           false
@@ -258,15 +263,15 @@
                 Required:           false
                 Type:               Object
                 Default value:      {}
-								Description:        This parameter will be passed "as is" to the Chosen/Select2 plugin constructor
+                Description:        This parameter will be passed "as is" to the Chosen/Select2 plugin constructor
 
 * select_null_option
                 Required:           false
                 Type:               string
                 Default value:      'null'
-								Description:        String value which internaly represents null option in select filters,
-																		also it is send to server if serverside feature is enabled
-																		Supports exclude, with exclude enabled the string is wrapped with exclude regex
+                Description:        String value which internaly represents null option in select filters,
+                                    also it is send to server if serverside feature is enabled
+                                    Supports exclude, with exclude enabled the string is wrapped with exclude regex
 
 * filter_plugin_options
                 Required:           false
@@ -306,26 +311,26 @@
 * reset_button_style_class
                 Required:           false
                 Type:               String
-								Description:        Allows adding additional class/classes to filter reset button
+                Description:        Allows adding additional class/classes to filter reset button
 
 * externally_triggered_checkboxes_text
-								Required:           false
-								Default value:      false,
+                Required:           false
+                Default value:      false,
                 Type:               boolean | string
-								Description:        Adds external checkboxes button, and hiddes exclude/null/regex checkboxes
-																		usecase: hide/show options (checkboxes) button,  checkboxes in popover/modal
+                Description:        Adds external checkboxes button, and hiddes exclude/null/regex checkboxes
+                                    usecase: hide/show options (checkboxes) button,  checkboxes in popover/modal
 
 * externally_triggered_checkboxes_function
-								Required:           false
-								Default value:      undefined,
+                Required:           false
+                Default value:      undefined,
                 Type:               function
-								Description:        Adds onclick function to external checkboxes button, with event parameter
+                Description:        Adds onclick function to external checkboxes button, with event parameter
 
 * externally_triggered_checkboxes_button_style_class
-								Required:           false
-								Default value:      ''
+                Required:           false
+                Default value:      ''
                 Type:               String
-								Description:        Allows adding additional class/classes to external checkboxes button
+                Description:        Allows adding additional class/classes to external checkboxes button
 
 * Global Parameters (per table rather than per column)
 *
@@ -450,12 +455,12 @@
 								Usage example:      yadcf.exResetAllFilters(table_arg);
 
 * exRefreshColumnFilterWithDataProp
-								Description:        Updates column filter with new data, when data property was used in initialization for this filter
-																		 e.g. select filter, when we used data property and we want to update it
-								Arguments:          table_arg: variable of the datatable
-																		col_num: number index of column filter
-																		updatedData: array of new data (use same data structure as was used in yadcf.init options)
-								Usage example:      yadcf.exRefreshColumnFilterWithDataProp(table_arg, 5, ['One', 'Two', 'Three']);
+                Description:        Updates column filter with new data, when data property was used in initialization for this filter
+                                    e.g. select filter, when we used data property and we want to update it
+                Arguments:          table_arg: variable of the datatable
+                                    col_num: number index of column filter
+                                    updatedData: array of new data (use same data structure as was used in yadcf.init options)
+                                Usage example:      yadcf.exRefreshColumnFilterWithDataProp(table_arg, 5, ['One', 'Two', 'Three']);
 *
 *
 *
