@@ -1,0 +1,20 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@wdio/cli": "^5.10.0",
+    "@wdio/local-runner": "^5.10.0",
+    "@wdio/mocha-framework": "^5.9.4",
+    "@wdio/selenium-standalone-service": "^5.9.3",
+    "@wdio/spec-reporter": "^5.9.3",
+    "@wdio/sync": "^5.10.0"
+  }
+}
