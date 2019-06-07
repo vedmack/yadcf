@@ -5,10 +5,12 @@
 
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.5.1/css/colReorder.dataTables.min.css">
+    <!-- <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css"> -->
     <link rel="stylesheet" type="text/css" href="../../../jquery.dataTables.yadcf.css">
 
     <script  src="https://code.jquery.com/jquery-3.3.1.js"  crossorigin="anonymous"></script>
     <script  src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"  crossorigin="anonymous"></script>
+    <!-- <script  src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"  crossorigin="anonymous"></script> -->
     <script  src="../../jquery.dataTables.yadcf.js"></script>
 
     <meta charset=utf-8 />
@@ -26,38 +28,20 @@
       },
       height: 0,
       level: 'master',
-      weight: 90,
-      age: 45,
-      number: null,
-      salary: 1200,
-      card: null,
-      gender: 'male'
     },
     {
       id: {
         name: 'Tiger'
       },
       height: 4,
-      level: null,
-      weight: 180,
-      age: 75,
-      number: 7,
-      salary: null,
-      card: 7777,
-      gender: null
+      level: null
     },
     {
       id: {
         name: 'Lion1234'
       },
       height: null,
-      level: 'noob',
-      weight: 180,
-      age: 75,
-      number: 7,
-      salary: null,
-      card: 7777,
-      gender: null
+      level: 'noob'
     }
   ];
 
@@ -83,36 +67,6 @@
         {
           title: "level",
           data: 'level',
-          render: renderFunc,
-        },
-        {
-          title: "weight",
-          data: 'weight',
-          render: renderFunc,
-        },
-        {
-          title: "age",
-          data: 'age',
-          render: renderFunc,
-        },
-        {
-          title: "lucky number",
-          data: 'number',
-          render: renderFunc,
-        },
-        {
-          title: "salary",
-          data: 'salary',
-          render: renderFunc,
-        },
-        {
-          title: "card",
-          data: 'card',
-          render: renderFunc,
-        },
-        {
-          title: "gender",
-          data: 'gender',
           render: renderFunc,
         },
       ]

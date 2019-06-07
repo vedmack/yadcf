@@ -3,7 +3,9 @@ const assert = require('assert');
 describe('yadcf test', () => {
 
     beforeEach(() => {
-        browser.url('file:///C:/Users/sk040188/Desktop/yadcf/src/test/specs/test.html');
+        /* IMPORTANT*/
+        // use absolute path since relatiove is not supported
+        browser.url('file:///ABSOLUTE_PATH/src/test/specs/test.html');
     });
 
     it('should have the right title - base init test', () => {
