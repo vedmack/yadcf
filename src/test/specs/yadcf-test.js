@@ -437,4 +437,74 @@ describe('yadcf test', () => {
         });
     });
 
+    describe('select filter', () => {
+
+        it('select - one match', () => {
+            // arrange
+            const inputElement = $('#yadcf-filter--example-2');
+            inputElement.selectByVisibleText('master');
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            const filteredTd = $('td=master');
+            const tdText = filteredTd.getText();
+            // assert
+            assert.equal(tdText, 'master');
+            assert.equal(infoText, showOneInfo);
+        });
+
+        it('select  null - one match', () => {
+            // arrange
+            const inputElement = $('#yadcf-filter--example-2');
+            inputElement.selectByVisibleText('master');
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            const filteredTd = $('td=null');
+            const tdText = filteredTd.getText();
+            // assert
+            assert.equal(tdText, 'null');
+            assert.equal(infoText, showOneInfo);
+        });
+
+        it('select exclude - two match', () => {
+            // arrange
+            const inputElement = $('#yadcf-filter--example-2');
+            const excludeElement = $('#yadcf-filter-wrapper--example-2 input');
+            inputElement.selectByVisibleText('null');
+            excludeElement.click();
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            const filteredTd = $('td=master');
+            const tdText = filteredTd.getText();
+            const filteredTd2 = $('td=noob');
+            const td2Text = filteredTd2.getText();
+            // assert
+            assert.equal(td2Text, 'noob');
+            assert.equal(tdText, 'master');
+            assert.equal(infoText, showTwoInfo);
+        });
+
+        it('clear - all match', () => {
+            // arrange
+            const inputElement = $('#yadcf-filter--example-2');
+            const excludeElement = $('#yadcf-filter-wrapper--example-2 input');
+            const clearElement = $('#yadcf-filter-wrapper--example-2 button');
+            inputElement.selectByVisibleText('null');
+            excludeElement.click();
+            // act
+            clearElement.click();
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            const excludeChecked = excludeElement.getProperty('checked');
+            const inputText = inputElement.getValue();
+            // asset
+            assert.equal(excludeChecked, false);
+            assert.equal(inputText, '-1');
+            assert.equal(infoText, showAllInfo);
+        });
+    });
+
 });

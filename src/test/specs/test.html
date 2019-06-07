@@ -25,7 +25,7 @@
         name: null
       },
       height: 0,
-      level: 11,
+      level: 'master',
       weight: 90,
       age: 45,
       number: null,
@@ -38,7 +38,7 @@
         name: 'Tiger'
       },
       height: 4,
-      level: 3,
+      level: null,
       weight: 180,
       age: 75,
       number: 7,
@@ -51,7 +51,7 @@
         name: 'Lion1234'
       },
       height: null,
-      level: 3,
+      level: 'noob',
       weight: 180,
       age: 75,
       number: 7,
@@ -130,6 +130,12 @@
         column_number: 1,
         filter_type: "range_number",
         null_check_box: true,
+        exclude: true,
+      },
+      {
+        column_number: 2,
+        filter_type: "select",
+        data:['master', 'noob', null],
         exclude: true,
       }
     ]);
