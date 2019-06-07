@@ -507,4 +507,59 @@ describe('yadcf test', () => {
         });
     });
 
+    describe('reset all filters', () => {
+
+        it('reset all button - all match', () => {
+            // arrange
+            const inputTextElement = $('#yadcf-filter--example-0');
+            const nullElement = $('.yadcf-null-wrapper input');
+            const excludeElement = $('#yadcf-filter-wrapper--example-0 input');
+            const regexElement = $('.yadcf-regex-wrapper input');
+            const inputFromElement = $('#yadcf-filter--example-from-1');
+            const inputToElement = $('#yadcf-filter--example-to-1');
+            const null2Element = $$('.yadcf-null-wrapper input')[1];
+            const exclude2Element = $('#yadcf-filter-wrapper--example-1 input');
+            const inputSelectElement = $('#yadcf-filter--example-2');
+            const exclude3Element = $('#yadcf-filter-wrapper--example-2 input');
+            const resetAllElement = $('#resetAll');
+            inputTextElement.setValue('lion');
+            nullElement.click();
+            excludeElement.click();
+            regexElement.click();
+            inputFromElement.setValue('-1');
+            inputToElement.setValue('5');
+            null2Element.click();
+            exclude2Element.click();
+            inputSelectElement.selectByVisibleText('null');
+            exclude3Element.click();
+            // act
+            resetAllElement.click();
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            const nullChecked = nullElement.getProperty('checked');
+            const regexChecked = regexElement.getProperty('checked');
+            const excludeChecked = excludeElement.getProperty('checked');
+            const inputText = inputTextElement.getValue();
+            const null2Checked = null2Element.getProperty('checked');
+            const exclude2Checked = exclude2Element.getProperty('checked');
+            const inputFromText = inputFromElement.getValue();
+            const inputToText = inputToElement.getValue();
+            const exclude3Checked = exclude3Element.getProperty('checked');
+            const inputSelectText = inputSelectElement.getValue();
+            // asset
+            assert.equal(nullChecked, false);
+            assert.equal(regexChecked, false);
+            assert.equal(excludeChecked, false);
+            assert.equal(null2Checked, false);
+            assert.equal(exclude2Checked, false);
+            assert.equal(exclude3Checked, false);
+            assert.equal(inputText, '');
+            assert.equal(inputFromText, '');
+            assert.equal(inputToText, '');
+            assert.equal(inputSelectText, '-1');
+            assert.equal(infoText, showAllInfo);
+        });
+    });
+
 });

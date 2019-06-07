@@ -68,7 +68,6 @@
     return data;
   }
 
-  $(document).ready(function() {
     const table = $('#example').DataTable({
       data: dataSet,
       columns: [{
@@ -140,7 +139,14 @@
       }
     ]);
 
-    });
+    $('#resetAll').click(function(e, dt, button, conf) {
+      var t = $('#example').DataTable();
+      yadcf.exResetAllFilters(t, false);
+     });
+
 });
 </script>
+<button id="resetAll">
+  reset all
+  </button>
 </html>
