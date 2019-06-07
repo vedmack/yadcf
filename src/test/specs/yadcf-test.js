@@ -18,14 +18,13 @@ describe('yadcf test', () => {
 
     describe('text filter', () => {
 
-
         it('input - no match', () => {
             // arrange
             const inputElement = $('#yadcf-filter--example-0');
             inputElement.setValue('abc');
             // get values
             const infoElement = $('#example_info');
-            const infoText = infoElement.getText(false);
+            const infoText = infoElement.getText();
             // assert
             assert.equal(infoText, showNoneInfo);
         });
@@ -36,7 +35,7 @@ describe('yadcf test', () => {
             inputElement.setValue('tiger');
             // get values
             const infoElement = $('#example_info');
-            const infoText = infoElement.getText(false);
+            const infoText = infoElement.getText();
             const filteredTd = $('td=Tiger');
             const tdText = filteredTd.getText();
             // assert
@@ -52,7 +51,7 @@ describe('yadcf test', () => {
             excludeElement.click();
             // get values
             const infoElement = $('#example_info');
-            const infoText = infoElement.getText(false);
+            const infoText = infoElement.getText();
             const filteredTd = $('td=Tiger');
             const tdText = filteredTd.getText();
             const filteredNullTd = $('td=null');
@@ -166,6 +165,274 @@ describe('yadcf test', () => {
             assert.equal(regexChecked, false);
             assert.equal(excludeChecked, false);
             assert.equal(inputText, '');
+            assert.equal(infoText, showAllInfo);
+        });
+    });
+
+    describe('range number filter', () => {
+
+        it('from - one match', () => {
+            // arrange
+            const inputElement = $('#yadcf-filter--example-from-1');
+            inputElement.setValue('3');
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            const filteredTd = $('td=4');
+            const tdText = filteredTd.getText();
+            // assert
+            assert.equal(tdText, '4');
+            assert.equal(infoText, showOneInfo);
+        });
+
+        it('exclude from - one match', () => {
+            // arrange
+            const inputElement = $('#yadcf-filter--example-from-1');
+            const excludeElement = $('#yadcf-filter-wrapper--example-1 input');
+            excludeElement.click();
+            inputElement.setValue('3');
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            const filteredTd = $('td=0');
+            const tdText = filteredTd.getText();
+            // assert
+            assert.equal(tdText, '0');
+            assert.equal(infoText, showOneInfo);
+        });
+
+        it('to - two match', () => {
+            // arrange
+            const inputElement = $('#yadcf-filter--example-to-1');
+            inputElement.setValue('5');
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            const filteredTd4 = $('td=4');
+            const td4Text = filteredTd4.getText();
+            const filteredTd0 = $('td=0');
+            const td0Text = filteredTd0.getText();
+            // assert
+            assert.equal(td4Text, '4');
+            assert.equal(td0Text, '0');
+            assert.equal(infoText, showTwoInfo);
+        });
+
+        it('exclude to - one match', () => {
+            // arrange
+            const inputElement = $('#yadcf-filter--example-to-1');
+            const excludeElement = $('#yadcf-filter-wrapper--example-1 input');
+            excludeElement.click();
+            inputElement.setValue('3');
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            const filteredTd = $('td=4');
+            const tdText = filteredTd.getText();
+            // assert
+            assert.equal(tdText, '4');
+            assert.equal(infoText, showOneInfo);
+        });
+
+        it('from and to - single number - one match', () => {
+            // arrange
+            const inputFromElement = $('#yadcf-filter--example-from-1');
+            const inputToElement = $('#yadcf-filter--example-to-1');
+            inputFromElement.setValue('0');
+            inputToElement.setValue('0');
+
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            const filteredTd = $('td=0');
+            const tdText = filteredTd.getText();
+            // assert
+            assert.equal(tdText, '0');
+            assert.equal(infoText, showOneInfo);
+        });
+
+        it('from and to - number range - one match', () => {
+            // arrange
+            const inputFromElement = $('#yadcf-filter--example-from-1');
+            const inputToElement = $('#yadcf-filter--example-to-1');
+            inputFromElement.setValue('1');
+            inputToElement.setValue('7');
+
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            const filteredTd = $('td=4');
+            const tdText = filteredTd.getText();
+            // assert
+            assert.equal(tdText, '4');
+            assert.equal(infoText, showOneInfo);
+        });
+
+        it('from and to - number range - two match', () => {
+            // arrange
+            const inputFromElement = $('#yadcf-filter--example-from-1');
+            const inputToElement = $('#yadcf-filter--example-to-1');
+            inputFromElement.setValue('-5');
+            inputToElement.setValue('7');
+
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            const filteredTd4= $('td=4');
+            const td4Text = filteredTd4.getText();
+            const filteredTd0 = $('td=0');
+            const td0Text = filteredTd0.getText();
+            // assert
+            assert.equal(td4Text, '4');
+            assert.equal(td0Text, '0');
+            assert.equal(infoText, showTwoInfo);
+        });
+
+        it('from and to - number range - no match', () => {
+            // arrange
+            const inputFromElement = $('#yadcf-filter--example-from-1');
+            const inputToElement = $('#yadcf-filter--example-to-1');
+            inputFromElement.setValue('400');
+            inputToElement.setValue('700');
+
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            // assert
+            assert.equal(infoText, showNoneInfo);
+        });
+
+        it('from and to exclude - single number - one match', () => {
+            // arrange
+            const inputFromElement = $('#yadcf-filter--example-from-1');
+            const inputToElement = $('#yadcf-filter--example-to-1');
+            const excludeElement = $('#yadcf-filter-wrapper--example-1 input');
+            excludeElement.click();
+            inputFromElement.setValue('0');
+            inputToElement.setValue('0');
+
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            const filteredTd = $('td=4');
+            const tdText = filteredTd.getText();
+            // assert
+            assert.equal(tdText, '4');
+            assert.equal(infoText, showOneInfo);
+        });
+
+        it('from and to exclude - number range - two match', () => {
+            // arrange
+            const inputFromElement = $('#yadcf-filter--example-from-1');
+            const inputToElement = $('#yadcf-filter--example-to-1');
+            const excludeElement = $('#yadcf-filter-wrapper--example-1 input');
+            excludeElement.click();
+            inputFromElement.setValue('1');
+            inputToElement.setValue('2');
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            const filteredTd4 = $('td=4');
+            const td4Text = filteredTd4.getText();
+            const filteredTd0 = $('td=0');
+            const td0Text = filteredTd0.getText();
+            // assert
+            assert.equal(td4Text, '4');
+            assert.equal(td0Text, '0');
+            assert.equal(infoText, showTwoInfo);
+        });
+
+        it('from and to exclude - number range - no match', () => {
+            // arrange
+            const inputFromElement = $('#yadcf-filter--example-from-1');
+            const inputToElement = $('#yadcf-filter--example-to-1');
+            const excludeElement = $('#yadcf-filter-wrapper--example-1 input');
+            excludeElement.click();
+            inputFromElement.setValue('-1');
+            inputToElement.setValue('5');
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            // assert
+            assert.equal(infoText, showNoneInfo);
+        });
+
+        it('from and to - from greater then to - no filter', () => {
+            // arrange
+            const inputFromElement = $('#yadcf-filter--example-from-1');
+            const inputToElement = $('#yadcf-filter--example-to-1');
+            inputFromElement.setValue('400');
+            inputToElement.setValue('5');
+
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            // assert
+            assert.equal(infoText, showNoneInfo);
+        });
+
+        it('null - one match', () => {
+            // arrange
+            const inputFromElement = $('#yadcf-filter--example-from-1');
+            const nullElement = $$('.yadcf-null-wrapper input')[1];
+            inputFromElement.setValue('400');
+            nullElement.click();
+            // get values
+            const filteredNullTd = $('td=null');
+            const tdNullText = filteredNullTd.getText();
+
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            // assert
+            assert.equal(tdNullText, 'null');
+            assert.equal(infoText, showOneInfo);
+        });
+
+        it('null exclude - two match', () => {
+            // arrange
+            const inputFromElement = $('#yadcf-filter--example-from-1');
+            const nullElement = $$('.yadcf-null-wrapper input')[1];
+            const excludeElement = $('#yadcf-filter-wrapper--example-1 input');
+            excludeElement.click();
+            inputFromElement.setValue('400');
+            nullElement.click();
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            const filteredTd4 = $('td=4');
+            const td4Text = filteredTd4.getText();
+            const filteredTd0 = $('td=0');
+            const td0Text = filteredTd0.getText();
+            // assert
+            assert.equal(td4Text, '4');
+            assert.equal(td0Text, '0');
+            assert.equal(infoText, showTwoInfo);
+        });
+
+        it('clear - all match', () => {
+            // arrange
+            const inputFromElement = $('#yadcf-filter--example-from-1');
+            const inputToElement = $('#yadcf-filter--example-to-1');
+            const nullElement = $$('.yadcf-null-wrapper input')[1];
+            const excludeElement = $('#yadcf-filter-wrapper--example-1 input');
+            const clearElement = $('#yadcf-filter-wrapper--example-1 button');
+            inputFromElement.setValue('-1');
+            inputToElement.setValue('5');
+            nullElement.click();
+            excludeElement.click();
+            // act
+            clearElement.click();
+            // get values
+            const infoElement = $('#example_info');
+            const infoText = infoElement.getText();
+            const nullChecked = nullElement.getProperty('checked');
+            const excludeChecked = excludeElement.getProperty('checked');
+            const inputFromText = inputFromElement.getValue();
+            const inputToText = inputToElement.getValue();
+            // asset
+            assert.equal(nullChecked, false);
+            assert.equal(excludeChecked, false);
+            assert.equal(inputToText, '');
             assert.equal(infoText, showAllInfo);
         });
     });
