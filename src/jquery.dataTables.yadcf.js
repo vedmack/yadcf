@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.26
+* Version:     0.9.4.beta.27
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -837,13 +837,13 @@ if (!Object.entries) {
 		}
 
 		function escapeRegExp(string) {
-			return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+			return string.replace(/([.*+?^=!:${}()|'\[\]\/\\])/g, "\\$1");
 		}
 
 		function escapeRegExpInArray(arr) {
 			var i;
 			for (i = 0; i < arr.length; i++) {
-				arr[i] = arr[i].replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+				arr[i] = arr[i].replace(/([.*+?^=!:${}()|'\[\]\/\\])/g, "\\$1");
 			}
 			return arr;
 		}
@@ -3299,6 +3299,7 @@ if (!Object.entries) {
 									if (columnObj.filter_type === "select") {
 										tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
 										let filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
+										tmpStr = escapeRegExp(tmpStr);
 										let optionExists = filter.find("option[value='" + tmpStr + "']").length === 1;
 										// Set the state preselected value only if the option exists in the select dropdown.
 										if (optionExists) {
@@ -3445,6 +3446,7 @@ if (!Object.entries) {
 									tmpStr = tmpStr.replace(excludeStrEnd, '');
 								}
 								let filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
+								tmpStr = escapeRegExp(tmpStr);
 								let optionExists = filter.find("option[value='" + tmpStr + "']").length === 1;
 								// Set the state preselected value only if the option exists in the select dropdown.
 								if (optionExists) {
