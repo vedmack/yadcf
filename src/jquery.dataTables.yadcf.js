@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.27
+* Version:     0.9.4.beta.28
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -77,9 +77,10 @@
                 Required:           false
                 Type:               String
                 Default value:      'text'
-                Possible values:    text / html / rendered_html
+                Possible values:    text / html / rendered_html / html5_data_complex
                 Description:        The type of data in column , use "html" when you have some html code in the column (support parsing of multiple elements per cell),
-                                    use rendered_html when you are using render function of columnDefs or similar, that produces a html code, note that both types rendered_html and html have a fallback for simple text parsing
+																		use rendered_html when you are using render function of columnDefs or similar, that produces a html code, note that both types rendered_html and html have a fallback for simple text parsing.
+																		html5_data_complex allows to populate filter with pairs of display/value by using datatables datatables HTML5 data-* attributes - should be used along with specifying html5_data attibute (read docs)
 
 * text_data_delimiter
                 Required:           false
@@ -114,7 +115,8 @@
                 Type:               String
                 Default value:      undefined
                 Possible values:    data-filter / data-search / anything that is supported by datatables
-                Description:        Allows to filter based on data-filter / data-search attributes of the <td> element, read more: http://www.datatables.net/examples/advanced_init/html5-data-attributes.html
+								Description:        Allows to filter based on data-filter / data-search attributes of the <td> element, read more: http://www.datatables.net/examples/advanced_init/html5-data-attributes.html
+								Special notes:			Can be used along with column_data_type: 'html5_data_complex' to populate filter with pairs of display/value instead of values only
 
 * filter_container_id
                 Required:           false
@@ -3011,7 +3013,20 @@ if (!Object.entries) {
 							column_data.push(col_inner_data);
 						}
 					}
+				} else if (columnObj.column_data_type === "html5_data_complex") {
+					col_inner_data = data[j]._aData[column_number_filter];
+					col_inner_data_helper = col_inner_data['@' + columnObj.html5_data];
+					if (!col_filter_array.hasOwnProperty(col_inner_data_helper)) {
+						col_filter_array[col_inner_data_helper] = col_inner_data_helper;
+						column_data.push(
+							{ 
+								value: col_inner_data_helper,
+								label: col_inner_data['display']
+							}
+						);
+					}
 				}
+
 			}
 			columnObj.col_filter_array = col_filter_array;
 			return column_data;
