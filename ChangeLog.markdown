@@ -10,6 +10,7 @@
 * Support for stateSave with serverSide currently only for filter_type: 'text'
 * Support Date Range Picker plugin (datepicker_type: 'daterangepicker') - https://github.com/vedmack/yadcf/issues/537
 * Added column_data_type: 'html5_data_complex' type to parse value/display from datatable html5 attributes - https://github.com/vedmack/yadcf/issues/581
+* Added range_data_type: 'delimiter' , to allow range slider filter to handle multiple values per cell - https://github.com/vedmack/yadcf/issues/580
 * Misc bug fixed issues:
 	https://github.com/vedmack/yadcf/issues/469 - Cannot apply style_class on date filter
 	https://github.com/vedmack/yadcf/issues/470 - filter_delay not working on range_date
@@ -30,6 +31,7 @@
 	https://github.com/vedmack/yadcf/issues/535 - Feature request: DataTables Editor DateTime picker support.
 	https://github.com/vedmack/yadcf/issues/562 - multi_select_custom_func not considered in exGetColumnFilterVal
 	https://github.com/vedmack/yadcf/issues/564 - Error undefinded ColumnObj with ServerSide, Range_Number and Custom_Range_Delimiter
+
 	
 ## 0.9.3
 

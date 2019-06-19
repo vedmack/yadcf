@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.28
+* Version:     0.9.4.beta.29
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -81,6 +81,14 @@
                 Description:        The type of data in column , use "html" when you have some html code in the column (support parsing of multiple elements per cell),
 																		use rendered_html when you are using render function of columnDefs or similar, that produces a html code, note that both types rendered_html and html have a fallback for simple text parsing.
 																		html5_data_complex allows to populate filter with pairs of display/value by using datatables datatables HTML5 data-* attributes - should be used along with specifying html5_data attibute (read docs)
+
+* column_data_render
+                Required:           false
+                Type:               function
+                Possible values:    function (data) {return data.someValue || ('whatever ' + data.otherValue)}
+								Description:        function that will help yadcf to know what is "text" is present in the cell
+								Note:								Originally added to enable cumulative_filtering with column_data_type: "rendered_html"
+								
 
 * text_data_delimiter
                 Required:           false
@@ -379,6 +387,8 @@
                 Description:        Calls the provided callback function in the end of the yadcf init function
 				Note:               This callback function will run before datatables fires its event such as draw/xhr/etc., migth be usefull for call some
 									third parties init / loading code
+
+
 * jquery_ui_datepicker_locale
                 Required:           false
                 Type:               string
@@ -1319,7 +1329,7 @@ if (!Object.entries) {
 					if (columnObj.ignore_char !== undefined) {
 						array[i] = array[i].toString().replace(columnObj.ignore_char, "");
 					}
-					if (columnObj.range_data_type === 'single') {
+					if (columnObj.range_data_type !== 'range') {
 						num = +array[i];
 					} else {
 						num = array[i].split(columnObj.range_data_type_delim);
@@ -1330,7 +1340,7 @@ if (!Object.entries) {
 					}
 				}
 			}
-			min = Math.min.apply(Math, narray);
+			min = Math.min(...narray);
 			if (!isFinite(min)) {
 				min = 0;
 			} else if (min !== 0) {
@@ -1354,7 +1364,7 @@ if (!Object.entries) {
 					if (columnObj.ignore_char !== undefined) {
 						array[i] = array[i].toString().replace(columnObj.ignore_char, "");
 					}
-					if (columnObj.range_data_type === 'single') {
+					if (columnObj.range_data_type !== 'range') {
 						num = +array[i];
 					} else {
 						num = array[i].split(columnObj.range_data_type_delim);
@@ -1365,7 +1375,7 @@ if (!Object.entries) {
 					}
 				}
 			}
-			max = Math.max.apply(Math, narray);
+			max = Math.max(...narray);
 			if (!isFinite(max)) {
 				max = 0;
 			} else {
@@ -1511,16 +1521,28 @@ if (!Object.entries) {
 							val = val.split(columnObj.range_data_type_delim);
 							valFrom = (val[0] !== "") ? (+val[0]) : val[0];
 							valTo = (val[1] !== "") ? (+val[1]) : val[1];
-							if (min === "" && max === "") {
-								retVal = true;
-							} else if (min === "" && valTo <= max) {
-								retVal = true;
-							} else if (min <= valFrom && "" === max) {
-								retVal = true;
-							} else if (min <= valFrom && valTo <= max) {
-								retVal = true;
-							} else if ((valFrom === '' || isNaN(valFrom)) && (valTo === '' || isNaN(valTo))) {
-								retVal = true;
+							if (!columnObj.range_data_operator) {
+								if (min === "" && max === "") {
+									retVal = true;
+								} else if (min === "" && valTo <= max) {
+									retVal = true;
+								} else if (min <= valFrom && "" === max) {
+									retVal = true;
+								} else if (min <= valFrom && valTo <= max) {
+									retVal = true;
+								} else if ((valFrom === '' || isNaN(valFrom)) && (valTo === '' || isNaN(valTo))) {
+									retVal = true;
+								}
+							}
+						} else if (columnObj.range_data_type === 'delimiter') {
+							if (columnObj.text_data_delimiter !== undefined) {
+								let valSplitted = val.split(columnObj.text_data_delimiter);
+								let anyNumberInRange = function(fromToObj) {
+									return function(element, index, array) {
+										return element >= fromToObj.from && element <= fromToObj.to;
+									};
+								};
+								retVal = valSplitted.some(anyNumberInRange({from: min, to: max}));
 							}
 						}
 						return retVal;
