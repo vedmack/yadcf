@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.5.1/css/colReorder.dataTables.min.css">
+    <!-- <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css"> -->
+    <link rel="stylesheet" type="text/css" href="../../../jquery.dataTables.yadcf.css">
+
+    <script  src="https://code.jquery.com/jquery-3.3.1.js"  crossorigin="anonymous"></script>
+    <script  src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"  crossorigin="anonymous"></script>
+    <!-- <script  src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"  crossorigin="anonymous"></script> -->
+    <script  src="../../jquery.dataTables.yadcf.js"></script>
+
+    <meta charset=utf-8 />
+    <title>yadcf - Test</title>
+</head>
+
+<table id="example" class="display nowrap" style="width:100%">
+</table>
+<script>
+    $(document).ready(function() {
+    var dataSet = [
+    {
+      id: {
+        name: null
+      },
+      height: 0,
+      level: 'master',
+    },
+    {
+      id: {
+        name: 'Tiger'
+      },
+      height: 4,
+      level: null
+    },
+    {
+      id: {
+        name: 'Lion1234'
+      },
+      height: null,
+      level: 'noob'
+    }
+  ];
+
+  function renderFunc(data, type, row, meta) {
+    if (type === 'display') {
+      return data === null ? 'null': data;
+    }
+    return data;
+  }
+
+    const table = $('#example').DataTable({
+      data: dataSet,
+      columns: [{
+          title: "ID",
+          data: 'id.name',
+          render: renderFunc
+        },
+        {
+          title: "height",
+          data: 'height',
+          render: renderFunc,
+        },
+        {
+          title: "level",
+          data: 'level',
+          render: renderFunc,
+        },
+      ]
+    });
+    yadcf.init(table, [
+      {
+        column_number: 0,
+        filter_type: 'text',
+        exclude: true,
+        regex_check_box: true,
+        null_check_box: true
+      },
+      {
+        column_number: 1,
+        filter_type: "range_number",
+        null_check_box: true,
+        exclude: true,
+      },
+      {
+        column_number: 2,
+        filter_type: "select",
+        data:['master', 'noob', null],
+        exclude: true,
+      }
+    ]);
+
+    $('#resetAll').click(function(e, dt, button, conf) {
+      var t = $('#example').DataTable();
+      yadcf.exResetAllFilters(t, false);
+     });
+
+});
+</script>
+<button id="resetAll">
+  reset all
+  </button>
+</html>
