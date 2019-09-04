@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.29
+* Version:     0.9.4.beta.30
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -2212,7 +2212,7 @@ if (!Object.entries) {
 				innerWrapperAdditionalClass = 'input-daterange';
 			}
 			//add a wrapper to hold both filter and reset button
-			$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper " + columnObj.style_class + "\"></div>");
+			$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper \"></div>");
 			filter_selector_string += " div.yadcf-filter-wrapper";
 			filter_selector_string_tmp = filter_selector_string;
 
@@ -2224,9 +2224,9 @@ if (!Object.entries) {
 				filterActionStr = '';
 			}
 
-			$(filter_selector_string).append("<input onkeydown=\"yadcf.preventDefaultForEnter(event);\" placeholder=\"" + filter_default_label[0] + "\" id=\"" + fromId + "\" class=\"yadcf-filter-range-date yadcf-filter-range yadcf-filter-range-start\" " + filterActionStr + "></input>");
+			$(filter_selector_string).append("<input onkeydown=\"yadcf.preventDefaultForEnter(event);\" placeholder=\"" + filter_default_label[0] + "\" id=\"" + fromId + "\" class=\"yadcf-filter-range-date yadcf-filter-range yadcf-filter-range-start " + columnObj.style_class + "\" " + filterActionStr + "></input>");
 			$(filter_selector_string).append("<span class=\"yadcf-filter-range-date-seperator\" >" + "</span>");
-			$(filter_selector_string).append("<input onkeydown=\"yadcf.preventDefaultForEnter(event);\" placeholder=\"" + filter_default_label[1] + "\" id=\"" + toId + "\" class=\"yadcf-filter-range-date yadcf-filter-range yadcf-filter-range-end\" " + filterActionStr + "></input>");
+			$(filter_selector_string).append("<input onkeydown=\"yadcf.preventDefaultForEnter(event);\" placeholder=\"" + filter_default_label[1] + "\" id=\"" + toId + "\" class=\"yadcf-filter-range-date yadcf-filter-range yadcf-filter-range-end " + columnObj.style_class + "\" " + filterActionStr + "></input>");
 
 			$fromInput = $("#" + fromId);
 			$toInput = $("#" + toId);
