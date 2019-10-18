@@ -3134,15 +3134,15 @@ if (!Object.entries) {
 									}
 								}
 								column_position = col_num_visible;
-								filter_selector_string = table_selector + ' ' + filters_position + ' th:eq(' + column_position + ')';
+								filter_selector_string = table_selector + ' > ' + filters_position + ' > tr > th:eq(' + column_position + ')';
 							} else {
-								filter_selector_string = table_selector + ' ' + filters_position + ' th:eq(' + $(unique_th[column_position]).index() + ')';
+								filter_selector_string = table_selector + ' > ' + filters_position + ' > tr > th:eq(' + $(unique_th[column_position]).index() + ')';
 							}
 						} else {
 							if (columnObj.filters_tr_index === undefined) {
-								filter_selector_string = table_selector + ' ' + filters_position + ' tr:eq(' + $(unique_th[column_position]).parent().index() + ') th:eq(' + $(unique_th[column_position]).index() + ')';
+								filter_selector_string = table_selector + ' > ' + filters_position + ' > tr:eq(' + $(unique_th[column_position]).parent().index() + ') > th:eq(' + $(unique_th[column_position]).index() + ')';
 							} else {
-								filter_selector_string = table_selector + ' ' + filters_position + ' tr:eq(' + columnObj.filters_tr_index + ') th:eq(' + $(unique_th[column_position]).index() + ')';
+								filter_selector_string = table_selector + ' > ' + filters_position + ' > tr:eq(' + columnObj.filters_tr_index + ') > th:eq(' + $(unique_th[column_position]).index() + ')';
 							}
 						}
 						$filter_selector = $(filter_selector_string).find(".yadcf-filter");
