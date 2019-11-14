@@ -32,6 +32,7 @@
 	https://github.com/vedmack/yadcf/issues/562 - multi_select_custom_func not considered in exGetColumnFilterVal
 	https://github.com/vedmack/yadcf/issues/564 - Error undefinded ColumnObj with ServerSide, Range_Number and Custom_Range_Delimiter
 	https://github.com/vedmack/yadcf/issues/587 - Applying style_class to range_date uses the wrong element
+	https://github.com/vedmack/yadcf/issues/602 - Filter not working on dynamic input in Firefox but in Chrome
 
 	
 ## 0.9.3

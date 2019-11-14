@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.30
+* Version:     0.9.4.beta.31
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -3051,6 +3051,9 @@ if (!Object.entries) {
 
 			}
 			columnObj.col_filter_array = col_filter_array;
+			if (column_data && columnObj.ignore_char !== undefined) {
+				column_data = column_data.map(function (element) { return element.toString().replace(columnObj.ignore_char, ""); });
+			}
 			return column_data;
 		}
 
