@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.31
+* Version:     0.9.4.beta.33
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -165,7 +165,7 @@
                 Required:           false
                 Type:               String
                 Default value:      'alpha'
-                Possible values:    alpha / num / alphaNum / none
+                Possible values:    alpha / num / alphaNum / custom / none
                 Description:        Defines how the values in the filter will be sorted, alphabetically / numerically / alphanumeric / custom / not sorted at all (none is useful to preserve
                                     the order of the data attribute as is)
                 Note:               When custom value is set you must provide a custom sorting function for the sort_as_custom_func property
@@ -3845,6 +3845,9 @@ if (!Object.entries) {
 				$toInput = $("#" + toId);
 				$fromInput.datepicker('update');
 				$toInput.datepicker('update');
+			} else if (columnObj.datepicker_type === 'jquery-ui') {
+				$("#" + fromId).datepicker('option', 'maxDate', null);
+				$("#" + toId).datepicker('option', 'minDate', null);
 			}
 
 			return;

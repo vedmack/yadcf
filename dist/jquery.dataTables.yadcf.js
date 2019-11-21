@@ -6,7 +6,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.28
+* Version:     0.9.4.beta.33
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -86,6 +86,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 																		use rendered_html when you are using render function of columnDefs or similar, that produces a html code, note that both types rendered_html and html have a fallback for simple text parsing.
 																		html5_data_complex allows to populate filter with pairs of display/value by using datatables datatables HTML5 data-* attributes - should be used along with specifying html5_data attibute (read docs)
 
+* column_data_render
+                Required:           false
+                Type:               function
+                Possible values:    function (data) {return data.someValue || ('whatever ' + data.otherValue)}
+								Description:        function that will help yadcf to know what is "text" is present in the cell
+								Note:								Originally added to enable cumulative_filtering with column_data_type: "rendered_html"
+								
+
 * text_data_delimiter
                 Required:           false
                 Type:               String
@@ -161,7 +169,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 Required:           false
                 Type:               String
                 Default value:      'alpha'
-                Possible values:    alpha / num / alphaNum / none
+                Possible values:    alpha / num / alphaNum / custom / none
                 Description:        Defines how the values in the filter will be sorted, alphabetically / numerically / alphanumeric / custom / not sorted at all (none is useful to preserve
                                     the order of the data attribute as is)
                 Note:               When custom value is set you must provide a custom sorting function for the sort_as_custom_func property
@@ -383,6 +391,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 Description:        Calls the provided callback function in the end of the yadcf init function
 				Note:               This callback function will run before datatables fires its event such as draw/xhr/etc., migth be usefull for call some
 									third parties init / loading code
+
+
 * jquery_ui_datepicker_locale
                 Required:           false
                 Type:               string
@@ -1314,7 +1324,7 @@ if (!Object.entries) {
 					if (columnObj.ignore_char !== undefined) {
 						array[i] = array[i].toString().replace(columnObj.ignore_char, "");
 					}
-					if (columnObj.range_data_type === 'single') {
+					if (columnObj.range_data_type !== 'range') {
 						num = +array[i];
 					} else {
 						num = array[i].split(columnObj.range_data_type_delim);
@@ -1349,7 +1359,7 @@ if (!Object.entries) {
 					if (columnObj.ignore_char !== undefined) {
 						array[i] = array[i].toString().replace(columnObj.ignore_char, "");
 					}
-					if (columnObj.range_data_type === 'single') {
+					if (columnObj.range_data_type !== 'range') {
 						num = +array[i];
 					} else {
 						num = array[i].split(columnObj.range_data_type_delim);
@@ -1505,16 +1515,28 @@ if (!Object.entries) {
 						val = val.split(columnObj.range_data_type_delim);
 						valFrom = val[0] !== "" ? +val[0] : val[0];
 						valTo = val[1] !== "" ? +val[1] : val[1];
-						if (min === "" && max === "") {
-							retVal = true;
-						} else if (min === "" && valTo <= max) {
-							retVal = true;
-						} else if (min <= valFrom && "" === max) {
-							retVal = true;
-						} else if (min <= valFrom && valTo <= max) {
-							retVal = true;
-						} else if ((valFrom === '' || isNaN(valFrom)) && (valTo === '' || isNaN(valTo))) {
-							retVal = true;
+						if (!columnObj.range_data_operator) {
+							if (min === "" && max === "") {
+								retVal = true;
+							} else if (min === "" && valTo <= max) {
+								retVal = true;
+							} else if (min <= valFrom && "" === max) {
+								retVal = true;
+							} else if (min <= valFrom && valTo <= max) {
+								retVal = true;
+							} else if ((valFrom === '' || isNaN(valFrom)) && (valTo === '' || isNaN(valTo))) {
+								retVal = true;
+							}
+						}
+					} else if (columnObj.range_data_type === 'delimiter') {
+						if (columnObj.text_data_delimiter !== undefined) {
+							var valSplitted = val.split(columnObj.text_data_delimiter);
+							var anyNumberInRange = function anyNumberInRange(fromToObj) {
+								return function (element, index, array) {
+									return element >= fromToObj.from && element <= fromToObj.to;
+								};
+							};
+							retVal = valSplitted.some(anyNumberInRange({ from: min, to: max }));
 						}
 					}
 					return retVal;
@@ -2146,7 +2168,7 @@ if (!Object.entries) {
 				innerWrapperAdditionalClass = 'input-daterange';
 			}
 			//add a wrapper to hold both filter and reset button
-			$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper " + columnObj.style_class + "\"></div>");
+			$(filter_selector_string).append("<div onmousedown=\"yadcf.stopPropagation(event);\" onclick=\"yadcf.stopPropagation(event);\"  id=\"" + filter_wrapper_id + "\" class=\"yadcf-filter-wrapper \"></div>");
 			filter_selector_string += " div.yadcf-filter-wrapper";
 			filter_selector_string_tmp = filter_selector_string;
 
@@ -2158,9 +2180,9 @@ if (!Object.entries) {
 				filterActionStr = '';
 			}
 
-			$(filter_selector_string).append("<input onkeydown=\"yadcf.preventDefaultForEnter(event);\" placeholder=\"" + filter_default_label[0] + "\" id=\"" + fromId + "\" class=\"yadcf-filter-range-date yadcf-filter-range yadcf-filter-range-start\" " + filterActionStr + "></input>");
+			$(filter_selector_string).append("<input onkeydown=\"yadcf.preventDefaultForEnter(event);\" placeholder=\"" + filter_default_label[0] + "\" id=\"" + fromId + "\" class=\"yadcf-filter-range-date yadcf-filter-range yadcf-filter-range-start " + columnObj.style_class + "\" " + filterActionStr + "></input>");
 			$(filter_selector_string).append("<span class=\"yadcf-filter-range-date-seperator\" >" + "</span>");
-			$(filter_selector_string).append("<input onkeydown=\"yadcf.preventDefaultForEnter(event);\" placeholder=\"" + filter_default_label[1] + "\" id=\"" + toId + "\" class=\"yadcf-filter-range-date yadcf-filter-range yadcf-filter-range-end\" " + filterActionStr + "></input>");
+			$(filter_selector_string).append("<input onkeydown=\"yadcf.preventDefaultForEnter(event);\" placeholder=\"" + filter_default_label[1] + "\" id=\"" + toId + "\" class=\"yadcf-filter-range-date yadcf-filter-range yadcf-filter-range-end " + columnObj.style_class + "\" " + filterActionStr + "></input>");
 
 			$fromInput = $("#" + fromId);
 			$toInput = $("#" + toId);
@@ -2966,6 +2988,11 @@ if (!Object.entries) {
 				}
 			}
 			columnObj.col_filter_array = col_filter_array;
+			if (column_data && columnObj.ignore_char !== undefined) {
+				column_data = column_data.map(function (element) {
+					return element.toString().replace(columnObj.ignore_char, "");
+				});
+			}
 			return column_data;
 		}
 
@@ -3696,6 +3723,9 @@ if (!Object.entries) {
 				$toInput = $("#" + toId);
 				$fromInput.datepicker('update');
 				$toInput.datepicker('update');
+			} else if (columnObj.datepicker_type === 'jquery-ui') {
+				$("#" + fromId).datepicker('option', 'maxDate', null);
+				$("#" + toId).datepicker('option', 'minDate', null);
 			}
 
 			return;
@@ -5381,7 +5411,7 @@ if (!Object.entries) {
 			if (noRedraw !== true) {
 				//clear global filter
 				settingsDt.oPreviousSearch.sSearch = '';
-				if (settingsDt.aanFeatures.f !== undefined) {
+				if (typeof settingsDt.aanFeatures.f !== 'undefined') {
 					for (i = 0; i < settingsDt.aanFeatures.f.length; i++) {
 						$('input', settingsDt.aanFeatures.f[i]).val('');
 					}
