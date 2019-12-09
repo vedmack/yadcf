@@ -11,6 +11,7 @@
 * Support Date Range Picker plugin (datepicker_type: 'daterangepicker') - https://github.com/vedmack/yadcf/issues/537
 * Added column_data_type: 'html5_data_complex' type to parse value/display from datatable html5 attributes - https://github.com/vedmack/yadcf/issues/581
 * Added range_data_type: 'delimiter' , to allow range slider filter to handle multiple values per cell - https://github.com/vedmack/yadcf/issues/580
+* Added initOnDtXhrComplete: Allows to set a callback function to be called after dt xhr finishes - https://github.com/vedmack/yadcf/issues/609
 * Misc bug fixed issues:
 	https://github.com/vedmack/yadcf/issues/469 - Cannot apply style_class on date filter
 	https://github.com/vedmack/yadcf/issues/470 - filter_delay not working on range_date
@@ -34,6 +35,7 @@
 	https://github.com/vedmack/yadcf/issues/587 - Applying style_class to range_date uses the wrong element
 	https://github.com/vedmack/yadcf/issues/602 - Filter not working on dynamic input in Firefox but in Chrome
 	https://github.com/vedmack/yadcf/issues/603 - Date range with jquery-ui datepicker disables "future" dates even after they have been cleared
+	
 
 	
 ## 0.9.3

@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.33
+* Version:     0.9.4.beta.35
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -472,7 +472,12 @@
                 Arguments:          table_arg: variable of the datatable
                                     col_num: number index of column filter
                                     updatedData: array of new data (use same data structure as was used in yadcf.init options)
-                                Usage example:      yadcf.exRefreshColumnFilterWithDataProp(table_arg, 5, ['One', 'Two', 'Three']);
+								Usage example:      yadcf.exRefreshColumnFilterWithDataProp(table_arg, 5, ['One', 'Two', 'Three']);
+* initOnDtXhrComplete
+                Description:        Allows to set a callback function to be called after dt xhr finishs
+                Arguments:          function to do some logic
+                Usage example:      yadcf.initOnDtXhrComplete(function() { $("#yadcf-filter--example-0").multiselect('refresh'); });
+
 *
 *
 *
@@ -600,7 +605,8 @@ if (!Object.entries) {
 				range: ['From', 'To'],
 				date: 'Select a date'
 			},
-			settingsMap = {};
+			settingsMap = {},
+			dTXhrComplete;
 
 		let ctrlPressed = false;
 		let closeBootstrapDatepicker = false;
@@ -955,6 +961,10 @@ if (!Object.entries) {
 			selectElementCustomInitFunc = initFunc;
 			selectElementCustomRefreshFunc = refreshFunc;
 			selectElementCustomDestroyFunc = destroyFunc;
+		}
+
+		function initOnDtXhrComplete(initFunc) {
+			dTXhrComplete = initFunc;
 		}
 
 		//Used by exFilterColumn for translating readable search value into proper search string for datatables filtering
@@ -4675,6 +4685,11 @@ if (!Object.entries) {
 								}
 							}
 						}
+						if (dTXhrComplete !== undefined ) {
+							yadcfDelay(function () {
+								dTXhrComplete();
+							}, 100);
+						}
 					});
 				}
 			}
@@ -5675,7 +5690,8 @@ if (!Object.entries) {
 			initSelectPluginCustomTriggers: initSelectPluginCustomTriggers,
 			preventDefaultForEnter: preventDefaultForEnter,
 			generateTableSelectorJQFriendly2: generateTableSelectorJQFriendly2,
-			exRefreshColumnFilterWithDataProp: exRefreshColumnFilterWithDataProp
+			exRefreshColumnFilterWithDataProp: exRefreshColumnFilterWithDataProp,
+			initOnDtXhrComplete: initOnDtXhrComplete
 		};
 
 	}());
