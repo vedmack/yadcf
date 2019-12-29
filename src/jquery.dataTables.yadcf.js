@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.35
+* Version:     0.9.4.beta.36
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -474,7 +474,7 @@
                                     updatedData: array of new data (use same data structure as was used in yadcf.init options)
 								Usage example:      yadcf.exRefreshColumnFilterWithDataProp(table_arg, 5, ['One', 'Two', 'Three']);
 * initOnDtXhrComplete
-                Description:        Allows to set a callback function to be called after dt xhr finishs
+                Description:        Allows to set a callback function to be called after dt xhr finishes
                 Arguments:          function to do some logic
                 Usage example:      yadcf.initOnDtXhrComplete(function() { $("#yadcf-filter--example-0").multiselect('refresh'); });
 
@@ -2977,7 +2977,7 @@ if (!Object.entries) {
 					} else {
 						if (columnObj.column_number_data === undefined) {
 							col_inner_data = data[j]._aData[column_number_filter];
-							if (typeof col_inner_data === 'object') {
+							if (col_inner_data !== null && typeof col_inner_data === 'object') {
 								if (columnObj.html5_data !== undefined) {
 									col_inner_data = col_inner_data['@' + columnObj.html5_data];
 								} else if (col_inner_data && col_inner_data.display) {

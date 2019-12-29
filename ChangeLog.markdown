@@ -35,6 +35,7 @@
 	https://github.com/vedmack/yadcf/issues/587 - Applying style_class to range_date uses the wrong element
 	https://github.com/vedmack/yadcf/issues/602 - Filter not working on dynamic input in Firefox but in Chrome
 	https://github.com/vedmack/yadcf/issues/603 - Date range with jquery-ui datepicker disables "future" dates even after they have been cleared
+	https://github.com/vedmack/yadcf/issues/149 - forgot to define html5_data attribute column x error
 	
 
 	
