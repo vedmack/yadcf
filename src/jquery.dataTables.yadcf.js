@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.37
+* Version:     0.9.4.beta.40
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -3348,13 +3348,13 @@ if (!Object.entries) {
 									tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 									if (columnObj.filter_type === "select") {
 										tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
-										let filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
-										tmpStr = escapeRegExp(tmpStr);
-										let optionExists = filter.find("option[value='" + tmpStr + "']").length === 1;
-										// Set the state preselected value only if the option exists in the select dropdown.
-										if (optionExists) {
-											filter.val(tmpStr).addClass("inuse");
+										let foundEntry = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number + ' option').filter(function() {
+											return $(this).val() === tmpStr;
+										}).prop('selected', true);
+										if (foundEntry && foundEntry.length > 0) {
+											$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass("inuse");
 										}
+
 									} else if (columnObj.filter_type === "multi_select") {
 										tmpStr = yadcfParseMatchFilterMultiSelect(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
 										tmpStr = tmpStr.replace(/\\/g, "");
