@@ -4453,7 +4453,7 @@ if (!Object.entries) {
 		}
 
 		function saveTextKeyUpState(oTable, table_selector_jq_friendly, column_number, regex_check_box, null_checked, exclude) {
-			if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState.yadcfState) {
+			if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState && oTable.fnSettings().oLoadedState.yadcfState) {
 				if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
 					oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
 						{
