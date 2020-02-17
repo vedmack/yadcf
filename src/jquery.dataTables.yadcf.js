@@ -598,12 +598,41 @@ if (!Object.entries) {
 			selectElementCustomInitFunc,
 			selectElementCustomRefreshFunc,
 			selectElementCustomDestroyFunc,
-			placeholderLang = {
-				select: 'Select value',
-				select_multi: 'Select values',
-				filter: 'Type to filter',
-				range: ['From', 'To'],
-				date: 'Select a date'
+			default_options = {
+				filter_type: "select",
+				enable_auto_complete: false,
+				sort_as: "alpha",
+				sort_order: "asc",
+				date_format: "mm/dd/yyyy",
+				ignore_char: undefined,
+				filter_match_mode: "contains",
+				select_type: undefined,
+				select_type_options: {},
+				select_null_option: 'null',
+				case_insensitive: true,
+				column_data_type: 'text',
+				html_data_type: 'text',
+				exclude_label: 'exclude',
+				regex_label: 'regex',
+				null_label: 'null',
+				checkbox_position_after: false,
+				style_class: '',
+				reset_button_style_class: '',
+				datepicker_type: 'jquery-ui',
+				range_data_type: 'single',
+				range_data_type_delim: '-',
+				omit_default_label: false,
+				custom_range_delimiter: '-yadcf_delim-',
+				externally_triggered_checkboxes_text: false,
+				externally_triggered_checkboxes_function: undefined,
+				externally_triggered_checkboxes_button_style_class: '',
+				language: {
+					select: 'Select value',
+					select_multi: 'Select values',
+					filter: 'Type to filter',
+					range: ['From', 'To'],
+					date: 'Select a date'
+				}
 			},
 			settingsMap = {},
 			dTXhrComplete;
@@ -695,6 +724,10 @@ if (!Object.entries) {
 			return column_number_obj;
 		}
 
+		function setDefaults(params) {
+			return $.extend(true, default_options, params);
+		}
+
 		function getOptions(selector) {
 			return options[selector];
 		}
@@ -726,36 +759,7 @@ if (!Object.entries) {
 		function setOptions(selector_arg, options_arg, params, table) {
 			var tmpOptions = {},
 				i,
-				col_num_as_int,
-				default_options = {
-					filter_type: "select",
-					enable_auto_complete: false,
-					sort_as: "alpha",
-					sort_order: "asc",
-					date_format: "mm/dd/yyyy",
-					ignore_char: undefined,
-					filter_match_mode: "contains",
-					select_type: undefined,
-					select_type_options: {},
-					select_null_option: 'null',
-					case_insensitive: true,
-					column_data_type: 'text',
-					html_data_type: 'text',
-					exclude_label: 'exclude',
-					regex_label: 'regex',
-					null_label: 'null',
-					checkbox_position_after: false,
-					style_class: '',
-					reset_button_style_class: '',
-					datepicker_type: 'jquery-ui',
-					range_data_type: 'single',
-					range_data_type_delim: '-',
-					omit_default_label: false,
-					custom_range_delimiter: '-yadcf_delim-',
-					externally_triggered_checkboxes_text: false,
-					externally_triggered_checkboxes_function: undefined,
-					externally_triggered_checkboxes_button_style_class: '',
-				};
+				col_num_as_int;
 				//adaptContainerCssClassImpl = function (dummy) { return ''; };
 
 			$.extend(true, default_options, params);
@@ -3186,15 +3190,15 @@ if (!Object.entries) {
 
 					if (filter_default_label === undefined) {
 						if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
-							filter_default_label = placeholderLang.select;
+							filter_default_label = default_options.language.select;
 						} else if (columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
-							filter_default_label = placeholderLang.select_multi;
+							filter_default_label = default_options.language.select_multi;
 						} else if (columnObj.filter_type === "auto_complete" || columnObj.filter_type === "text") {
-							filter_default_label = placeholderLang.filter;
+							filter_default_label = default_options.language.filter;
 						} else if (columnObj.filter_type === "range_number" || columnObj.filter_type === "range_date") {
-							filter_default_label = placeholderLang.range;
+							filter_default_label = default_options.language.range;
 						} else if (columnObj.filter_type === "date" || columnObj.filter_type === 'date_custom_func') {
-							filter_default_label = placeholderLang.date;
+							filter_default_label = default_options.language.date;
 						}
 						columnObj.filter_default_label = filter_default_label;
 					}
@@ -4807,15 +4811,6 @@ if (!Object.entries) {
 			} else {
 				params.filters_position = 'tfoot';
 			}
-			if (params.language !== undefined) {
-				for (tmpParams in placeholderLang) {
-					if (placeholderLang.hasOwnProperty(tmpParams)) {
-						if (params.language[tmpParams] !== undefined) {
-							placeholderLang[tmpParams] = params.language[tmpParams];
-						}
-					}
-				}
-			}
 			$(document).data(this.selector + "_filters_position", params.filters_position);
 
 			if ($(this.selector).length === 1) {
@@ -4862,15 +4857,6 @@ if (!Object.entries) {
 				params.filters_position = 'thead';
 			} else {
 				params.filters_position = 'tfoot';
-			}
-			if (params.language !== undefined) {
-				for (tmpParams in placeholderLang) {
-					if (placeholderLang.hasOwnProperty(tmpParams)) {
-						if (params.language[tmpParams] !== undefined) {
-							placeholderLang[tmpParams] = params.language[tmpParams];
-						}
-					}
-				}
 			}
 			$(document).data(instance.selector + "_filters_position", params.filters_position);
 
@@ -5666,6 +5652,7 @@ if (!Object.entries) {
 			doFilterAutocomplete: doFilterAutocomplete,
 			autocompleteKeyUP: autocompleteKeyUP,
 			getOptions: getOptions,
+			setDefaults: setDefaults,
 			rangeNumberKeyUP: rangeNumberKeyUP,
 			rangeDateKeyUP: rangeDateKeyUP,
 			rangeClear: rangeClear,
