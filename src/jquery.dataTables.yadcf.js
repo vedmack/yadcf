@@ -478,6 +478,11 @@
                 Arguments:          function to do some logic
                 Usage example:      yadcf.initOnDtXhrComplete(function() { $("#yadcf-filter--example-0").multiselect('refresh'); });
 
+* setDefaults
+                Description:        Set global defaults for all yadcf instances.
+                Arguments:          Object consisting of anything defined under "Global Parameters"
+                Usage example:      yadcf.setDefaults({'language': {'select': 'تحديد قيمة'}});
+
 *
 *
 *
