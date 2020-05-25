@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.40
+* Version:     0.9.4.beta.41
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -478,10 +478,10 @@
                 Arguments:          function to do some logic
                 Usage example:      yadcf.initOnDtXhrComplete(function() { $("#yadcf-filter--example-0").multiselect('refresh'); });
 
-* setDefaults
-                Description:        Set global defaults for all yadcf instances.
-                Arguments:          Object consisting of anything defined under "Global Parameters"
-                Usage example:      yadcf.setDefaults({'language': {'select': 'تحديد قيمة'}});
+* initDefaults
+                Description:        Inint global defaults for all yadcf instances.
+                Arguments:          Object consisting of anything defined inside default_options varaible
+                Usage example:      yadcf.initDefaults({language: {select: 'Pick some'}});
 
 *
 *
@@ -729,7 +729,7 @@ if (!Object.entries) {
 			return column_number_obj;
 		}
 
-		function setDefaults(params) {
+		function initDefaults(params) {
 			return $.extend(true, default_options, params);
 		}
 
@@ -5657,7 +5657,7 @@ if (!Object.entries) {
 			doFilterAutocomplete: doFilterAutocomplete,
 			autocompleteKeyUP: autocompleteKeyUP,
 			getOptions: getOptions,
-			setDefaults: setDefaults,
+			initDefaults: initDefaults,
 			rangeNumberKeyUP: rangeNumberKeyUP,
 			rangeDateKeyUP: rangeDateKeyUP,
 			rangeClear: rangeClear,

@@ -6,7 +6,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.33
+* Version:     0.9.4.beta.41
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -476,7 +476,17 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 Arguments:          table_arg: variable of the datatable
                                     col_num: number index of column filter
                                     updatedData: array of new data (use same data structure as was used in yadcf.init options)
-                                Usage example:      yadcf.exRefreshColumnFilterWithDataProp(table_arg, 5, ['One', 'Two', 'Three']);
+								Usage example:      yadcf.exRefreshColumnFilterWithDataProp(table_arg, 5, ['One', 'Two', 'Three']);
+* initOnDtXhrComplete
+                Description:        Allows to set a callback function to be called after dt xhr finishes
+                Arguments:          function to do some logic
+                Usage example:      yadcf.initOnDtXhrComplete(function() { $("#yadcf-filter--example-0").multiselect('refresh'); });
+
+* initDefaults
+                Description:        Inint global defaults for all yadcf instances.
+                Arguments:          Object consisting of anything defined inside default_options varaible
+                Usage example:      yadcf.initDefaults({language: {select: 'Pick some'}});
+
 *
 *
 *
@@ -594,14 +604,44 @@ if (!Object.entries) {
 		    selectElementCustomInitFunc,
 		    selectElementCustomRefreshFunc,
 		    selectElementCustomDestroyFunc,
-		    placeholderLang = {
-			select: 'Select value',
-			select_multi: 'Select values',
-			filter: 'Type to filter',
-			range: ['From', 'To'],
-			date: 'Select a date'
+		    default_options = {
+			filter_type: "select",
+			enable_auto_complete: false,
+			sort_as: "alpha",
+			sort_order: "asc",
+			date_format: "mm/dd/yyyy",
+			ignore_char: undefined,
+			filter_match_mode: "contains",
+			select_type: undefined,
+			select_type_options: {},
+			select_null_option: 'null',
+			case_insensitive: true,
+			column_data_type: 'text',
+			html_data_type: 'text',
+			exclude_label: 'exclude',
+			regex_label: 'regex',
+			null_label: 'null',
+			checkbox_position_after: false,
+			style_class: '',
+			reset_button_style_class: '',
+			datepicker_type: 'jquery-ui',
+			range_data_type: 'single',
+			range_data_type_delim: '-',
+			omit_default_label: false,
+			custom_range_delimiter: '-yadcf_delim-',
+			externally_triggered_checkboxes_text: false,
+			externally_triggered_checkboxes_function: undefined,
+			externally_triggered_checkboxes_button_style_class: '',
+			language: {
+				select: 'Select value',
+				select_multi: 'Select values',
+				filter: 'Type to filter',
+				range: ['From', 'To'],
+				date: 'Select a date'
+			}
 		},
-		    settingsMap = {};
+		    settingsMap = {},
+		    dTXhrComplete;
 
 		var ctrlPressed = false;
 		var closeBootstrapDatepicker = false;
@@ -692,6 +732,10 @@ if (!Object.entries) {
 			return column_number_obj;
 		}
 
+		function initDefaults(params) {
+			return $.extend(true, default_options, params);
+		}
+
 		function getOptions(selector) {
 			return options[selector];
 		}
@@ -723,36 +767,7 @@ if (!Object.entries) {
 		function setOptions(selector_arg, options_arg, params, table) {
 			var tmpOptions = {},
 			    i,
-			    col_num_as_int,
-			    default_options = {
-				filter_type: "select",
-				enable_auto_complete: false,
-				sort_as: "alpha",
-				sort_order: "asc",
-				date_format: "mm/dd/yyyy",
-				ignore_char: undefined,
-				filter_match_mode: "contains",
-				select_type: undefined,
-				select_type_options: {},
-				select_null_option: 'null',
-				case_insensitive: true,
-				column_data_type: 'text',
-				html_data_type: 'text',
-				exclude_label: 'exclude',
-				regex_label: 'regex',
-				null_label: 'null',
-				checkbox_position_after: false,
-				style_class: '',
-				reset_button_style_class: '',
-				datepicker_type: 'jquery-ui',
-				range_data_type: 'single',
-				range_data_type_delim: '-',
-				omit_default_label: false,
-				custom_range_delimiter: '-yadcf_delim-',
-				externally_triggered_checkboxes_text: false,
-				externally_triggered_checkboxes_function: undefined,
-				externally_triggered_checkboxes_button_style_class: ''
-			};
+			    col_num_as_int;
 			//adaptContainerCssClassImpl = function (dummy) { return ''; };
 
 			$.extend(true, default_options, params);
@@ -957,6 +972,10 @@ if (!Object.entries) {
 			selectElementCustomInitFunc = initFunc;
 			selectElementCustomRefreshFunc = refreshFunc;
 			selectElementCustomDestroyFunc = destroyFunc;
+		}
+
+		function initOnDtXhrComplete(initFunc) {
+			dTXhrComplete = initFunc;
 		}
 
 		//Used by exFilterColumn for translating readable search value into proper search string for datatables filtering
@@ -2907,7 +2926,7 @@ if (!Object.entries) {
 					} else {
 						if (columnObj.column_number_data === undefined) {
 							col_inner_data = data[j]._aData[column_number_filter];
-							if ((typeof col_inner_data === 'undefined' ? 'undefined' : _typeof(col_inner_data)) === 'object') {
+							if (col_inner_data !== null && (typeof col_inner_data === 'undefined' ? 'undefined' : _typeof(col_inner_data)) === 'object') {
 								if (columnObj.html5_data !== undefined) {
 									col_inner_data = col_inner_data['@' + columnObj.html5_data];
 								} else if (col_inner_data && col_inner_data.display) {
@@ -3081,15 +3100,15 @@ if (!Object.entries) {
 
 					if (filter_default_label === undefined) {
 						if (columnObj.filter_type === "select" || columnObj.filter_type === 'custom_func') {
-							filter_default_label = placeholderLang.select;
+							filter_default_label = default_options.language.select;
 						} else if (columnObj.filter_type === "multi_select" || columnObj.filter_type === 'multi_select_custom_func') {
-							filter_default_label = placeholderLang.select_multi;
+							filter_default_label = default_options.language.select_multi;
 						} else if (columnObj.filter_type === "auto_complete" || columnObj.filter_type === "text") {
-							filter_default_label = placeholderLang.filter;
+							filter_default_label = default_options.language.filter;
 						} else if (columnObj.filter_type === "range_number" || columnObj.filter_type === "range_date") {
-							filter_default_label = placeholderLang.range;
+							filter_default_label = default_options.language.range;
 						} else if (columnObj.filter_type === "date" || columnObj.filter_type === 'date_custom_func') {
-							filter_default_label = placeholderLang.date;
+							filter_default_label = default_options.language.date;
 						}
 						columnObj.filter_default_label = filter_default_label;
 					}
@@ -3245,12 +3264,11 @@ if (!Object.entries) {
 									tmpStr = settingsDt.aoPreSearchCols[column_position].sSearch;
 									if (columnObj.filter_type === "select") {
 										tmpStr = yadcfParseMatchFilter(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
-										var filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
-										tmpStr = escapeRegExp(tmpStr);
-										var optionExists = filter.find("option[value='" + tmpStr + "']").length === 1;
-										// Set the state preselected value only if the option exists in the select dropdown.
-										if (optionExists) {
-											filter.val(tmpStr).addClass("inuse");
+										var foundEntry = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number + ' option').filter(function () {
+											return $(this).val() === tmpStr;
+										}).prop('selected', true);
+										if (foundEntry && foundEntry.length > 0) {
+											$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass("inuse");
 										}
 									} else if (columnObj.filter_type === "multi_select") {
 										tmpStr = yadcfParseMatchFilterMultiSelect(tmpStr, getOptions(oTable.selector)[column_number].filter_match_mode);
@@ -3385,12 +3403,12 @@ if (!Object.entries) {
 									tmpStr = tmpStr.replace(excludeStrStart, '');
 									tmpStr = tmpStr.replace(excludeStrEnd, '');
 								}
-								var _filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
+								var filter = $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number);
 								tmpStr = escapeRegExp(tmpStr);
-								var _optionExists = _filter.find("option[value='" + tmpStr + "']").length === 1;
+								var optionExists = filter.find("option[value='" + tmpStr + "']").length === 1;
 								// Set the state preselected value only if the option exists in the select dropdown.
-								if (_optionExists) {
-									_filter.val(tmpStr).addClass("inuse");
+								if (optionExists) {
+									filter.val(tmpStr).addClass("inuse");
 									if (exclude) {
 										$('#yadcf-filter-wrapper-' + table_selector_jq_friendly + '-' + column_number).find('.yadcf-exclude-wrapper').find(':checkbox').prop('checked', true);
 										$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", tmpStr);
@@ -4532,6 +4550,12 @@ if (!Object.entries) {
 								}
 							}
 						}
+						if (dTXhrComplete !== undefined) {
+							yadcfDelay(function () {
+								dTXhrComplete();
+								dTXhrComplete = undefined;
+							}, 100);
+						}
 					});
 				}
 			}
@@ -4644,15 +4668,6 @@ if (!Object.entries) {
 			} else {
 				params.filters_position = 'tfoot';
 			}
-			if (params.language !== undefined) {
-				for (tmpParams in placeholderLang) {
-					if (placeholderLang.hasOwnProperty(tmpParams)) {
-						if (params.language[tmpParams] !== undefined) {
-							placeholderLang[tmpParams] = params.language[tmpParams];
-						}
-					}
-				}
-			}
 			$(document).data(this.selector + "_filters_position", params.filters_position);
 
 			if ($(this.selector).length === 1) {
@@ -4699,15 +4714,6 @@ if (!Object.entries) {
 				params.filters_position = 'thead';
 			} else {
 				params.filters_position = 'tfoot';
-			}
-			if (params.language !== undefined) {
-				for (tmpParams in placeholderLang) {
-					if (placeholderLang.hasOwnProperty(tmpParams)) {
-						if (params.language[tmpParams] !== undefined) {
-							placeholderLang[tmpParams] = params.language[tmpParams];
-						}
-					}
-				}
 			}
 			$(document).data(instance.selector + "_filters_position", params.filters_position);
 
@@ -5492,6 +5498,7 @@ if (!Object.entries) {
 			doFilterAutocomplete: doFilterAutocomplete,
 			autocompleteKeyUP: autocompleteKeyUP,
 			getOptions: getOptions,
+			initDefaults: initDefaults,
 			rangeNumberKeyUP: rangeNumberKeyUP,
 			rangeDateKeyUP: rangeDateKeyUP,
 			rangeClear: rangeClear,
@@ -5517,7 +5524,8 @@ if (!Object.entries) {
 			initSelectPluginCustomTriggers: initSelectPluginCustomTriggers,
 			preventDefaultForEnter: preventDefaultForEnter,
 			generateTableSelectorJQFriendly2: generateTableSelectorJQFriendly2,
-			exRefreshColumnFilterWithDataProp: exRefreshColumnFilterWithDataProp
+			exRefreshColumnFilterWithDataProp: exRefreshColumnFilterWithDataProp,
+			initOnDtXhrComplete: initOnDtXhrComplete
 		};
 	}();
 	if (window) {
