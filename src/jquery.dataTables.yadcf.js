@@ -803,11 +803,13 @@ if (!Object.entries) {
 				} else {
 					if (table && table.column) {
 						//translate from column_selector to column_number
-						let columnNumber = table.column(options_arg[i].column_selector);
-						if (columnNumber.index() >= 0) {
-							options_arg[i].column_number = columnNumber.index();
-							tmpOptions[options_arg[i].column_number] = $.extend(true, {}, default_options, options_arg[i]);
-						}
+						table.columns(options_arg[i].column_selector).every(function() {
+							let columnNumber = this;
+							if (columnNumber.index() >= 0) {
+								options_arg[i].column_number = columnNumber.index();
+								tmpOptions[options_arg[i].column_number] = $.extend(true, {}, default_options, options_arg[i]);
+							}
+						});
 					}
 				}
 			}
