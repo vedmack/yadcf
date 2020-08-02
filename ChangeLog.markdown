@@ -39,6 +39,7 @@
 	* https://github.com/vedmack/yadcf/issues/149 - forgot to define html5_data attribute column x error
 	* https://github.com/vedmack/yadcf/issues/612 - Pre Selecting an escaped value
 	* https://github.com/vedmack/yadcf/issues/610 - Configure globally
+	* https://github.com/vedmack/yadcf/issues/614 - Uncaught TypeError: Cannot read property 'yadcfState' of null
 	
 	
 
