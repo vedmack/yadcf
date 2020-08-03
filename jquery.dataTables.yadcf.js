@@ -873,7 +873,7 @@ if (!Object.entries) {
 			var case_insensitive = yadcf.getOptions(oTable.selector)[original_column_number].case_insensitive;
 			if (exclude !== true) {
 				if (filter_match_mode === "contains") {
-					oTable.fnFilter(selected_value, column_number, false, true, true, case_insensitive);
+					oTable.fnFilter(selected_value, column_number, false, false, true, case_insensitive);
 				} else if (filter_match_mode === "exact") {
 					selected_value = escapeRegExp(selected_value);
 					oTable.fnFilter("^" + selected_value + "$", column_number, true, false, true, case_insensitive);
@@ -994,7 +994,7 @@ if (!Object.entries) {
 
 			$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", arg.value);
 
-			selected_value = $.trim($(arg).find('option:selected').val());
+			selected_value = $.trim($(arg).find('option:selected').text());
 
 			if (arg.value !== "-1") {
 				yadcfMatchFilter(oTable, selected_value, filter_match_mode, column_number_filter, false, column_number);
