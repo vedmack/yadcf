@@ -80,7 +80,7 @@
                 Possible values:    text / html / rendered_html / html5_data_complex
                 Description:        The type of data in column , use "html" when you have some html code in the column (support parsing of multiple elements per cell),
                                     use rendered_html when you are using render function of columnDefs or similar, that produces a html code, note that both types rendered_html and html have a fallback for simple text parsing.
-                                    html5_data_complex allows to populate filter with pairs of display/value by using datatables datatables HTML5 data-* attributes - should be used along with specifying html5_data attibute (read docs)
+                                    html5_data_complex allows to populate filter with pairs of display/value by using datatables datatables HTML5 data-* attributes - should be used along with specifying html5_data attribute (read docs)
 
 * column_data_render
                 Required:           false
@@ -92,13 +92,13 @@
 * text_data_delimiter
                 Required:           false
                 Type:               String
-                Description:        Delimiter that seperates text in table column, for example text_data_delimiter: ","
+                Description:        Delimiter that separates text in table column, for example text_data_delimiter: ","
 
 * custom_range_delimiter:
                 Required:           false
                 Type:               String
                 Default value:      '-yadcf_delim-'
-                Description:        Delimiter that seperates min and max values for number range filter type, for example custom_range_delimiter: 'minMax'
+                Description:        Delimiter that separates min and max values for number range filter type, for example custom_range_delimiter: 'minMax'
 
 * html_data_type
                 Required:           false
@@ -278,7 +278,7 @@
                 Required:           false
                 Type:               string
                 Default value:      'null'
-                Description:        String value which internaly represents null option in select filters,
+                Description:        String value which internally represents null option in select filters,
                                     also it is send to server if serverside feature is enabled
                                     Supports exclude, with exclude enabled the string is wrapped with exclude regex
 
@@ -325,8 +325,8 @@
                 Required:           false
                 Default value:      false,
                 Type:               boolean | string
-                Description:        Adds external checkboxes button, and hiddes exclude/null/regex checkboxes
-                                    usecase: hide/show options (checkboxes) button,  checkboxes in popover/modal
+                Description:        Adds external checkboxes button, and hides exclude/null/regex checkboxes
+                                    usecase: hide/show options (checkboxes) button, checkboxes in popover/modal
 
 * externally_triggered_checkboxes_function
                 Required:           false
@@ -357,8 +357,8 @@
                 Required:           false
                 Type:               boolean
                 Default value:      false
-                Description:        Change the default behaviour of the filters so its options will be populated from the filtered rows (remaining
-                                    table data after filtering) only, unlike the normal behaviour in which the options of the filters are from all the table data
+                Description:        Change the default behavior of the filters so its options will be populated from the filtered rows (remaining
+                                    table data after filtering) only, unlike the normal behavior in which the options of the filters are from all the table data
 
 * filters_position
                 Required:           false
@@ -366,7 +366,7 @@
                 Default value:      header
                 Possible values:    'header' / 'footer'
                 Description:        Filters can be placed in the header (thead) or in the footer (tfoot) of the table,
-                Note:               When 'footer' you must provide a valid tfoot elemet in your table
+                Note:               When 'footer' you must provide a valid tfoot element in your table
 
 * filters_tr_index
                 Required:           false
@@ -380,7 +380,7 @@
                 Type:               function
                 Default value:      undefined
                 Description:        Calls the provided callback function in the end of the yadcf init function
-                Note:               This callback function will run before datatables fires its event such as draw/xhr/etc., migth be usefull for call some
+                Note:               This callback function will run before datatables fires its event such as draw/xhr/etc., might be useful for call some
                                     third parties init / loading code
 
 * jquery_ui_datepicker_locale
@@ -397,14 +397,14 @@
                 Required:           false
                 Type:               string
                 Default value:      "null"
-                Description:        Value which represents null, and is used as argument for fnFilter function, and sended to server
+                Description:        Value which represents null, and is used as argument for fnFilter function, and sent to server
                 Note:               works with null filter enabled only
 
 * not_null_api_call_value
                 Required:           false
                 Type:               string
                 Default value:      "!^@"
-                Description:        Value which represents not null, and is used as argument for fnFilter function, and sended to server
+                Description:        Value which represents not null, and is used as argument for fnFilter function, and sent to server
                 Note:               works with null filter enabled only
 
 *
@@ -448,7 +448,7 @@
 
 * initSelectPluginCustomTriggers
                 Description:        Allows to set any select jquery plugin initialize and refresh functions. jQuery selector will be passed to the user defined function to initialize and refresh the plugin.
-                                    Great for integrating any jquey select plugin  (Selectize / MultiSelect / etc)
+                                    Great for integrating any jquery select plugin  (Selectize / MultiSelect / etc)
                 Arguments:          initFunc  : function which will initialize the plugin
                                     refreshFunc : function that will refresh the plugin.
                                     destroyFunc : function that will destroy the plugin (upon table destroy even trigger).
@@ -474,7 +474,7 @@
 
 * initDefaults
                 Description:        Inint global defaults for all yadcf instances.
-                Arguments:          Object consisting of anything defined inside default_options varaible
+                Arguments:          Object consisting of anything defined inside default_options variable
                 Usage example:      yadcf.initDefaults({language: {select: 'Pick some'}});
 
 *
@@ -1816,7 +1816,7 @@ if (!Object.entries) {
 						exclude_checked = $(fixedPrefix + "#yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + col_num).find('.yadcf-exclude-wrapper :checkbox').prop('checked');
 					}
 					if (rowData !== undefined) {
-						// supprort dt render fn, usecase structured data when top is null inner property will return undefined
+						// support dt render fn, usecase structured data when top is null inner property will return undefined
 						// e.g data = person.cat.name && person.cat = null
 						let rowDataRender;
 						if (columnObj.column_number_render) {
@@ -2010,7 +2010,7 @@ if (!Object.entries) {
 						null_checked = oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].null_checked;
 						$('#' + filter_wrapper_id).find('.yadcf-null-wrapper :checkbox').prop('checked', null_checked);
 						if (columnObj.exclude) {
-							exclude_checked = oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].exclude_checked
+							exclude_checked = oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number].exclude_checked;
 							$('#' + filter_wrapper_id).find('.yadcf-exclude-wrapper :checkbox').prop('checked', exclude_checked);
 						}
 					}
@@ -2051,7 +2051,8 @@ if (!Object.entries) {
 				table_selector_jq_friendly,
 				column_number_filter,
 				settingsDt,
-				columnObj;
+				columnObj,
+				yadcfState;
 
 			if (pDate) {
 				if (pDate.type === 'dp') {
@@ -2118,7 +2119,7 @@ if (!Object.entries) {
 									from: ""
 								};
 							} else {
-								let yadcfState = {};
+								yadcfState = {};
 								yadcfState[table_selector_jq_friendly] = [];
 								yadcfState[table_selector_jq_friendly][column_number] = {
 									from: ""
@@ -2557,7 +2558,7 @@ if (!Object.entries) {
 				last_handle = $(".yadcf-number-slider-filter-wrapper-inner.-" + table_selector_jq_friendly + "-" + column_number + " .ui-slider-handle:last");
 				$(last_handle).addClass("yadcf-filter-range-number-slider-max-tip").html(max_tip_inner);
 			} else {
-				//migth happen when scrollX is used or when filter row is being duplicated by DT
+				//might happen when scrollX is used or when filter row is being duplicated by DT
 				$($(first_handle)[0]).find('.ui-slider-handle:first').addClass("yadcf-filter-range-number-slider-min-tip").html(min_tip_inner);
 				$($(last_handle)[0]).find('.ui-slider-handle:last').addClass("yadcf-filter-range-number-slider-max-tip").html(max_tip_inner);
 
@@ -3117,7 +3118,7 @@ if (!Object.entries) {
 									col_inner_data = col_inner_data.display;
 								} else {
 									console.log('Warning: Looks like you have forgot to define the html5_data attribute for the ' + columnObj.column_number + ' column');
-									return;
+									return [];
 								}
 							}
 						} else if (data[j]._aFilterData !== undefined && data[j]._aFilterData !== null) {
@@ -3186,7 +3187,7 @@ if (!Object.entries) {
 						column_data.push(
 							{
 								value: col_inner_data_helper,
-								label: col_inner_data['display']
+								label: col_inner_data.display
 							}
 						);
 					}
@@ -3929,33 +3930,18 @@ if (!Object.entries) {
 
 							null_str = $();
 							if (columnObj.null_check_box === true) {
-								if (columnObj.externally_triggered !== true) {
-									null_str = $("<span>", {
-										class: "yadcf-null-wrapper",
-										onmousedown: "yadcf.stopPropagation(event);",
-										onclick: "yadcf.stopPropagation(event);"
-									}).append($("<div>", {
-										class: "yadcf-label small",
-										text: columnObj.null_label
-									})).append($("<input>", {
-										type: "checkbox",
-										title: columnObj.null_label,
-										onclick: "yadcf.stopPropagation(event);yadcf.nullChecked(event,'" + table_selector_jq_friendly + "'," + column_number + ");"
-									}));
-								} else {
-									null_str = $("<span>", {
-										class: "yadcf-null-wrapper",
-										onmousedown: "yadcf.stopPropagation(event);",
-										onclick: "yadcf.stopPropagation(event);"
-									}).append($("<div>", {
-										class: "yadcf-label small",
-										text: columnObj.null_label
-									})).append($("<input>", {
-										type: "checkbox",
-										title: columnObj.null_label,
-										onclick: "yadcf.stopPropagation(event);yadcf.nullChecked(event,'" + table_selector_jq_friendly + "'," + column_number + ");"
-									}));
-								}
+								null_str = $("<span>", {
+									class: "yadcf-null-wrapper",
+									onmousedown: "yadcf.stopPropagation(event);",
+									onclick: "yadcf.stopPropagation(event);"
+								}).append($("<div>", {
+									class: "yadcf-label small",
+									text: columnObj.null_label
+								})).append($("<input>", {
+									type: "checkbox",
+									title: columnObj.null_label,
+									onclick: "yadcf.stopPropagation(event);yadcf.nullChecked(event,'" + table_selector_jq_friendly + "'," + column_number + ");"
+								}));
 								if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 									addNullFilterCapability(table_selector_jq_friendly, column_number, false);
 								}
@@ -4687,7 +4673,6 @@ if (!Object.entries) {
 				exclude,
 				regex_check_box,
 				null_checked = false,
-				yadcfState,
 				keyCodes = [37, 38, 39, 40, 17];
 
 			if (keyCodes.indexOf(ev.keyCode) !== -1 || ctrlPressed) {
@@ -4708,7 +4693,7 @@ if (!Object.entries) {
 				}
 				$.fn.dataTableExt.iApiIndex = oTablesIndex[table_selector_jq_friendly];
 
-				// chcek checkboxes
+				// check checkboxes
 				if (columnObj.null_check_box === true) {
 					null_checked = $(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).closest('.yadcf-filter-wrapper').find('.yadcf-null-wrapper :checkbox').prop('checked');
 				}
@@ -4784,6 +4769,8 @@ if (!Object.entries) {
 		}
 
 		function saveTextKeyUpState(oTable, table_selector_jq_friendly, column_number, regex_check_box, null_checked, exclude) {
+			var yadcfState;
+
 			if (oTable.fnSettings().oFeatures.bStateSave === true && oTable.fnSettings().oLoadedState && oTable.fnSettings().oLoadedState.yadcfState) {
 				if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
 					oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
@@ -4793,7 +4780,7 @@ if (!Object.entries) {
 						exclude_checked: exclude
 					};
 				} else {
-					let yadcfState = {};
+					yadcfState = {};
 					yadcfState[table_selector_jq_friendly] = [];
 					yadcfState[table_selector_jq_friendly][column_number] = {
 						regex_check_box: regex_check_box,
@@ -5431,7 +5418,6 @@ if (!Object.entries) {
 					filter_reset_button_text: 'x',
 					case_insensitive: true
 				},
-				columnsObjKey,
 				columnsObj,
 				columnsArrIndex,
 				column_number_str,
@@ -5885,7 +5871,7 @@ if (!Object.entries) {
 							break;
 						case 'auto_complete':
 						case 'text':
-							$filterElement.prop('disabled', false)
+							$filterElement.prop('disabled', false);
 							$filterElement.val('').removeClass('inuse inuse-exclude inuse-regex');
 							table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
 							resetExcludeRegexCheckboxes($filterElement.parent());
@@ -6007,7 +5993,8 @@ if (!Object.entries) {
 			keys = Array.isArray(keys) ? keys : keys.split('.');
 			if (keys.length > 1) {
 				object[keys[0]] = object[keys[0]] || {};
-				return setProp(object[keys[0]], keys.slice(1), val);
+				setProp(object[keys[0]], keys.slice(1), val);
+				return;
 			}
 			object[keys[0]] = val;
 		}
