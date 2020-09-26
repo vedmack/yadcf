@@ -1022,7 +1022,7 @@ if (!Object.entries) {
 			var case_insensitive = yadcf.getOptions(oTable.selector)[original_column_number].case_insensitive;
 			if (exclude !== true) {
 				if (filter_match_mode === "contains") {
-					oTable.fnFilter(selected_value, column_number, false, true, true, case_insensitive);
+					oTable.fnFilter(selected_value, column_number, false, false, true, case_insensitive);
 				} else if (filter_match_mode === "exact") {
 					selected_value = escapeRegExp(selected_value);
 					oTable.fnFilter("^" + selected_value + "$", column_number, true, false, true, case_insensitive);
@@ -3458,14 +3458,14 @@ if (!Object.entries) {
 								if (typeof column_data[0] === 'object') {
 									for (ii = 0; ii < column_data.length; ii++) {
 										options_tmp = options_tmp.add($("<option>", {
-											value: (column_data[ii].value + '').replace(/"/g, '&quot;'),
+											value: column_data[ii].value,
 											text: column_data[ii].label
 										}));
 									}
 								} else {
 									for (ii = 0; ii < column_data.length; ii++) {
 										options_tmp = options_tmp.add($("<option>", {
-											value: (column_data[ii] + '').replace(/"/g, '&quot;'),
+											value: column_data[ii],
 											text: column_data[ii]
 										}));
 									}
@@ -3474,12 +3474,12 @@ if (!Object.entries) {
 								for (ii = 0; ii < column_data.length; ii++) {
 									if (typeof column_data[ii] === 'object') {
 										options_tmp = options_tmp.add($("<option>", {
-											value: (column_data[ii].value + '').replace(/"/g, '&quot;'),
+											value: column_data[ii].value,
 											text: column_data[ii].label
 										}));
 									} else {
 										options_tmp = options_tmp.add($("<option>", {
-											value: (column_data[ii] + '').replace(/"/g, '&quot;'),
+											value: column_data[ii],
 											text: column_data[ii]
 										}));
 									}
