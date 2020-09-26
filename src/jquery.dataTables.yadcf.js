@@ -1019,13 +1019,21 @@ if (!Object.entries) {
 		}
 
 		function yadcfMatchFilter(oTable, selected_value, filter_match_mode, column_number, exclude, original_column_number) {
-			var case_insensitive = yadcf.getOptions(oTable.selector)[original_column_number].case_insensitive;
+			var columnObj = getOptions(oTable.selector)[original_column_number],
+				case_insensitive = columnObj.case_insensitive;
 			if (exclude !== true) {
 				if (filter_match_mode === "contains") {
 					oTable.fnFilter(selected_value, column_number, false, true, true, case_insensitive);
 				} else if (filter_match_mode === "exact") {
+					let prefix = '^';
+					let suffix = '$';
+					if (columnObj.text_data_delimiter !== undefined) {
+						let text_data_delimiter = escapeRegExp(columnObj.text_data_delimiter);
+						prefix = '(' + prefix + '|' + text_data_delimiter + ')';
+						suffix = '(' + suffix + '|' + text_data_delimiter + ')';
+					}
 					selected_value = escapeRegExp(selected_value);
-					oTable.fnFilter("^" + selected_value + "$", column_number, true, false, true, case_insensitive);
+					oTable.fnFilter(prefix + selected_value + suffix, column_number, true, false, true, case_insensitive);
 				} else if (filter_match_mode === "startsWith") {
 					selected_value = escapeRegExp(selected_value);
 					oTable.fnFilter("^" + selected_value, column_number, true, false, true, case_insensitive);
