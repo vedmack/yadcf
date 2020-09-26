@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.42
+* Version:     0.9.4.beta.43
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1791,7 +1791,6 @@ if (!Object.entries) {
 				function (settingsDt, aData, iDataIndex, rowData) {
 					var val,
 						retVal = false,
-						oTable = oTables[table_selector_jq_friendly],
 						table_selector_jq_friendly_local = table_selector_jq_friendly,
 						current_table_selector_jq_friendly = yadcf.generateTableSelectorJQFriendly2(settingsDt),
 						columnObj,
@@ -1979,33 +1978,18 @@ if (!Object.entries) {
 
 			null_str = $();
 			if (columnObj.null_check_box === true) {
-				if (columnObj.externally_triggered !== true) {
-					null_str = $("<span>", {
-						class: "yadcf-null-wrapper",
-						onmousedown: "yadcf.stopPropagation(event);",
-						onclick: "yadcf.stopPropagation(event);"
-					}).append($("<div>", {
-						class: "yadcf-label small",
-						text: columnObj.null_label
-					})).append($("<input>", {
-						type: "checkbox",
-						title: columnObj.null_label,
-						onclick: "yadcf.stopPropagation(event);yadcf.nullChecked(event,'" + table_selector_jq_friendly + "'," + column_number + ");"
-					}));
-				} else {
-					null_str = $("<span>", {
-						class: "yadcf-null-wrapper",
-						onmousedown: "yadcf.stopPropagation(event);",
-						onclick: "yadcf.stopPropagation(event);"
-					}).append($("<div>", {
-						class: "yadcf-label small",
-						text: columnObj.null_label
-					})).append($("<input>", {
-						type: "checkbox",
-						title: columnObj.null_label,
-						onclick: "yadcf.stopPropagation(event);yadcf.nullChecked(event,'" + table_selector_jq_friendly + "'," + column_number + ");"
-					}));
-				}
+				null_str = $("<span>", {
+					class: "yadcf-null-wrapper",
+					onmousedown: "yadcf.stopPropagation(event);",
+					onclick: "yadcf.stopPropagation(event);"
+				}).append($("<div>", {
+					class: "yadcf-label small",
+					text: columnObj.null_label
+				})).append($("<input>", {
+					type: "checkbox",
+					title: columnObj.null_label,
+					onclick: "yadcf.stopPropagation(event);yadcf.nullChecked(event,'" + table_selector_jq_friendly + "'," + column_number + ");"
+				}));
 				if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 					addNullFilterCapability(table_selector_jq_friendly, column_number, false);
 				}
@@ -2142,7 +2126,7 @@ if (!Object.entries) {
 										from: ""
 									};
 							} else {
-								yadcfState = {};
+								let yadcfState = {};
 								yadcfState[table_selector_jq_friendly] = [];
 								yadcfState[table_selector_jq_friendly][column_number] = {
 									from: ""
@@ -4819,7 +4803,7 @@ if (!Object.entries) {
 							exclude_checked: exclude,
 						};
 				} else {
-					yadcfState = {};
+					let yadcfState = {};
 					yadcfState[table_selector_jq_friendly] = [];
 					yadcfState[table_selector_jq_friendly][column_number] = {
 						regex_check_box: regex_check_box,
@@ -5179,7 +5163,7 @@ if (!Object.entries) {
 				$.fn.dataTableExt.iApiIndex = 0;
 			}
 
-			if (params !== undefined && params.onInitComplete !== undefined) {
+			if (params.onInitComplete !== undefined) {
 				params.onInitComplete();
 			}
 			return this;
@@ -5226,7 +5210,7 @@ if (!Object.entries) {
 				$.fn.dataTableExt.iApiIndex = 0;
 			}
 
-			if (params !== undefined && params.onInitComplete !== undefined) {
+			if (params.onInitComplete !== undefined) {
 				params.onInitComplete();
 			}
 		}
@@ -5870,7 +5854,7 @@ if (!Object.entries) {
 				tableOptions,
 				optionsObj,
 				columnObjKey,
-				settingsDt = getSettingsObjFromTable(table_arg),
+				settingsDt,
 				i,
 				$filterElement;
 
@@ -5901,6 +5885,7 @@ if (!Object.entries) {
 					case 'select':
 						resetExcludeRegexCheckboxes($filterElement.parent());
 						clearStateSave(table_arg, column_number, table_selector_jq_friendly);
+						break;
 					case 'custom_func':
 						$filterElement.val('-1').removeClass('inuse');
 						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';

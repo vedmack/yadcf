@@ -3,6 +3,7 @@
  
 ## 0.9.4 is in beta (grab latest stable from https://github.com/vedmack/yadcf/releases)
 
+* PR (by m417z) Use proper jQuery objects instead of strings for better security - https://github.com/vedmack/yadcf/pull/630
 * Added (by @misanek) "regex" filtering mode checkbox (currently available for the text filter) - https://github.com/vedmack/yadcf/pull/490
 * Added babel transpiled version (es5) in /build folder
 * Fixed cumulative filtering issue (not calling proper dt api / version) 
@@ -12,7 +13,7 @@
 * Added column_data_type: 'html5_data_complex' type to parse value/display from datatable html5 attributes - https://github.com/vedmack/yadcf/issues/581
 * Added range_data_type: 'delimiter' , to allow range slider filter to handle multiple values per cell - https://github.com/vedmack/yadcf/issues/580
 * Added initOnDtXhrComplete: Allows to set a callback function to be called after dt xhr finishes - https://github.com/vedmack/yadcf/issues/609
-* Added initDefaults: Iמןמ global defaults for all yadcf instances. Usage example: yadcf.initDefaults({language: {select: 'Pick some'}}); thanks goes to @bytestream
+* Added initDefaults: Init global defaults for all yadcf instances. Usage example: yadcf.initDefaults({language: {select: 'Pick some'}}); thanks goes to @bytestream
 * Misc bug fixed issues:
 	* https://github.com/vedmack/yadcf/issues/469 - Cannot apply style_class on date filter
 	* https://github.com/vedmack/yadcf/issues/470 - filter_delay not working on range_date
