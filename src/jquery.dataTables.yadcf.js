@@ -5885,7 +5885,6 @@ if (!Object.entries) {
 					case 'select':
 						resetExcludeRegexCheckboxes($filterElement.parent());
 						clearStateSave(table_arg, column_number, table_selector_jq_friendly);
-						break;
 					case 'custom_func':
 						$filterElement.val('-1').removeClass('inuse');
 						table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
