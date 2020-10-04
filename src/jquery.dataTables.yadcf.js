@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.44
+* Version:     0.9.4.beta.45
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -5867,10 +5867,9 @@ if (!Object.entries) {
 
 					switch (optionsObj.filter_type) {
 						case 'select':
+						case 'custom_func':
 							resetExcludeRegexCheckboxes($filterElement.parent());
 							clearStateSave(table_arg, column_number, table_selector_jq_friendly);
-							break;
-						case 'custom_func':
 							$filterElement.val('-1').removeClass('inuse');
 							table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
 							if (optionsObj.select_type !== undefined) {
