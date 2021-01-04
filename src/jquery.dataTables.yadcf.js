@@ -1083,7 +1083,7 @@ if (!Object.entries) {
 			if (arg.value !== undefined && arg.value !== "-1") {
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
 			} else {
-				//wehn arg === 'clear' or arg.value === '-1'
+				//when arg === 'clear' or arg.value === '-1'
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val('-1').focus();
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
 				refreshSelectPlugin(columnObj, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number), '-1');
@@ -2141,7 +2141,12 @@ if (!Object.entries) {
 				if (columnObj.datepicker_type === 'daterangepicker' && oTable.fnSettings().oFeatures.bServerSide !== true) {
 					rangeClear(table_selector_jq_friendly, event, column_number);
 				} else {
-					oTable.fnFilter('', column_number_filter);
+					if (columnObj.filter_type !== 'date_custom_func') {
+						oTable.fnFilter('', column_number_filter);
+					} else {
+						$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val('');
+						doFilterCustomDateFunc({ value: date }, table_selector_jq_friendly, column_number);
+					}
 				}
 				$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val('').removeClass("inuse");
 				if (columnObj.datepicker_type === 'bootstrap-datepicker') {
@@ -5681,6 +5686,7 @@ if (!Object.entries) {
 							break;
 						case 'custom_func':
 						case 'multi_select_custom_func':
+						case 'date_custom_func':
 							$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(filter_value);
 							if (filter_value !== '') {
 								$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).addClass('inuse');
