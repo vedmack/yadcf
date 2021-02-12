@@ -5838,6 +5838,7 @@ if (!Object.entries) {
 		function exResetAllFilters(table_arg, noRedraw, columns) {
 			var table_selector_jq_friendly,
 				column_number,
+                column_position,
 				fromId,
 				toId,
 				sliderId,
@@ -5860,6 +5861,10 @@ if (!Object.entries) {
 				if (tableOptions.hasOwnProperty(columnObjKey)) {
 					optionsObj = tableOptions[columnObjKey];
 					column_number = optionsObj.column_number;
+                    column_position = column_number;
+                    if (plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly] !== undefined && plugins[table_selector_jq_friendly].ColReorder !== undefined) {
+                        column_position = plugins[table_selector_jq_friendly].ColReorder[column_number];
+                    }
 
 					if (columns !== undefined && $.inArray(column_number, columns) === -1) {
 						continue;
@@ -5875,9 +5880,9 @@ if (!Object.entries) {
 						case 'select':
 						case 'custom_func':
 							resetExcludeRegexCheckboxes($filterElement.parent());
-							clearStateSave(table_arg, column_number, table_selector_jq_friendly);
+							clearStateSave(table_arg, column_position, table_selector_jq_friendly);
 							$filterElement.val('-1').removeClass('inuse');
-							table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
+							table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = '';
 							if (optionsObj.select_type !== undefined) {
 								refreshSelectPlugin(optionsObj, $filterElement, '-1');
 							}
@@ -5886,13 +5891,13 @@ if (!Object.entries) {
 						case 'text':
 							$filterElement.prop('disabled', false);
 							$filterElement.val('').removeClass('inuse inuse-exclude inuse-regex');
-							table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
+							table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = '';
 							resetExcludeRegexCheckboxes($filterElement.parent());
-							clearStateSave(table_arg, column_number, table_selector_jq_friendly);
+							clearStateSave(table_arg, column_position, table_selector_jq_friendly);
 							break;
 						case 'date':
 							$filterElement.val('').removeClass('inuse');
-							table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
+							table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = '';
 							if ($filterElement.prev().hasClass('yadcf-exclude-wrapper')) {
 								$filterElement.prev().find('input').prop('checked', false);
 							}
@@ -5901,7 +5906,7 @@ if (!Object.entries) {
 						case 'multi_select_custom_func':
 							$filterElement.val('-1');
 							$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", undefined);
-							table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
+							table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = '';
 							if (optionsObj.select_type !== undefined) {
 								refreshSelectPlugin(optionsObj, $filterElement, '-1');
 							}
@@ -5914,9 +5919,9 @@ if (!Object.entries) {
 							$(selectorePrefix + '#' + toId).val('');
 							$(selectorePrefix + '#' + toId).removeClass('inuse');
 							if (table_arg.fnSettings().oFeatures.bServerSide === true) {
-								table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
+								table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = '';
 							}
-							clearStateSave(table_arg, column_number, table_selector_jq_friendly);
+							clearStateSave(table_arg, column_position, table_selector_jq_friendly);
 							break;
 						case 'range_number':
 							fromId = 'yadcf-filter-' + table_selector_jq_friendly + '-from-' + column_number;
@@ -5928,10 +5933,10 @@ if (!Object.entries) {
 							$(selectorePrefix + '#' + toId).val('');
 							$(selectorePrefix + '#' + toId).removeClass('inuse inuse-exclude');
 							if (table_arg.fnSettings().oFeatures.bServerSide === true) {
-								table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
+								table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = '';
 							}
 							resetExcludeRegexCheckboxes($(selectorePrefix + '#' + fromId).parent().parent());
-							clearStateSave(table_arg, column_number, table_selector_jq_friendly);
+							clearStateSave(table_arg, column_position, table_selector_jq_friendly);
 							break;
 						case 'range_number_slider':
 							sliderId = 'yadcf-filter-' + table_selector_jq_friendly + '-slider-' + column_number;
@@ -5945,9 +5950,9 @@ if (!Object.entries) {
 							$(selectorePrefix + '#' + toId).parent().parent().find('.ui-slider-range').removeClass('inuse');
 							$(selectorePrefix + '#' + sliderId).slider("option", "values", [$('#' + fromId).parent().parent().find('.yadcf-filter-range-number-slider-min-tip-hidden').text(), $('#' + fromId).parent().parent().find('.yadcf-filter-range-number-slider-max-tip-hidden').text()]);
 							if (table_arg.fnSettings().oFeatures.bServerSide === true) {
-								table_arg.fnSettings().aoPreSearchCols[column_number].sSearch = '';
+								table_arg.fnSettings().aoPreSearchCols[column_position].sSearch = '';
 							}
-							clearStateSave(table_arg, column_number, table_selector_jq_friendly);
+							clearStateSave(table_arg, column_position, table_selector_jq_friendly);
 							break;
 					}
 				}
