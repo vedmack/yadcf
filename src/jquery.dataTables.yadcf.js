@@ -1084,7 +1084,7 @@ if (!Object.entries) {
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).addClass("inuse");
 			} else {
 				//when arg === 'clear' or arg.value === '-1'
-				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val('-1').focus();
+				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val('-1').trigger('focus');
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
 				refreshSelectPlugin(columnObj, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number), '-1');
 			}
@@ -1152,7 +1152,7 @@ if (!Object.entries) {
 				if (exGetColumnFilterVal(oTable, column_number) === '') {
 					return;
 				}
-				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("-1").focus();
+				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("-1").trigger('focus');
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
 				$(document).data("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val", "-1");
 				oTable.fnFilter("", column_number_filter);
@@ -1297,7 +1297,7 @@ if (!Object.entries) {
 				if (exGetColumnFilterVal(oTable, column_number) === '') {
 					return;
 				}
-				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
+				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").trigger('focus');
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
 				$(document).removeData("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "_val");
 				oTable.fnFilter("", column_number_filter);
@@ -2093,7 +2093,7 @@ if (!Object.entries) {
 				} else {
 					clear = 'clear';
 				}
-				$(event).blur();
+				$(event).trigger('blur');
 			} else if (columnObj.datepicker_type === 'bootstrap-datepicker') {
 				if (pDate.dates) {
 					date = pDate.format(0, columnObj.date_format);
@@ -2202,7 +2202,7 @@ if (!Object.entries) {
 				} else {
 					$(event).addClass("inuse");
 				}
-				$(event).blur();
+				$(event).trigger('blur');
 			} else if (pDate.type === 'changeDate') {
 				if (pDate.date !== undefined) {
 					$(event).addClass("inuse");
@@ -4145,7 +4145,7 @@ if (!Object.entries) {
 			} else {
 				buttonSelector.find(".yadcf-filter-range").val("");
 				if (buttonSelector.find(".yadcf-filter-range-number").length > 0) {
-					$(buttonSelector.find(".yadcf-filter-range")[0]).focus();
+					$(buttonSelector.find(".yadcf-filter-range")[0]).trigger('focus');
 				}
 			}
 
@@ -4219,7 +4219,7 @@ if (!Object.entries) {
 			buttonSelector.prev().find(".yadcf-filter-range-number-slider").slider("option", "yadcf-reset", true);
 			buttonSelector.prev().find(".yadcf-filter-range-number-slider").slider("option", "values", [min_val, max_val]);
 
-			$(buttonSelector.prev().find(".ui-slider-handle")[0]).attr("tabindex", -1).focus();
+			$(buttonSelector.prev().find(".ui-slider-handle")[0]).attr("tabindex", -1).trigger('focus');
 
 			$(buttonSelector.prev().find(".ui-slider-handle")[0]).removeClass("inuse");
 			$(buttonSelector.prev().find(".ui-slider-handle")[1]).removeClass("inuse");
@@ -4517,7 +4517,7 @@ if (!Object.entries) {
 
 			if (clear !== undefined || !selected_values || selected_values.length === 0) {
 				if (clear !== undefined) {
-					$(event.target).parent().find('select').val('-1').focus();
+					$(event.target).parent().find('select').val('-1').trigger('focus');
 					$(event.target).parent().find('selectn ').removeClass("inuse");
 				}
 				if (columnsObj.column_number instanceof Array) {
@@ -4576,7 +4576,7 @@ if (!Object.entries) {
 
 			if (clear !== undefined || event.target.value === '-1') {
 				if (clear !== undefined) {
-					$(event.target).parent().find('select').val('-1').focus();
+					$(event.target).parent().find('select').val('-1').trigger('focus');
 					$(event.target).parent().find('select').removeClass("inuse");
 				}
 				if (columnsObj.column_number instanceof Array) {
@@ -4631,10 +4631,10 @@ if (!Object.entries) {
 
 				if (clear !== undefined || event.target.value === '') {
 					if (clear !== undefined) {
-						$(event.target).prev().val("").focus();
+						$(event.target).prev().val("").trigger('focus');
 						$(event.target).prev().removeClass("inuse");
 					} else {
-						$(event.target).val("").focus();
+						$(event.target).val("").trigger('focus');
 						$(event.target).removeClass("inuse");
 					}
 					if (columnsObj.column_number instanceof Array) {
@@ -4751,7 +4751,7 @@ if (!Object.entries) {
 						return;
 					}
 
-					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
+					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").trigger('focus');
 					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse inuse-exclude inuse-regex");
 					oTable.fnFilter("", column_number_filter);
 					resetIApiIndex();
@@ -4840,7 +4840,7 @@ if (!Object.entries) {
 				input.removeClass('inuse inuse-exclude inuse-regex');
 
 				if (columnObj.filter_type === "text") {
-					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").focus();
+					$(fixedPrefix + "#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).val("").trigger('focus');
 					if (oTable.fnSettings().oFeatures.bServerSide !== true) {
 						oTable.fnFilter('', column_number_filter);
 					}
