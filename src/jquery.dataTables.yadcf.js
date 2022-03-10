@@ -1190,8 +1190,8 @@ if (!Object.entries) {
 					oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
 				}
 			} else {
-				oTable.fnFilter("", column_number_filter);
 				$("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number).removeClass("inuse");
+				oTable.fnFilter("", column_number_filter);
 			}
 			resetIApiIndex();
 		}
