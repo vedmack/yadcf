@@ -201,7 +201,7 @@
 * ignore_char
                 Required:           false
                 Type:               String
-                Description:        Tells the range_number and range_number_slide to ignore specific char while filtering (that char can used as number separator)
+                Description:        Tells the range_number and range_number_slider to ignore specific char while filtering (that char can used as number separator)
                 Note:               Use double escape for regex chars , e.g \\$ , also you can use multiple ignore chars with | , e.g '_|\\.|\\$'
 
 * filter_match_mode
