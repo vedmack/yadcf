@@ -47,6 +47,10 @@
 	white-space: nowrap;
 	margin-left: 2px;
 }
+/* issue 669 */
+.yadcf-filter-wrapper .datepicker-months, .yadcf-filter-wrapper .datepicker-years, .yadcf-filter-wrapper datepicker-decades {
+	white-space: normal;
+}
 
 .yadcf-filter-range-number {
 	width: 40px;
