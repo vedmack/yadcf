@@ -444,7 +444,7 @@
                                     array with columns numbers
                                     noRedraw:   (boolean) , use it if you don't want your table to be reloaded after the filter reset,
                                                 for example if you planning to call exFilterColumn function right after the exResetFilters (to avoid two AJAX requests)
-                Usage example:      yadcf.exResetAllFilters(oTable, [1,2]);
+                Usage example:      yadcf.exResetFilters(oTable, [1,2]);
 
 * initSelectPluginCustomTriggers
                 Description:        Allows to set any select jquery plugin initialize and refresh functions. jQuery selector will be passed to the user defined function to initialize and refresh the plugin.
@@ -457,7 +457,7 @@
 * exFilterExternallyTriggered
                 Description:        Triggers all the available filters, should be used only when the externally_triggered option used
                 Arguments:          table_arg: (variable of the datatable)
-                Usage example:      yadcf.exResetAllFilters(table_arg);
+                Usage example:      yadcf.exFilterExternallyTriggered(table_arg);
 
 * exRefreshColumnFilterWithDataProp
                 Description:        Updates column filter with new data, when data property was used in initialization for this filter
@@ -473,7 +473,7 @@
                 Usage example:      yadcf.initOnDtXhrComplete(function() { $("#yadcf-filter--example-0").multiselect('refresh'); });
 
 * initDefaults
-                Description:        Inint global defaults for all yadcf instances.
+                Description:        Init global defaults for all yadcf instances.
                 Arguments:          Object consisting of anything defined inside default_options variable
                 Usage example:      yadcf.initDefaults({language: {select: 'Pick some'}});
 
