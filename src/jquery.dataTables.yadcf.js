@@ -1870,7 +1870,7 @@ if (!Object.entries) {
 				filter_wrapper_id,
 				oTable,
 				columnObj,
-				filterActionStr,
+				filterActionFn,
 				null_str,
 				exclude_str;
 
@@ -1900,9 +1900,9 @@ if (!Object.entries) {
 			}));
 			filter_selector_string += " div.yadcf-filter-wrapper-inner";
 
-			filterActionFn = function(jqTable){
+			filterActionFn = function(tableSel){
 				return function(event){
-					yadcf.rangeNumberKeyUP(jqTable, event);
+					yadcf.rangeNumberKeyUP(tableSel, event);
 				};
 			}(table_selector_jq_friendly);
 			if (columnObj.externally_triggered === true) {
@@ -1924,7 +1924,7 @@ if (!Object.entries) {
 				placeholder: filter_default_label[1],
 				id: toId,
 				class: "yadcf-filter-range-number yadcf-filter-range",
-				onkeyup: filterActionStr
+				onkeyup: filterActionFn
 			}));
 
 			if (filter_reset_button_text !== false) {
@@ -1932,10 +1932,10 @@ if (!Object.entries) {
 					type: "button",
 					id: "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset",
 					onmousedown: yadcf.stopPropagation,
-					onclick: function(colNo, jqTable){
+					onclick: function(colNo, tableSel){
 						return function(event){
 							yadcf.stopPropagation(event);
-							yadcf.rangeClear(jqTable, event, colNo);
+							yadcf.rangeClear(tableSel, event, colNo);
 							return false;
 						};
 					}(column_number, table_selector_jq_friendly),
@@ -1969,10 +1969,10 @@ if (!Object.entries) {
 					})).append(makeElement("<input>", {
 						type: "checkbox",
 						title: columnObj.exclude_label,
-						onclick: function(jqTable){
+						onclick: function(tableSel){
 							return function(event){
 								yadcf.stopPropagation(event);
-								yadcf.rangeNumberKeyUP(jqTable, event);
+								yadcf.rangeNumberKeyUP(tableSel, event);
 							};
 						}(table_selector_jq_friendly)
 					}));
@@ -2004,10 +2004,10 @@ if (!Object.entries) {
 				})).append(makeElement("<input>", {
 					type: "checkbox",
 					title: columnObj.null_label,
-					onclick: function(colNo, jqTable){
+					onclick: function(colNo, tableSel){
 						return function(event){
 							yadcf.stopPropagation(event);
-							yadcf.nullChecked(event, jqTable, colNo);
+							yadcf.nullChecked(event, tableSel, colNo);
 						};
 					}(column_number, table_selector_jq_friendly)
 				}));
@@ -2296,7 +2296,7 @@ if (!Object.entries) {
 				oTable,
 				columnObj,
 				datepickerObj = {},
-				filterActionStr,
+				filterActionFn,
 				$fromInput,
 				$toInput,
 				innerWrapperAdditionalClass = '';
@@ -2328,9 +2328,9 @@ if (!Object.entries) {
 			}));
 			filter_selector_string += " div.yadcf-filter-wrapper-inner";
 
-			filterActionFn = function(jqTable){
+			filterActionFn = function(tableSel){
 				return function(event){
-					yadcf.rangeDateKeyUP(jqTable, date_format, event);
+					yadcf.rangeDateKeyUP(tableSel, date_format, event);
 				};
 			}(table_selector_jq_friendly);
 			if (columnObj.externally_triggered === true) {
@@ -2352,7 +2352,7 @@ if (!Object.entries) {
 				placeholder: filter_default_label[1],
 				id: toId,
 				class: "yadcf-filter-range-date yadcf-filter-range yadcf-filter-range-end " + columnObj.style_class,
-				onkeyup: filterActionStr
+				onkeyup: filterActionFn
 			}));
 
 			$fromInput = $("#" + fromId);
@@ -2362,10 +2362,10 @@ if (!Object.entries) {
 				$(filter_selector_string_tmp).append(makeElement("<button>", {
 					type: "button",
 					onmousedown: yadcf.stopPropagation,
-					onclick: function(colNo, jqTable){
+					onclick: function(colNo, tableSel){
 						return function(event){
 							yadcf.stopPropagation(event);
-							yadcf.rangeClear(jqTable, event, colNo);
+							yadcf.rangeClear(tableSel, event, colNo);
 							return false;
 						};
 					}(column_number, table_selector_jq_friendly),
@@ -2451,7 +2451,7 @@ if (!Object.entries) {
 				oTable,
 				columnObj,
 				datepickerObj = {},
-				filterActionStr,
+				filterActionFn,
 				settingsDt;
 
 			filter_wrapper_id = "yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number;
@@ -2473,7 +2473,7 @@ if (!Object.entries) {
 			filter_selector_string += " div.yadcf-filter-wrapper";
 			filter_selector_string_tmp = filter_selector_string;
 
-			filterActionFn = function(jqTable) {
+			filterActionFn = function(tableSel) {
 				return function(event){
 					yadcf.dateKeyUP(table_selector_jq_friendly, date_format, event);
 				};
@@ -2487,7 +2487,7 @@ if (!Object.entries) {
 				placeholder: filter_default_label,
 				id: dateId,
 				class: "yadcf-filter-date " + columnObj.style_class,
-				onkeyup: filterActionStr
+				onkeyup: filterActionFn
 			}));
 
 			if (filter_reset_button_text !== false) {
@@ -2495,10 +2495,10 @@ if (!Object.entries) {
 					type: "button",
 					id: dateId + "-reset",
 					onmousedown: yadcf.stopPropagation,
-					onclick: function(jqTable){
+					onclick: function(tableSel){
 						return function(event){
 							yadcf.stopPropagation(event);
-							yadcf.dateSelectSingle(jqTable, yadcf.eventTargetFixUp(event).target, 'clear');
+							yadcf.dateSelectSingle(tableSel, yadcf.eventTargetFixUp(event).target, 'clear');
 							return false;
 						};
 					}(table_selector_jq_friendly),
@@ -2833,10 +2833,10 @@ if (!Object.entries) {
 					$(filter_selector_string_tmp).append(makeElement("<button>", {
 						type: "button",
 						onmousedown: yadcf.stopPropagation,
-						onclick: function(jqTable){
+						onclick: function(tableSel){
 							return function(event){
 								yadcf.stopPropagation(event);
-								yadcf.rangeNumberSliderClear(jqTable, event);
+								yadcf.rangeNumberSliderClear(tableSel, event);
 								return false;
 							};
 						}(table_selector_jq_friendly),
@@ -3309,7 +3309,6 @@ if (!Object.entries) {
 				filters_position,
 				unique_th,
 				settingsDt,
-				filterActionStr,
 				filterActionFn,
 				custom_func_filter_value_holder,
 				exclude_str,
@@ -3640,9 +3639,9 @@ if (!Object.entries) {
 							filter_selector_string += " div.yadcf-filter-wrapper";
 
 							if (columnObj.filter_type === "select") {
-								filterActionFn = function(colNo, jqTable) {
+								filterActionFn = function(colNo, tableSel) {
 									return function(event) {
-										yadcf.doFilter(this, jqTable, colNo, filter_match_mode);
+										yadcf.doFilter(this, tableSel, colNo, filter_match_mode);
 									};
 								}(column_number, table_selector_jq_friendly);
 								if (columnObj.externally_triggered === true) {
@@ -3662,9 +3661,9 @@ if (!Object.entries) {
 										type: "button",
 										id: "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset",
 										onmousedown: yadcf.stopPropagation,
-										onclick: function(colNo, jqTable){
+										onclick: function(colNo, tableSel){
 											return function(event) {
-												yadcf.doFilter('clear', jqTable, colNo);
+												yadcf.doFilter('clear', tableSel, colNo);
 												return false;
 											}
 										}(column_number, table_selector_jq_friendly),
@@ -3695,10 +3694,10 @@ if (!Object.entries) {
 									})).append(makeElement("<input>", {
 										type: "checkbox",
 										title: columnObj.exclude_label,
-										onclick: function(colNo, jqTable){
+										onclick: function(colNo, tableSel){
 											return function(event){
 												yadcf.stopPropagation(event);
-												yadcf.doFilter('exclude', jqTable, colNo, filter_match_mode);
+												yadcf.doFilter('exclude', tableSel, colNo, filter_match_mode);
 											};
 										}(column_number, table_selector_jq_friendly)
 									}));
@@ -3716,9 +3715,9 @@ if (!Object.entries) {
 									sel.find('.yadcf-exclude-wrapper').hide();
 								}
 							} else {
-								filterActionFn = function(colNo, jqTable){
+								filterActionFn = function(colNo, tableSel){
 									return function(event){
-										yadcf.doFilterCustomDateFunc(this, jqTable, colNo);
+										yadcf.doFilterCustomDateFunc(this, tableSel, colNo);
 									}
 								}(column_number, table_selector_jq_friendly);
 								if (columnObj.externally_triggered === true) {
@@ -3727,7 +3726,7 @@ if (!Object.entries) {
 								$(filter_selector_string).append(makeElement("<select>", {
 									id: "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number,
 									class: "yadcf-filter " + columnObj.style_class,
-									onchange: filterActionStr,
+									onchange: filterActionFn,
 									onkeydown: yadcf.preventDefaultForEnter,
 									onmousedown: yadcf.stopPropagation,
 									onclick: yadcf.stopPropagation,
@@ -3737,10 +3736,10 @@ if (!Object.entries) {
 									$(filter_selector_string).find(".yadcf-filter").after($("<button>", {
 										type: "button",
 										onmousedown: yadcf.stopPropagation,
-										onclick: function(colNo, jqTable){
+										onclick: function(colNo, tableSel){
 											return function(event){
 												yadcf.stopPropagation(event);
-												yadcf.doFilterCustomDateFunc('clear', jqTable, colNo);
+												yadcf.doFilterCustomDateFunc('clear', tableSel, colNo);
 												return false;
 											};
 										}(column_number, table_selector_jq_friendly),
@@ -3835,9 +3834,9 @@ if (!Object.entries) {
 							filter_selector_string += " div.yadcf-filter-wrapper";
 
 							if (columnObj.filter_type === "multi_select") {
-								filterActionFn = function(colNo, jqTable) {
+								filterActionFn = function(colNo, tableSel) {
 									return function(event) {
-										yadcf.doFilterMultiSelect(this, jqTable, colNo, filter_match_mode);
+										yadcf.doFilterMultiSelect(this, tableSel, colNo, filter_match_mode);
 									};
 								}(column_number, table_selector_jq_friendly);
 								if (columnObj.externally_triggered === true) {
@@ -3852,17 +3851,17 @@ if (!Object.entries) {
 									onkeydown: yadcf.preventDefaultForEnter,
 									onmousedown: yadcf.stopPropagation,
 									onclick: yadcf.stopPropagation,
-									html: column_data,
+									html: column_data
 								}));
 
 								if (filter_reset_button_text !== false) {
 									$(filter_selector_string).find(".yadcf-filter").after(makeElement("<button>", {
 										type: "button",
 										onmousedown: yadcf.stopPropagation,
-										onclick: function(colNo, jqTable){
+										onclick: function(colNo, tableSel){
 											return function(event) {
 												yadcf.stopPropagation(event);
-												yadcf.doFilter('clear', jqTable, colNo);
+												yadcf.doFilter('clear', tableSel, colNo);
 												return false;
 											}
 										}(column_number, table_selector_jq_friendly),
@@ -3879,9 +3878,9 @@ if (!Object.entries) {
 									$('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(tmpStr);
 								}
 							} else {
-								filterActionStr = function(colNo, jqTable){
+								filterActionFn = function(colNo, tableSel){
 									return function(event){
-										yadcf.doFilterCustomDateFunc(this, jqTable, colNo);
+										yadcf.doFilterCustomDateFunc(this, tableSel, colNo);
 									};
 								}(column_number, table_selector_jq_friendly);
 								if (columnObj.externally_triggered === true) {
@@ -3903,10 +3902,10 @@ if (!Object.entries) {
 									$(filter_selector_string).find(".yadcf-filter").after($("<button>", {
 										type: "button",
 										onmousedown: yadcf.stopPropagation,
-										onclick: function(colNo, jqTable){
+										onclick: function(colNo, tableSel){
 											return function(event){
 												yadcf.stopPropagation(event);
-												yadcf.doFilterCustomDateFunc('clear', jqTable, colNo);
+												yadcf.doFilterCustomDateFunc('clear', tableSel, colNo);
 												return false;
 											};
 										}(column_number, table_selector_jq_friendly),
@@ -3952,9 +3951,9 @@ if (!Object.entries) {
 							}));
 							filter_selector_string += " div.yadcf-filter-wrapper";
 
-							filterActionFn = function(jqTable){
+							filterActionFn = function(tableSel){
 								return function(event){
-									yadcf.autocompleteKeyUP(jqTable, event);
+									yadcf.autocompleteKeyUP(tableSel, event);
 								};
 							}(table_selector_jq_friendly);
 							if (columnObj.externally_triggered === true) {
@@ -3976,10 +3975,10 @@ if (!Object.entries) {
 								$(filter_selector_string).find(".yadcf-filter").after($("<button>", {
 									type: "button",
 									onmousedown: yadcf.stopPropagation,
-									onclick: function(colNo, jqTable){
+									onclick: function(colNo, tableSel){
 										return function(event){
 											yadcf.stopPropagation(event);
-											yadcf.doFilterAutocomplete('clear', jqTable, colNo);
+											yadcf.doFilterAutocomplete('clear', tableSel, colNo);
 											return false;
 										};
 									}(column_number, table_selector_jq_friendly),
@@ -3997,10 +3996,10 @@ if (!Object.entries) {
 							filter_selector_string += " div.yadcf-filter-wrapper";
 
 
-							filterActionFn = function(colNo, tSel) {
+							filterActionFn = function(colNo, tableSel) {
 								/* IIFE closure to preserve column number. */
 								return function(event) {
-									yadcf.textKeyUP(event, tSel, colNo);
+									yadcf.textKeyUP(event, tableSel, colNo);
 								};
 							}(column_number, table_selector_jq_friendly);
 							if (columnObj.externally_triggered === true) {
@@ -4020,10 +4019,10 @@ if (!Object.entries) {
 									})).append(makeElement("<input>", {
 										type: "checkbox",
 										title: columnObj.exclude_label,
-										onclick: function(colNo, jqTable){
+										onclick: function(colNo, tableSel){
 											return function(event){
 												yadcf.stopPropagation(event);
-												yadcf.textKeyUP(event, jqTable, colNo);
+												yadcf.textKeyUP(event, tableSel, colNo);
 											};
 										}(column_number, table_selector_jq_friendly)
 									}));
@@ -4056,10 +4055,10 @@ if (!Object.entries) {
 									})).append(makeElement("<input>", {
 										type: "checkbox",
 										title: columnObj.regex_label,
-										onclick: function(colNo, jqTable){
+										onclick: function(colNo, tableSel){
 											return function(event){
 												yadcf.stopPropagation(event);
-												yadcf.textKeyUP(event, jqTable, colNo);
+												yadcf.textKeyUP(event, tableSel, colNo);
 											};
 										}(column_number, table_selector_jq_friendly)
 									}));
@@ -4091,10 +4090,10 @@ if (!Object.entries) {
 								})).append(makeElement("<input>", {
 									type: "checkbox",
 									title: columnObj.null_label,
-									onclick: function(colNo, jqTable){
+									onclick: function(colNo, tableSel){
 										return function(event){
 											yadcf.stopPropagation(event);
-											yadcf.nullChecked(event, jqTable, colNo);
+											yadcf.nullChecked(event, tableSel, colNo);
 										};
 									}(column_number, table_selector_jq_friendly)
 								}));
@@ -4146,11 +4145,11 @@ if (!Object.entries) {
 									type: "button",
 									id: "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset",
 									onmousedown: yadcf.stopPropagation,
-									onclick: function(colNo, jqTable){
+									onclick: function(colNo, tableSel){
 										/* IIFE closure to preserve column_number */
 										return function(event) {
 											yadcf.stopPropagation(event);
-											yadcf.textKeyUP(event, jqTable, colNo, 'clear');
+											yadcf.textKeyUP(event, tableSel, colNo, 'clear');
 											return false;
 										}
 									}(column_number, table_selector_jq_friendly),
@@ -5523,7 +5522,6 @@ if (!Object.entries) {
 								return function(event){
 									yadcf.stopPropagation(event);
 									yadcf.doFilterMultiTables(tablesSelectors, event, colNo);
-									return false;
 								}
 							}(column_number_str),
 							onmousedown: yadcf.stopPropagation,
@@ -5545,7 +5543,6 @@ if (!Object.entries) {
 								return function(event){
 									yadcf.stopPropagation(event);
 									yadcf.doFilterMultiTablesMultiSelect(tablesSelectors, event, colNo);
-									return false;
 								};
 							}(column_number_str),
 							onmousedown: yadcf.stopPropagation,
