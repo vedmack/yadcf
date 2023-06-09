@@ -923,7 +923,7 @@ if (!Object.entries) {
 		function initializeSelectPlugin(selectType, $selectObject, select_type_options) {
 			if (selectType === 'chosen') {
 				$selectObject.chosen(select_type_options);
-				$selectObject.next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
+				$selectObject.next().on("click", yadcf.stopPropagation).on("mousedown", yadcf.stopPropagation);
 				refreshSelectPlugin({
 					select_type: selectType,
 					select_type_options: select_type_options
@@ -933,11 +933,11 @@ if (!Object.entries) {
 					$selectObject.select2(select_type_options);
 				}
 				if ($selectObject.next().hasClass('select2-container')) {
-					$selectObject.next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
+					$selectObject.next().on("click", yadcf.stopPropagation).on("mousedown", yadcf.stopPropagation);
 				}
 			} else if (selectType === 'custom_select') {
 				selectElementCustomInitFunc($selectObject);
-				$selectObject.next().attr("onclick", "yadcf.stopPropagation(event);").attr("onmousedown", "yadcf.stopPropagation(event);");
+				$selectObject.next().on("click", yadcf.stopPropagation).on("mousedown", yadcf.stopPropagation);
 			}
 		}
 
@@ -3213,6 +3213,27 @@ if (!Object.entries) {
 			return column_data;
 		}
 
+		function makeElement(element, opts) {
+			/* Wrap making an element so all event handlers are dynamically bound. */
+			var onclick = opts.onclick;
+			var onkeyup = opts.onkeyup;
+			var onmousedown = opts.onmousedown;
+			var onkeydown = opts.onkeydown;
+			var onchange = opts.onchange;
+			delete opts.onclick;
+			delete opts.onkeyup;
+			delete opts.onmousedown;
+			delete opts.onkeydown;
+			delete opts.onchange;
+			var el = $(element, opts);
+			if (onclick) { el.on('click', onclick); }
+			if (onkeyup) { el.on('keyup', onkeyup); }
+			if (onkeydown) { el.on('keydown', onkeydown); }
+			if (onmousedown) { el.on('mousedown', onmousedown); }
+			if (onchange) { el.on('change', onchange); }
+			return el;
+		}
+
 		function appendFilters(oTable, args, table_selector, pSettings) {
 			var $filter_selector,
 				filter_selector_string,
@@ -3243,6 +3264,7 @@ if (!Object.entries) {
 				unique_th,
 				settingsDt,
 				filterActionStr,
+				filterActionFn,
 				custom_func_filter_value_holder,
 				exclude_str,
 				regex_str,
@@ -3572,25 +3594,34 @@ if (!Object.entries) {
 							filter_selector_string += " div.yadcf-filter-wrapper";
 
 							if (columnObj.filter_type === "select") {
-								filterActionStr = 'yadcf.doFilter(this, \'' + table_selector_jq_friendly + '\', ' + column_number + ', \'' + filter_match_mode + '\');';
+								filterActionFn = function(colNo, jqTable) {
+									return function(event) {
+										yadcf.doFilter(this, jqTable, colNo, filter_match_mode);
+									};
+								}(column_number, table_selector_jq_friendly);
 								if (columnObj.externally_triggered === true) {
-									filterActionStr = '';
+									filterActionFn = function(){};
 								}
-								$(filter_selector_string).append($("<select>", {
+								$(filter_selector_string).append(makeElement("<select>", {
 									id: "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number,
 									class: "yadcf-filter " + columnObj.style_class,
-									onchange: filterActionStr,
-									onkeydown: "yadcf.preventDefaultForEnter(event);",
-									onmousedown: "yadcf.stopPropagation(event);",
-									onclick: "yadcf.stopPropagation(event);",
+									onchange: filterActionFn,
+									onkeydown: yadcf.preventDefaultForEnter,
+									onmousedown: yadcf.stopPropagation,
+									onclick: yadcf.stopPropagation,
 									html: column_data
 								}));
 								if (filter_reset_button_text !== false) {
-									$(filter_selector_string).find(".yadcf-filter").after($("<button>", {
+									$(filter_selector_string).find(".yadcf-filter").after(makeElement("<button>", {
 										type: "button",
 										id: "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset",
-										onmousedown: "yadcf.stopPropagation(event);",
-										onclick: "yadcf.stopPropagation(event);yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;",
+										onmousedown: yadcf.stopPropagation,
+										onclick: function(colNo, jqTable){
+											return function(event) {
+												yadcf.doFilter('clear', jqTable, colNo);
+												return false;
+											}
+										}(column_number, table_selector_jq_friendly),
 										class: "yadcf-filter-reset-button " + columnObj.reset_button_style_class,
 										text: filter_reset_button_text
 									}));
@@ -3743,27 +3774,37 @@ if (!Object.entries) {
 							filter_selector_string += " div.yadcf-filter-wrapper";
 
 							if (columnObj.filter_type === "multi_select") {
-								filterActionStr = 'yadcf.doFilterMultiSelect(this, \'' + table_selector_jq_friendly + '\', ' + column_number + ', \'' + filter_match_mode + '\');';
+								filterActionFn = function(colNo, jqTable) {
+									return function(event) {
+										yadcf.doFilterMultiSelect(this, jqTable, colNo, filter_match_mode);
+									};
+								}(column_number, table_selector_jq_friendly);
 								if (columnObj.externally_triggered === true) {
-									filterActionStr = '';
+									filterActionFn = function(){};
 								}
-								$(filter_selector_string).append($("<select>", {
+								$(filter_selector_string).append(makeElement("<select>", {
 									multiple: true,
 									"data-placeholder": filter_default_label,
 									id: "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number,
 									class: "yadcf-filter " + columnObj.style_class,
-									onchange: filterActionStr,
-									onkeydown: "yadcf.preventDefaultForEnter(event);",
-									onmousedown: "yadcf.stopPropagation(event);",
-									onclick: "yadcf.stopPropagation(event);",
-									html: column_data
+									onchange: filterActionFn,
+									onkeydown: yadcf.preventDefaultForEnter,
+									onmousedown: yadcf.stopPropagation,
+									onclick: yadcf.stopPropagation,
+									html: column_data,
 								}));
 
 								if (filter_reset_button_text !== false) {
-									$(filter_selector_string).find(".yadcf-filter").after($("<button>", {
+									$(filter_selector_string).find(".yadcf-filter").after(makeElement("<button>", {
 										type: "button",
-										onmousedown: "yadcf.stopPropagation(event);",
-										onclick: "yadcf.stopPropagation(event);yadcf.doFilter('clear', '" + table_selector_jq_friendly + "', " + column_number + "); return false;",
+										onmousedown: yadcf.stopPropagation,
+										onclick: function(colNo, jqTable){
+											return function(event) {
+												yadcf.stopPropagation(event);
+												yadcf.doFilter('clear', jqTable, colNo);
+												return false;
+											}
+										}(column_number, table_selector_jq_friendly),
 										class: "yadcf-filter-reset-button " + columnObj.reset_button_style_class,
 										text: filter_reset_button_text
 									}));
@@ -3874,9 +3915,15 @@ if (!Object.entries) {
 							}));
 							filter_selector_string += " div.yadcf-filter-wrapper";
 
-							filterActionStr = 'yadcf.textKeyUP(event,\'' + table_selector_jq_friendly + '\', ' + column_number + ');';
+
+							filterActionFn = function(colNo, tSel) {
+								/* IIFE closure to preserve column number. */
+								return function(event) {
+									yadcf.textKeyUP(event, tSel, colNo);
+								};
+							}(column_number, table_selector_jq_friendly);
 							if (columnObj.externally_triggered === true) {
-								filterActionStr = '';
+								filterActionFn = function(){};
 							}
 
 							exclude_str = $();
@@ -3960,16 +4007,16 @@ if (!Object.entries) {
 								}
 							}
 
-							let append_input = $("<input>", {
+							let append_input = makeElement("<input>", {
 								type: "text",
-								onkeydown: "yadcf.preventDefaultForEnter(event);",
+								onkeydown: yadcf.preventDefaultForEnter,
 								id: "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number,
 								class: "yadcf-filter " + columnObj.style_class,
-								onmousedown: "yadcf.stopPropagation(event);",
-								onclick: "yadcf.stopPropagation(event);",
+								onmousedown: yadcf.stopPropagation,
+								onclick: yadcf.stopPropagation,
 								placeholder: filter_default_label,
 								filter_match_mode: filter_match_mode,
-								onkeyup: filterActionStr
+								onkeyup: filterActionFn
 							});
 
 							if (columnObj.checkbox_position_after) {
@@ -3987,11 +4034,11 @@ if (!Object.entries) {
 								sel.find('.yadcf-exclude-wrapper').hide();
 								sel.find('.yadcf-regex-wrapper').hide();
 								sel.find('.yadcf-null-wrapper').hide();
-								$(filter_selector_string).find(".yadcf-filter").after($("<button>", {
+								$(filter_selector_string).find(".yadcf-filter").after(makeElement("<button>", {
 									type: "button",
 									id: "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-externally_triggered_checkboxes-button",
-									onmousedown: "yadcf.stopPropagation(event);",
-									onclick: "yadcf.stopPropagation(event);",
+									onmousedown: yadcf.stopPropagation,
+									onclick: yadcf.stopPropagation,
 									class: "yadcf-filter-externally_triggered_checkboxes-button " + columnObj.externally_triggered_checkboxes_button_style_class,
 									text: externally_triggered_checkboxes_text
 								}));
@@ -3999,11 +4046,18 @@ if (!Object.entries) {
 							}
 
 							if (filter_reset_button_text !== false) {
-								$(filter_selector_string).find(".yadcf-filter").after($("<button>", {
+								$(filter_selector_string).find(".yadcf-filter").after(makeElement("<button>", {
 									type: "button",
 									id: "yadcf-filter-" + table_selector_jq_friendly + "-" + column_number + "-reset",
-									onmousedown: "yadcf.stopPropagation(event);",
-									onclick: "yadcf.stopPropagation(event);yadcf.textKeyUP(event,'" + table_selector_jq_friendly + "', '" + column_number + "', 'clear'); return false;",
+									onmousedown: yadcf.stopPropagation(event),
+									onclick: function(colNo, jqTable){
+										/* IIFE closure to preserve column_number */
+										return function(event) {
+											yadcf.stopPropagation(event);
+											yadcf.textKeyUP(event, jqTable, colNo, 'clear');
+											return false;
+										}
+									}(column_number, table_selector_jq_friendly),
 									class: "yadcf-filter-reset-button " + columnObj.reset_button_style_class,
 									text: filter_reset_button_text
 								}));
