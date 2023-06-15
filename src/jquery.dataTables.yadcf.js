@@ -5400,7 +5400,7 @@ if (!Object.entries) {
 						}(column_number_str),
 					}));
 					if (filterOptions.filter_reset_button_text !== false) {
-						$(filter_selector_string).find(".yadcf-filter").after($("<button>", {
+						$(filter_selector_string).find(".yadcf-filter").after(makeElement("<button>", {
 							type: "button",
 							id: "yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str + "-reset",
 							onmousedown: yadcf.stopPropagation,
