@@ -1959,7 +1959,7 @@ if (!Object.entries) {
 			exclude_str = $();
 			if (columnObj.exclude === true) {
 				if (columnObj.externally_triggered !== true) {
-					exclude_str = $("<span>", {
+					exclude_str = makeElement("<span>", {
 						class: "yadcf-exclude-wrapper",
 						onmousedown: yadcf.stopPropagation,
 						onclick: yadcf.stopPropagation
@@ -1977,7 +1977,7 @@ if (!Object.entries) {
 						}(table_selector_jq_friendly)
 					}));
 				} else {
-					exclude_str = $("<span>", {
+					exclude_str = makeElement("<span>", {
 						class: "yadcf-exclude-wrapper",
 						onmousedown: yadcf.stopPropagation,
 						onclick: yadcf.stopPropagation
@@ -1994,7 +1994,7 @@ if (!Object.entries) {
 
 			null_str = $();
 			if (columnObj.null_check_box === true) {
-				null_str = $("<span>", {
+				null_str = makeElement("<span>", {
 					class: "yadcf-null-wrapper",
 					onmousedown: yadcf.stopPropagation,
 					onclick: yadcf.stopPropagation
@@ -3684,7 +3684,7 @@ if (!Object.entries) {
 								}
 								exclude_str = $();
 								if (columnObj.exclude === true) {
-									exclude_str = $("<span>", {
+									exclude_str = makeElement("<span>", {
 										class: "yadcf-exclude-wrapper",
 										onmousedown: yadcf.stopPropagation,
 										onclick: yadcf.stopPropagation
@@ -3733,7 +3733,7 @@ if (!Object.entries) {
 									html: column_data
 								}));
 								if (filter_reset_button_text !== false) {
-									$(filter_selector_string).find(".yadcf-filter").after($("<button>", {
+									$(filter_selector_string).find(".yadcf-filter").after(makeElement("<button>", {
 										type: "button",
 										onmousedown: yadcf.stopPropagation,
 										onclick: function(colNo, tableSel){
@@ -3899,7 +3899,7 @@ if (!Object.entries) {
 								}));
 
 								if (filter_reset_button_text !== false) {
-									$(filter_selector_string).find(".yadcf-filter").after($("<button>", {
+									$(filter_selector_string).find(".yadcf-filter").after(makeElement("<button>", {
 										type: "button",
 										onmousedown: yadcf.stopPropagation,
 										onclick: function(colNo, tableSel){
@@ -3972,7 +3972,7 @@ if (!Object.entries) {
 							$(document).data("yadcf-filter-" + table_selector_jq_friendly + "-" + column_number, column_data);
 
 							if (filter_reset_button_text !== false) {
-								$(filter_selector_string).find(".yadcf-filter").after($("<button>", {
+								$(filter_selector_string).find(".yadcf-filter").after(makeElement("<button>", {
 									type: "button",
 									onmousedown: yadcf.stopPropagation,
 									onclick: function(colNo, tableSel){
@@ -4009,7 +4009,7 @@ if (!Object.entries) {
 							exclude_str = $();
 							if (columnObj.exclude === true) {
 								if (columnObj.externally_triggered !== true) {
-									exclude_str = $("<span>", {
+									exclude_str = makeElement("<span>", {
 										class: "yadcf-exclude-wrapper",
 										onmousedown: yadcf.stopPropagation,
 										onclick: yadcf.stopPropagation
@@ -4027,7 +4027,7 @@ if (!Object.entries) {
 										}(column_number, table_selector_jq_friendly)
 									}));
 								} else {
-									exclude_str = $("<span>", {
+									exclude_str = makeElement("<span>", {
 										class: "yadcf-exclude-wrapper",
 										onmousedown: yadcf.stopPropagation,
 										onclick: yadcf.stopPropagation
@@ -4045,7 +4045,7 @@ if (!Object.entries) {
 							regex_str = $();
 							if (columnObj.regex_check_box === true) {
 								if (columnObj.externally_triggered !== true) {
-									regex_str = $("<span>", {
+									regex_str = makeElement("<span>", {
 										class: "yadcf-regex-wrapper",
 										onmousedown: yadcf.stopPropagation,
 										onclick: yadcf.stopPropagation
@@ -4063,7 +4063,7 @@ if (!Object.entries) {
 										}(column_number, table_selector_jq_friendly)
 									}));
 								} else {
-									regex_str = $("<span>", {
+									regex_str = makeElement("<span>", {
 										class: "yadcf-regex-wrapper",
 										onmousedown: yadcf.stopPropagation,
 										onclick: yadcf.stopPropagation
@@ -4080,7 +4080,7 @@ if (!Object.entries) {
 
 							null_str = $();
 							if (columnObj.null_check_box === true) {
-								null_str = $("<span>", {
+								null_str = makeElement("<span>", {
 									class: "yadcf-null-wrapper",
 									onmousedown: yadcf.stopPropagation,
 									onclick: yadcf.stopPropagation
@@ -5559,7 +5559,7 @@ if (!Object.entries) {
 					}
 					if (filterOptions.filter_type === 'select') {
 						if (filterOptions.filter_reset_button_text !== false) {
-							$(filter_selector_string).find(".yadcf-filter").after($("<button>", {
+							$(filter_selector_string).find(".yadcf-filter").after(makeElement("<button>", {
 								type: "button",
 								id: "yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str + "-reset",
 								onmousedown: yadcf.stopPropagation,
@@ -5576,7 +5576,7 @@ if (!Object.entries) {
 						}
 					} else if (filterOptions.filter_type === 'multi_select') {
 						if (filterOptions.filter_reset_button_text !== false) {
-							$(filter_selector_string).find(".yadcf-filter").after($("<button>", {
+							$(filter_selector_string).find(".yadcf-filter").after(makeElement("<button>", {
 								type: "button",
 								id: "yadcf-filter-" + table_selector_jq_friendly + '-' + column_number_str + "-reset",
 								onmousedown: yadcf.stopPropagation,
