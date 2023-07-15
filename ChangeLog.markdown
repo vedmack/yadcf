@@ -3,6 +3,7 @@
  
 ## 0.9.4 is in beta (grab latest stable from https://github.com/vedmack/yadcf/releases)
 
+* PR (by @stringfellow) Use dynamic event handlers on elements to prevent nonce-based CSP errors (unsafe-inline disallowed) - https://github.com/vedmack/yadcf/pull/675
 * PR (by m417z) Use proper jQuery objects instead of strings for better security - https://github.com/vedmack/yadcf/pull/630
 * Added (by @misanek) "regex" filtering mode checkbox (currently available for the text filter) - https://github.com/vedmack/yadcf/pull/490
 * Added babel transpiled version (es5) in /build folder
@@ -41,6 +42,7 @@
 	* https://github.com/vedmack/yadcf/issues/612 - Pre Selecting an escaped value
 	* https://github.com/vedmack/yadcf/issues/610 - Configure globally
 	* https://github.com/vedmack/yadcf/issues/614 - Uncaught TypeError: Cannot read property 'yadcfState' of null
+
 	
 	
 
