@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     2.0.1.beta.3
+* Version:     2.0.1.beta.4
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -5951,6 +5951,10 @@ if (!Object.entries) {
 
       // Function to set the current yadcf state
       function handleYadcfStateInDT(table, table_selector_jq_friendly, column_number, data) {
+        var settings = table.settings().init();
+        if (!settings.stateSave) {
+          return;
+        }
         let state = table.state.loaded();
         if (!state) {
           console.log('handleYadcfStateInDT failed get state from loaded()')
@@ -5958,6 +5962,7 @@ if (!Object.entries) {
           // state = {};
           // table.state.save();
         }
+
         if (!state.yadcfState) {
           state.yadcfState = {};
         }
@@ -5981,29 +5986,10 @@ if (!Object.entries) {
       function saveStateSave(oTable, column_number, table_selector_jq_friendly, from, to) {
         var yadcfState;
         if (oTable.settings()[0].oInit.stateSave === true) {
-          // if (!oTable.fnSettings().oLoadedState) {
-          //   oTable.fnSettings().oLoadedState = {};
-          // }
           handleYadcfStateInDT(oTable, table_selector_jq_friendly, column_number, {
             from: from,
             to: to
           });
-
-          // if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
-          //   oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] = {
-          //     from: from,
-          //     to: to
-          //   };
-          // } else {
-          //   yadcfState = {};
-          //   yadcfState[table_selector_jq_friendly] = [];
-          //   yadcfState[table_selector_jq_friendly][column_number] = {
-          //     from: from,
-          //     to: to
-          //   };
-          //   oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
-          // }
-          // oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
         }
       }
 
