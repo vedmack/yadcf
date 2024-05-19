@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     2.0.1.beta.2
+* Version:     2.0.1.beta.3
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -890,6 +890,8 @@ if (!Object.entries) {
           tmpStr = obj.selector;
         } else if (obj.table !== undefined) {
           tmpStr = obj.table().node().id;
+        } else if (obj.sTableId !== undefined) {
+          tmpStr = obj.sTableId;
         } else {
           return '';
         }
@@ -977,7 +979,6 @@ if (!Object.entries) {
         if (!selected_value) {
           return '';
         }
-debugger
         table_arg.fnSettings().aoPreSearchCols[column_number].smart = false;
         table_arg.fnSettings().aoPreSearchCols[column_number].regex = true;
         table_arg.fnSettings().aoPreSearchCols[column_number].caseInsensitive = case_insensitive;
@@ -1090,27 +1091,9 @@ debugger
           refreshSelectPlugin(columnObj, $("#yadcf-filter-" + table_selector_jq_friendly + "-" + column_number), '-1');
         }
 
-        if (!oTable.fnSettings().oLoadedState) {
-          oTable.fnSettings().oLoadedState = {};
-          oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
-        }
-        if (oTable.settings()[0].oInit.stateSave === true) {
-          if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
-            oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
-            {
-              from: arg.value
-            };
-          } else {
-            yadcfState = {};
-            yadcfState[table_selector_jq_friendly] = [];
-            yadcfState[table_selector_jq_friendly][column_number] = {
-              from: arg.value
-            };
-            oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
-          }
-          oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
-        }
-
+        handleYadcfStateInDT(oTable, table_selector_jq_friendly, column_number, {
+          from: arg.value
+        });
         oTable.draw();
       }
 
@@ -1429,7 +1412,7 @@ debugger
             if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
               return true;
             }
-            columnObj = getOptions(settingsDt.oInstance.selector)[col_num];
+            columnObj = getOptions('#' + settingsDt.sTableId)[col_num];
             if (columnObj.filter_type === 'range_number_slider') {
               min = $('#' + fromId).text();
               max = $('#' + toId).text();
@@ -1625,7 +1608,7 @@ debugger
 
             columnVal = aData[column_number_filter] === "-" ? 0 : aData[column_number_filter];
 
-            custom_func = getOptions(settingsDt.oInstance.selector)[col_num].custom_func;
+            custom_func = getOptions('#' + settingsDt.sTableId)[col_num].custom_func;
 
             retVal = custom_func(filterVal, columnVal, aData, stateVal);
 
@@ -1655,7 +1638,7 @@ debugger
             if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
               return true;
             }
-            columnObj = getOptions(settingsDt.oInstance.selector)[col_num];
+            columnObj = getOptions('#' + settingsDt.sTableId)[col_num];
             if (columnObj.filters_position === 'tfoot' && settingsDt.oScroll.sX) {
               let selectorePrefix = '.dataTables_scrollFoot ';
               min = document.querySelector(selectorePrefix + '#' + fromId) ? document.querySelector(selectorePrefix + '#' + fromId).value : '';
@@ -1805,7 +1788,7 @@ debugger
             if (table_selector_jq_friendly_local !== current_table_selector_jq_friendly) {
               return true;
             }
-            columnObj = getOptions(settingsDt.oInstance.selector)[col_num];
+            columnObj = getOptions('#' + settingsDt.sTableId)[col_num];
 
             column_number_filter = calcColumnNumberFilter(settingsDt, col_num, table_selector_jq_friendly);
 
@@ -2675,28 +2658,10 @@ debugger
             $(event.target).find(".ui-slider-range").removeClass("inuse");
           }
 
-          if (!oTable.fnSettings().oLoadedState) {
-            oTable.fnSettings().oLoadedState = {};
-            oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
-          }
-          if (oTable.settings()[0].oInit.stateSave === true) {
-            if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
-              oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] =
-              {
-                from: ui.values[0],
-                to: ui.values[1]
-              };
-            } else {
-              yadcfState = {};
-              yadcfState[table_selector_jq_friendly] = [];
-              yadcfState[table_selector_jq_friendly][column_number] = {
-                from: ui.values[0],
-                to: ui.values[1]
-              };
-              oTable.fnSettings().oLoadedState.yadcfState = yadcfState;
-            }
-            oTable.fnSettings().oApi._fnSaveState(oTable.fnSettings());
-          }
+          handleYadcfStateInDT(oTable, table_selector_jq_friendly, column_number, {
+            from: ui.values[0],
+            to: ui.values[1]
+          });
 
           resetIApiIndex();
         };
@@ -3755,7 +3720,7 @@ debugger
                       text: filter_reset_button_text
                     }));
                   }
-
+                  let settingsDt = getSettingsObjFromTable(oTable);
                   if (settingsDt.oFeatures.bStateSave === true && settingsDt.oLoadedState) {
                     if (settingsDt.oLoadedState.yadcfState && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly] && settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number]) {
                       tmpStr = settingsDt.oLoadedState.yadcfState[table_selector_jq_friendly][column_number].from;
@@ -5984,32 +5949,32 @@ debugger
         return retVal;
       }
 
-      // Function to get the current state or initialize it if not present
-      function getStateAndInitYADCF(table) {
+      // Function to set the current yadcf state
+      function handleYadcfStateInDT(table, table_selector_jq_friendly, column_number, data) {
         let state = table.state.loaded();
         if (!state) {
-          state = {};
-          table.state.save();
+          console.log('handleYadcfStateInDT failed get state from loaded()')
+          return;
+          // state = {};
+          // table.state.save();
         }
         if (!state.yadcfState) {
           state.yadcfState = {};
         }
-        return state;
+        let yadcfState = state.yadcfState;
+        // Ensure yadcf state structure is in place
+        if (!yadcfState[table_selector_jq_friendly]) {
+          yadcfState[table_selector_jq_friendly] = [];
+        }
+        // Update yadcf state
+        yadcfState[table_selector_jq_friendly][column_number] = data;
+        // Save the updated state
+        table.state.save();
       }
 
       function clearStateSave(oTable, column_number, table_selector_jq_friendly) {
         if (oTable.settings()[0].oInit.stateSave === true) {
-          let state = getStateAndInitYADCF(oTable);
-          let yadcfState = state.yadcfState;
-
-          // Ensure yadcf state structure is in place
-          if (!yadcfState[table_selector_jq_friendly]) {
-            yadcfState[table_selector_jq_friendly] = [];
-          }
-          // Update yadcf state
-          yadcfState[table_selector_jq_friendly][column_number] = undefined;
-          // Save the updated state
-          oTable.state.save();
+          handleYadcfStateInDT(oTable, table_selector_jq_friendly, column_number, undefined);
         }
       }
 
@@ -6019,19 +5984,10 @@ debugger
           // if (!oTable.fnSettings().oLoadedState) {
           //   oTable.fnSettings().oLoadedState = {};
           // }
-          let state = getStateAndInitYADCF(oTable);
-          let yadcfState = state.yadcfState;
-          // Ensure yadcf state structure is in place
-          if (!yadcfState[table_selector_jq_friendly]) {
-            yadcfState[table_selector_jq_friendly] = [];
-          }
-          // Update yadcf state
-          yadcfState[table_selector_jq_friendly][column_number] = {
+          handleYadcfStateInDT(oTable, table_selector_jq_friendly, column_number, {
             from: from,
             to: to
-          };
-          // Save the updated state
-          oTable.state.save();
+          });
 
           // if (oTable.fnSettings().oLoadedState.yadcfState !== undefined && oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly] !== undefined) {
           //   oTable.fnSettings().oLoadedState.yadcfState[table_selector_jq_friendly][column_number] = {
