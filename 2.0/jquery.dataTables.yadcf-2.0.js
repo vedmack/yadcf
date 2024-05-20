@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     2.0.1.beta.5
+* Version:     2.0.1.beta.6
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -1199,7 +1199,8 @@ if (!Object.entries) {
         let dtState = oTable.state.loaded();
         if (dtState) {
           if (dtState.yadcfState !== undefined && dtState.yadcfState[table_selector_jq_friendly] !== undefined) {
-            oTable.fnSettings().aoPreSearchCols[column_number].search = null_str;
+            let settingsDt = getSettingsObjFromTable(oTable);
+            settingsDt.aoPreSearchCols[column_number].search = null_str;
           }
         }
       }
@@ -2407,8 +2408,7 @@ if (!Object.entries) {
           oTable,
           columnObj,
           datepickerObj = {},
-          filterActionFn,
-          settingsDt;
+          filterActionFn;
 
         filter_wrapper_id = "yadcf-filter-wrapper-" + table_selector_jq_friendly + "-" + column_number;
 
@@ -2515,13 +2515,12 @@ if (!Object.entries) {
           });
         }
 
-        if (oTable.fnSettings().aoPreSearchCols[column_number].search !== '') {
-          $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(oTable.fnSettings().aoPreSearchCols[column_number].search).addClass("inuse");
+        let settingsDt = getSettingsObjFromTable(oTable);
+        if (settingsDt.aoPreSearchCols[column_number].search !== '') {
+          $('#yadcf-filter-' + table_selector_jq_friendly + '-' + column_number).val(settingsDt.aoPreSearchCols[column_number].search).addClass("inuse");
         }
 
         if (columnObj.filter_type === 'date_custom_func') {
-          settingsDt = getSettingsObjFromTable(oTable);
-
           let dtState = oTable.state.loaded();
           if (oTable.settings()[0].oInit.stateSave === true && dtState) {
             if (dtState.yadcfState && dtState.yadcfState[table_selector_jq_friendly] && dtState.yadcfState[table_selector_jq_friendly][column_number]) {
