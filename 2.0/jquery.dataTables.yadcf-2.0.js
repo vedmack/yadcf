@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     2.0.1.beta.6
+* Version:     2.0.1.beta.7
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -829,7 +829,7 @@ if (!Object.entries) {
 
       //taken and modified from DataTables 1.10.0-beta.2 source
       function yadcfVersionCheck(version) {
-        var aThis = $.fn.dataTable.ext.sVersion.split('.'),
+        var aThis = $.fn.dataTable.ext?.sVersion ? $.fn.dataTable.ext?.sVersion.split('.') : DataTable?.version.split('.'),
           aThat = version.split('.'),
           iThis,
           iThat,
