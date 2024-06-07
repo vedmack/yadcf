@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     0.9.4.beta.46
+* Version:     0.9.4.beta.47
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -3639,11 +3639,11 @@ if (!Object.entries) {
 							filter_selector_string += " div.yadcf-filter-wrapper";
 
 							if (columnObj.filter_type === "select") {
-								filterActionFn = function(colNo, tableSel) {
+								filterActionFn = function(colNo, tableSel, filter_match_mode) {
 									return function(event) {
 										yadcf.doFilter(this, tableSel, colNo, filter_match_mode);
 									};
-								}(column_number, table_selector_jq_friendly);
+								}(column_number, table_selector_jq_friendly, filter_match_mode);
 								if (columnObj.externally_triggered === true) {
 									filterActionFn = function(){};
 								}
@@ -3834,11 +3834,11 @@ if (!Object.entries) {
 							filter_selector_string += " div.yadcf-filter-wrapper";
 
 							if (columnObj.filter_type === "multi_select") {
-								filterActionFn = function(colNo, tableSel) {
+								filterActionFn = function(colNo, tableSel, filter_match_mode) {
 									return function(event) {
 										yadcf.doFilterMultiSelect(this, tableSel, colNo, filter_match_mode);
 									};
-								}(column_number, table_selector_jq_friendly);
+								}(column_number, table_selector_jq_friendly, filter_match_mode);
 								if (columnObj.externally_triggered === true) {
 									filterActionFn = function(){};
 								}
