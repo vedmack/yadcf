@@ -1,7 +1,7 @@
 # Yet Another DataTables Column Filter (yadcf) Change-log
 
  
-## 0.9.4 is in beta (grab latest stable from https://github.com/vedmack/yadcf/releases)
+## 0.9.5 (skipped 0.9.4)
 
 * PR (by @stringfellow) Use dynamic event handlers on elements to prevent nonce-based CSP errors (unsafe-inline disallowed) - https://github.com/vedmack/yadcf/pull/675
 * PR (by m417z) Use proper jQuery objects instead of strings for better security - https://github.com/vedmack/yadcf/pull/630
@@ -42,9 +42,7 @@
 	* https://github.com/vedmack/yadcf/issues/612 - Pre Selecting an escaped value
 	* https://github.com/vedmack/yadcf/issues/610 - Configure globally
 	* https://github.com/vedmack/yadcf/issues/614 - Uncaught TypeError: Cannot read property 'yadcfState' of null
-
-	
-	
+	* and more
 
 	
 ## 0.9.3
