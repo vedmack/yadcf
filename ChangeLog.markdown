@@ -1,7 +1,7 @@
 # Yet Another DataTables Column Filter (yadcf) Change-log
 
  
-## 0.9.5 (skipped 0.9.4)
+## 0.9.6 (skipped 0.9.4 and 0.9.5)
 
 * PR (by @stringfellow) Use dynamic event handlers on elements to prevent nonce-based CSP errors (unsafe-inline disallowed) - https://github.com/vedmack/yadcf/pull/675
 * PR (by m417z) Use proper jQuery objects instead of strings for better security - https://github.com/vedmack/yadcf/pull/630
