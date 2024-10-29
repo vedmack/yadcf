@@ -4964,7 +4964,7 @@ if (!Object.entries) {
       function isDOMSource(tableVar) {
         var settingsDt;
         settingsDt = getSettingsObjFromTable(tableVar);
-        if (!settingsDt.sAjaxSource && !settingsDt.ajax && settingsDt.oFeatures.bServerSide !== true && !settingsDt.oLanguage.sUrl) {
+        if (!settingsDt.sAjaxSource && !settingsDt.ajax && settingsDt.oFeatures.bServerSide !== true) {
           return true;
         }
         return false;
