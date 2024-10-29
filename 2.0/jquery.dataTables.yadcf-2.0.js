@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     2.0.1.beta.8
+* Version:     2.0.1.beta.9
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -3279,7 +3279,7 @@ if (!Object.entries) {
           unique_th = settingsDt.oApi._fnGetUniqueThs(settingsDt);
         } else {
           unique_th = oTable?.table().header?.structure()[0];
-          unique_th = unique_th.map(obj => obj.cell);
+          unique_th = unique_th?.map(obj => obj.cell);
         }
         for (columnObjKey in args) {
 
