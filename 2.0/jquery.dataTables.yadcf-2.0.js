@@ -3279,7 +3279,7 @@ if (!Object.entries) {
           unique_th = settingsDt.oApi._fnGetUniqueThs(settingsDt);
         } else {
           unique_th = oTable?.table().header?.structure()[0];
-          unique_th = unique_th?.map(obj => obj.cell);
+          unique_th = unique_th.map(obj => obj.cell);
         }
         for (columnObjKey in args) {
 
@@ -4964,7 +4964,7 @@ if (!Object.entries) {
       function isDOMSource(tableVar) {
         var settingsDt;
         settingsDt = getSettingsObjFromTable(tableVar);
-        if (!settingsDt.sAjaxSource && !settingsDt.ajax && settingsDt.oFeatures.bServerSide !== true) {
+        if (!settingsDt.sAjaxSource && !settingsDt.ajax && settingsDt.oFeatures.bServerSide !== true && !settingsDt.oLanguage.sUrl) {
           return true;
         }
         return false;
