@@ -2,7 +2,7 @@
 * Yet Another DataTables Column Filter - (yadcf)
 *
 * File:        jquery.dataTables.yadcf.js
-* Version:     2.0.1.beta.9
+* Version:     2.0.2.beta.1
 *
 * Author:      Daniel Reznick
 * Info:        https://github.com/vedmack/yadcf
@@ -3029,6 +3029,12 @@ if (!Object.entries) {
         }
 
         for (j = 0; j < data_length; j++) {
+          if (data[j] === null) {
+            // DataTables 2.x leaves null holes in aoData where rows have been deleted
+            // (the array length is kept stable so row indices stay put). Skip them
+            // rather than dereferencing ._aData / ._aFilterData on a null slot.
+            continue;
+          }
           if (columnObj.column_data_type === "html") {
             if (columnObj.column_number_data === undefined) {
               col_inner_elements = $(data[j]._aData[column_number_filter]);
